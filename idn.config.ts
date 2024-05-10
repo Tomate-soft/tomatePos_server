@@ -1,0 +1,1 @@
+export const idnMachine = "bba5cad8-9650-4fd4-9332-f8b4f8cf57e2"
