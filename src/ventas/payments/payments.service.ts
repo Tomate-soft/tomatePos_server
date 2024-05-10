@@ -65,6 +65,9 @@ export class PaymentsService {
     id: string,
     body: { accountId: string; body: CreatePaymentDto },
   ) {
+    console.log('LOGS DEL SERVICIO:');
+    console.log(id);
+    console.log(body);
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
