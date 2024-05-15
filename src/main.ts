@@ -12,7 +12,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'https://blue-river-09bdb3d0f.5.azurestaticapps.net'
+      'https://blue-river-09bdb3d0f.5.azurestaticapps.net',
       'https://tomate-pos.vercel.app',
       'https://tomate-ksuxm5zwf-tomatepvs-projects.vercel.app',
       'http://localhost:5174',
