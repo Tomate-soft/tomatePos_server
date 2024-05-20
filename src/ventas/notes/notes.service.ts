@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, model } from 'mongoose';
+import { flatMap } from 'rxjs';
 import { createNoteDto } from 'src/dto/ventas/notes/createNoteDto';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
 import { Bills } from 'src/schemas/ventas/bills.schema';
@@ -66,12 +67,18 @@ export class NotesService {
             (total, element) => total + parseFloat(element.checkTotal), //CALCULAMOS EL NUIEVO TOTAL
             0,
           );
-          const refreshData = { checkTotal: newTotal };
+          const sumProducts = [].concat(
+            ...refreshedBill.notes.map((element) => element.products),
+          );
+
+          const refreshData = { checkTotal: newTotal, products: sumProducts };
+
           const refreshTotalInBill = await this.BillsModel.findByIdAndUpdate(
-            //ACTUALIZAMOS LA CUENTA CON EL NUEVO TOTAL
+            //ACTUALIZAMOS LA CUENTA CON EL NUEVO TOTAL // y los nuevos productos
             accountId,
             refreshData,
           );
+
           return refreshTotalInBill; //RETORNAMOS LA CUENTA ACTUALIZADA
         }
       }
