@@ -29,7 +29,7 @@ export class CategoriesController {
       return categoriesArray;
     } catch (error) {
       console.error('Error al buscar categorías:', error);
-      throw new ConflictException(
+      throw new NotFoundException(
         'Ocurrió un error inesperado al buscar categorías.',
       );
     }

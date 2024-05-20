@@ -44,7 +44,6 @@ export class BillsController {
   }
   @Post()
   async create(@Body() body: CreateBillDto) {
-    console.log(body);
     try {
       const newBill = await this.billService.create(body);
       return newBill;

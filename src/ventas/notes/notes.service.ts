@@ -45,28 +45,34 @@ export class NotesService {
   }
 
   async update(id: string, updatedNote: updateNoteDto, accountId?: string) {
+    console.log('llegue a actualizaqr l enombre d el anota');
+    console.log(id);
+    console.log(updatedNote);
+    console.log(accountId);
     if (accountId && accountId != null) {
-      const billCurrent = await this.BillsModel.findById(accountId);
+      const billCurrent = await this.BillsModel.findById(accountId); // BUSCAMOS LA CUENTA ACTUAL A LA CUAL PERTENECE LA NOTA
       if (billCurrent && billCurrent.notes.length > 0) {
+        //
         const upNote = await this.noteModel.findByIdAndUpdate(id, updatedNote, {
           new: true,
-        });
+        }); // ACTUALIZAMOS L ANOTA
         if (upNote) {
           const refreshedBill = await this.BillsModel.findById(
+            //SI L ANOTA SE ACTUALIZO BUSCAMOS LA CUIENTA DE NUEVO
             accountId,
           ).populate({ path: 'notes' });
 
           const newTotal = refreshedBill.notes.reduce(
-            (total, element) => total + parseFloat(element.checkTotal),
+            (total, element) => total + parseFloat(element.checkTotal), //CALCULAMOS EL NUIEVO TOTAL
             0,
           );
-
           const refreshData = { checkTotal: newTotal };
           const refreshTotalInBill = await this.BillsModel.findByIdAndUpdate(
+            //ACTUALIZAMOS LA CUENTA CON EL NUEVO TOTAL
             accountId,
             refreshData,
           );
-          return refreshTotalInBill;
+          return refreshTotalInBill; //RETORNAMOS LA CUENTA ACTUALIZADA
         }
       }
     }
