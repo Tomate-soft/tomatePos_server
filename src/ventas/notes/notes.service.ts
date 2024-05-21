@@ -46,11 +46,45 @@ export class NotesService {
   }
 
   async update(id: string, updatedNote: updateNoteDto, accountId?: string) {
-    console.log('llegue a actualizaqr l enombre d el anota');
-    console.log(id);
-    console.log(updatedNote);
-    console.log(accountId);
     if (accountId && accountId != null) {
+      if (updatedNote.status) {
+        const session = await this.noteModel.startSession();
+        session.startTransaction();
+
+        try {
+          console.log('esto trae updatedNote');
+          console.log(updatedNote);
+
+          // Actualizar note
+          const upNote = await this.noteModel.findByIdAndUpdate(
+            id,
+            updatedNote,
+            { new: true, session },
+          );
+
+          // Actualizar bill
+          const updateBill = await this.BillsModel.findByIdAndUpdate(
+            accountId,
+            updatedNote,
+            { new: true },
+          );
+          console.log('ac la BILL wactualizada');
+          console.log(updateBill);
+
+          const res = { updNote: upNote, updBill: updateBill };
+
+          await session.commitTransaction();
+          session.endSession();
+
+          return res;
+        } catch (error) {
+          await session.abortTransaction();
+          session.endSession();
+          console.error('Hubo un error durante la sesión:', error);
+          throw error; // Vuelve a lanzar el error para que pueda ser manejado adecuadamente aguas arriba
+        }
+      }
+
       const billCurrent = await this.BillsModel.findById(accountId); // BUSCAMOS LA CUENTA ACTUAL A LA CUAL PERTENECE LA NOTA
       if (billCurrent && billCurrent.notes.length > 0) {
         //
@@ -83,7 +117,6 @@ export class NotesService {
         }
       }
     }
-
     return await this.noteModel.findByIdAndUpdate(id, updatedNote, {
       new: true,
     });
