@@ -5,6 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { Payment, PaymentSchema } from 'src/schemas/ventas/payment.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
+import {
+  CashierSession,
+  CashierSessionSchema,
+} from 'src/schemas/cashierSession/cashierSession';
 
 @Module({
   imports: [
@@ -20,6 +24,10 @@ import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
       {
         name: Notes.name,
         schema: NoteSchema,
+      },
+      {
+        name: CashierSession.name,
+        schema: CashierSessionSchema,
       },
     ]),
   ],

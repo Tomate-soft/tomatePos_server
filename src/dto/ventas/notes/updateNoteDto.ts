@@ -35,7 +35,7 @@ export class updateNoteDto {
 
   @IsOptional()
   @IsString()
-  status?: 'enabled' | 'disabled' | 'pending' | 'cancel';
+  status?: 'enabled' | 'disabled' | 'forPayment' | 'cancel';
 
   @IsOptional()
   @IsString()
