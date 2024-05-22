@@ -4,6 +4,7 @@ import { Model, model } from 'mongoose';
 import { flatMap } from 'rxjs';
 import { createNoteDto } from 'src/dto/ventas/notes/createNoteDto';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
+import { ENABLE_STATUS } from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
@@ -73,7 +74,7 @@ export class NotesService {
           if (searchAccount.cashierSession) {
             // aca haremos un proceso para cuando la cuenta ya tiene un cajero asignado
             const pendingNotes = searchAccount.notes.filter(
-              (element) => element.status != 'forPayment',
+              (element) => element.status === ENABLE_STATUS,
             );
             searchAccount.notes.forEach((element) =>
               console.log(element.status),
