@@ -6,6 +6,7 @@ import { Payment, PaymentSchema } from 'src/schemas/ventas/payment.schema';
 import { BillsService } from '../bills/bills.service';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -21,6 +22,10 @@ import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
       {
         name: Notes.name,
         schema: NoteSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
       },
     ]),
   ],
