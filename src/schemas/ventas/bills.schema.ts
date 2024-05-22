@@ -2,6 +2,8 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Payment } from './payment.schema';
 import { Notes } from './notes.schema';
+import { CashierSession } from '../cashierSession/cashierSession';
+import { Table } from '../tables/tableSchema';
 
 @Schema({ timestamps: true })
 export class Bills {
@@ -54,9 +56,10 @@ export class Bills {
 
   @Prop({
     required: true,
-    trim: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Table',
   })
-  table: string | undefined;
+  table: Table;
 
   @Prop({
     trim: true,
@@ -79,6 +82,9 @@ export class Bills {
     default: [],
   })
   transferHistory?: string[]; // historial de transferenncias // aca seguirmos
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'CashierSession' })
+  cashierSession?: CashierSession;
 
   /* 
 

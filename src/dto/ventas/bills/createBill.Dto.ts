@@ -55,6 +55,9 @@ export class CreateBillDto {
   @IsArray()
   transferHistory?: string[];
 
+  @IsOptional()
+  cashierSession?: string;
+
   /*
   @IsDefined()
   @IsString()

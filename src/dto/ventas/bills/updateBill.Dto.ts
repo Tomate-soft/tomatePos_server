@@ -50,6 +50,9 @@ export class UpdateBillDto {
   @IsArray()
   transferHistory?: string[];
 
+  @IsOptional()
+  cashierSession?: string;
+
   /*
   @IsDefined()
   @IsString()
