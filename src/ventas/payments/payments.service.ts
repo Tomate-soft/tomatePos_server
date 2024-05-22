@@ -4,7 +4,13 @@ import { Model } from 'mongoose';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
-import { FINISHED_STATUS } from 'src/libs/status.libs';
+import {
+  ENABLE_STATUS,
+  FINISHED_STATUS,
+  FOR_PAYMENT_STATUS,
+  FREE_STATUS,
+} from 'src/libs/status.libs';
+import { Table } from 'src/schemas/tables/tableSchema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
@@ -15,6 +21,7 @@ export class PaymentsService {
     @InjectModel(Payment.name) private paymentModel: Model<Payment>,
     @InjectModel(Notes.name) private readonly noteModel: Model<Notes>,
     @InjectModel(Bills.name) private readonly billModel: Model<Bills>,
+    @InjectModel(Table.name) private readonly tableModel: Model<Table>,
   ) {}
 
   async findAll() {
@@ -62,12 +69,10 @@ export class PaymentsService {
     });
   }
   async paymentNote(
+    // ACA EL METODO PARA PAGAR LA NOTA
     id: string,
     body: { accountId: string; body: CreatePaymentDto },
   ) {
-    console.log('LOGS DEL SERVICIO:');
-    console.log(id);
-    console.log(body);
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
@@ -76,16 +81,39 @@ export class PaymentsService {
       if (!newPayment) {
         throw new NotFoundException(`No se pudo crear el pago`);
       }
+
       const dataInjectInNote = {
         status: FINISHED_STATUS,
         paymentCode: newPayment._id,
       };
-      await this.noteModel.findByIdAndUpdate(id, dataInjectInNote);
-
-      const currentBill = await this.billModel.findById(body.accountId);
+      await this.noteModel.findByIdAndUpdate(id, dataInjectInNote); // cambiamos la nota
+      const currentBill = await this.billModel
+        .findById(body.accountId)
+        .populate({ path: 'notes' });
       const newTotal = (
         parseFloat(currentBill.checkTotal) - parseFloat(newPayment.paymentTotal)
       ).toString();
+      // ACA LIBERREMOS MESA Y CAMBIAMOS EL ESTUSA DE LA CUENTA;
+
+      const enableNotes = currentBill.notes.filter(
+        (note) =>
+          note.status === ENABLE_STATUS || note.status === FOR_PAYMENT_STATUS,
+      );
+      enableNotes.forEach((element) => element.status);
+      console.log(enableNotes.length);
+      if (enableNotes.length <= 0) {
+        //aca ACA LIBERREMOS MESA Y CAMBIAMOS EL ESTUSA DE LA CUENTA;
+        console.log(enableNotes);
+        console.log('LISTOS PARA HACER LA MAGIA');
+        console.log(currentBill.table);
+        const tableUpdated = await this.tableModel.findByIdAndUpdate(
+          currentBill.table,
+          { status: FREE_STATUS, bill: [] },
+        );
+        const updatingBill = this.billModel.findById(currentBill._id, {
+          status: FINISHED_STATUS,
+        });
+      }
 
       const updatedBillData = {
         payment: [...currentBill.payment, newPayment._id],

@@ -15,8 +15,7 @@ export class Payment {
   accountId: string;
 
   @Prop({
-    unique: true,
-    required: true,
+    /* unique: true, */
     trim: true,
   })
   paymentCode?: string;
