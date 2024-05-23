@@ -25,7 +25,10 @@ export class OperatingPeriodService {
       .find({
         createdAt: { $gte: startDate, $lt: endDate },
       })
-      .populate({ path: 'sellProcess' });
+      .populate({
+        path: 'sellProcess',
+        populate: { path: 'bills', populate: { path: 'notes' } },
+      });
 
     return doc;
   }
