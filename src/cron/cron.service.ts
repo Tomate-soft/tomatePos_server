@@ -25,7 +25,7 @@ export class CronService {
 
   private initializeCronJobs() {
     // Ejecutar una tarea cada minuto
-    cron.schedule('0 0 * * *', async () => {
+    cron.schedule('59 * * * *', async () => {
       console.log(new Date().toLocaleDateString());
       const newOperatingPeriod = new this.operatingPeriodModel();
       await newOperatingPeriod.save();
@@ -43,7 +43,7 @@ export class CronService {
       }
     });
     // se limpian las sesiones de los ussuArios
-    cron.schedule('0 0 * * * ', async () => {
+    cron.schedule('59 * * * * ', async () => {
       const tableUpdated = await this.tableModel.updateMany(
         {},
         { $set: { status: FREE_STATUS, bill: [] } },
@@ -53,14 +53,14 @@ export class CronService {
       }
     });
 
-    cron.schedule('0 0 * * * ', async () => {
+    cron.schedule('59 * * * * ', async () => {
       const deletedBills = await this.billsModel.deleteMany({});
       if (deletedBills) {
         console.log('cuentas eliminadas con exito');
       }
     });
 
-    cron.schedule('0 0 * * * ', async () => {
+    cron.schedule('59 * * * * ', async () => {
       const deletedNotes = await this.notesModel.deleteMany({});
       if (deletedNotes) {
         console.log('notas eliminadas con exito');
