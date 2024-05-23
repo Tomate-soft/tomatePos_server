@@ -6,6 +6,9 @@ import {
   OperatingPeriodSchema,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { User, UserSchema } from 'src/schemas/users.schema';
+import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
 
 @Module({
   imports: [
@@ -17,6 +20,18 @@ import { User, UserSchema } from 'src/schemas/users.schema';
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: Bills.name,
+        schema: BillSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
+      },
+      {
+        name: Notes.name,
+        schema: NoteSchema,
       },
     ]),
   ],
