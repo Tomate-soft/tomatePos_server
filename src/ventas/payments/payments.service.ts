@@ -90,10 +90,10 @@ export class PaymentsService {
       const currentBill = await this.billModel
         .findById(body.accountId)
         .populate({ path: 'notes' });
-      const newTotal = (
+      /* const newTotal = (
         parseFloat(currentBill.checkTotal) - parseFloat(newPayment.paymentTotal)
       ).toString();
-      // ACA LIBERREMOS MESA Y CAMBIAMOS EL ESTUSA DE LA CUENTA;
+      */ // Este metodo estab restando lo que se pagaba de la nota la acuenbt apero no es necesario revisar su borrado
 
       const enableNotes = currentBill.notes.filter(
         (note) =>
@@ -117,7 +117,6 @@ export class PaymentsService {
 
       const updatedBillData = {
         payment: [...currentBill.payment, newPayment._id],
-        checkTotal: newTotal,
       };
       await this.billModel.findByIdAndUpdate(currentBill._id, updatedBillData);
       await session.commitTransaction();
