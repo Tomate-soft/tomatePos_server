@@ -52,7 +52,7 @@ export class CancellationsService {
           { new: true },
         );
       }
-
+      // Notes cancel
       if (createdCancellation.noteId && !createdCancellation.productId) {
         const updateNote = await this.notesModel.findByIdAndUpdate(
           createdCancellation.noteId,
@@ -73,7 +73,7 @@ export class CancellationsService {
         const updateBill = await this.billsModel
           .findByIdAndUpdate(
             currentBill._id,
-            { notes: enableNotes, checkTotal: newTotal },
+            { checkTotal: newTotal },
             { new: true },
           )
           .populate({ path: 'notes' });
