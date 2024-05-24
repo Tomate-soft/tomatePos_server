@@ -1,25 +1,23 @@
 import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Bills } from './bills.schema';
+import { Notes } from './notes.schema';
+import { Product } from './product.schema';
 
 @Schema({ timestamps: true })
 export class Cancellations {
   @Prop({
     required: true,
-    trim: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Bills',
   })
-  checkCode: string;
+  accountId: Bills;
 
-  @Prop({
-    required: true,
-    trim: true,
-    // agregar valor default
-  })
-  sellType: string; // este sera un enum
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Notes' })
+  noteId?: Notes;
 
-  @Prop({
-    required: true,
-    trim: true,
-  })
-  cancellationMount: string;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Product' })
+  productId?: Product;
 
   @Prop({
     required: true,
@@ -38,12 +36,6 @@ export class Cancellations {
     trim: true,
   })
   cancellationReason: string;
-
-  @Prop({
-    required: true,
-    trim: true,
-  })
-  cancellationDate: string;
 }
 
 export const CancellationSchema = SchemaFactory.createForClass(Cancellations);

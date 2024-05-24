@@ -3,29 +3,25 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdateCancellationDto {
   @IsOptional()
   @IsString()
-  checkCode?: string;
+  accountId: string;
 
   @IsOptional()
   @IsString()
-  sellType?: string; // este sera un enum
+  noteId?: string;
 
   @IsOptional()
   @IsString()
-  cancellationMount?: string;
+  productId?: string;
 
   @IsOptional()
   @IsString()
-  cancellationBy?: string;
+  cancellationBy: string;
 
   @IsOptional()
   @IsString()
-  cancellationFor?: string;
+  cancellationFor: string;
 
   @IsOptional()
   @IsString()
-  cancellationReason?: string;
-
-  @IsOptional()
-  @IsString()
-  cancellationDate?: string;
+  cancellationReason: string;
 }

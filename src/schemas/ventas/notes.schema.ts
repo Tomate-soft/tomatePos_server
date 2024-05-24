@@ -59,7 +59,7 @@ export class Notes {
     required: true,
     trim: true,
   })
-  status: 'enable' | 'finished' | 'forPayment' | 'cancel';
+  status: 'enable' | 'finished' | 'forPayment' | 'cancelled';
 
   @Prop({
     required: true,
