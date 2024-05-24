@@ -93,26 +93,31 @@ export class PaymentsService {
       /* const newTotal = (
         parseFloat(currentBill.checkTotal) - parseFloat(newPayment.paymentTotal)
       ).toString();
-      */ // Este metodo estab restando lo que se pagaba de la nota la acuenbt apero no es necesario revisar su borrado
+      */ // Este metodo estab restando lo que se pagaba de la nota la cuenta apero no es necesario revisar su borrado
 
       const enableNotes = currentBill.notes.filter(
         (note) =>
           note.status === ENABLE_STATUS || note.status === FOR_PAYMENT_STATUS,
       );
       enableNotes.forEach((element) => element.status);
-      console.log(enableNotes.length);
       if (enableNotes.length <= 0) {
         //aca ACA LIBERREMOS MESA Y CAMBIAMOS EL ESTUSA DE LA CUENTA;
-        console.log(enableNotes);
-        console.log('LISTOS PARA HACER LA MAGIA');
         console.log(currentBill.table);
         const tableUpdated = await this.tableModel.findByIdAndUpdate(
           currentBill.table,
           { status: FREE_STATUS, bill: [] },
         );
-        const updatingBill = this.billModel.findById(currentBill._id, {
+
+        const updatedBillData = {
+          payment: [...currentBill.payment, newPayment._id],
           status: FINISHED_STATUS,
-        });
+        };
+        await this.billModel.findByIdAndUpdate(
+          currentBill._id,
+          updatedBillData,
+        );
+        await session.commitTransaction();
+        session.endSession();
       }
 
       const updatedBillData = {

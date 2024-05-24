@@ -1,17 +1,17 @@
-import { IsDefined, IsString } from 'class-validator';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
 
 export class CreateCancellationDto {
   @IsDefined()
   @IsString()
-  checkCode: string;
+  accountId: string;
 
-  @IsDefined()
+  @IsOptional()
   @IsString()
-  sellType: string; // este sera un enum
+  noteId?: string;
 
-  @IsDefined()
+  @IsOptional()
   @IsString()
-  cancellationMount: string;
+  productId?: string;
 
   @IsDefined()
   @IsString()
@@ -24,7 +24,4 @@ export class CreateCancellationDto {
   @IsDefined()
   @IsString()
   cancellationReason: string;
-
-  @IsString()
-  cancellationDate: string;
 }

@@ -53,9 +53,9 @@ export class PaymentsController {
       const newPayment = await this.paymentService.create(body);
       const id = newPayment._id;
       console.log(newPayment._id); // Creamos el pago
-      const accountForPayment = await this.billService.findOne(body.accountId); // traemos la cuenta actual
+      const accountForPayment = await this.billService.findOne(body.accountId);
       const payInBill = await this.billService.update(accountForPayment._id, {
-        payment: [id.toString()], // actualizamos la cuenta pasamos el id de la cuenta a actualizar - pasamos la key payment y como valor el id del ppago creado
+        payment: [id.toString()],
       });
 
       return newPayment;

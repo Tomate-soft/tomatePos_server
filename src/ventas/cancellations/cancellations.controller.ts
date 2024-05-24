@@ -48,6 +48,7 @@ export class CancellationsController {
 
   @Post()
   async create(@Body() body: CreateCancellationDto) {
+    console.log('llegue el controller');
     try {
       const newCancellation = await this.cancellationService.create(body);
       return newCancellation;
