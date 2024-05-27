@@ -89,4 +89,15 @@ export class BillsController {
       throw new NotFoundException(`Ha ocurrido algo inesperado: ${error}`);
     }
   }
+
+  @Put('/t/products')
+  async tansferproducts(@Body() body: {}) {
+    try {
+      const objectTransfer = await this.billService.transferProducts(body);
+    } catch (error) {
+      throw new NotFoundException(
+        `No se pudo transferir debido a un error inesperado, mas informacion: ${error}`,
+      );
+    }
+  }
 }
