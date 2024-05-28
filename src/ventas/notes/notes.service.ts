@@ -117,11 +117,10 @@ export class NotesService {
         } catch (error) {
           await session.abortTransaction();
           session.endSession();
-          console.error('Hubo un error durante la sesión:', error);
-          throw error; // Vuelve a lanzar el error para que pueda ser manejado adecuadamente aguas arriba
+          throw error;
         }
       }
-      const billCurrent = await this.BillsModel.findById(accountId); // BUSCAMOS LA CUENTA ACTUAL A LA CUAL PERTENECE LA NOTA
+      const billCurrent = await this.BillsModel.findById(accountId);
       if (billCurrent && billCurrent.notes.length > 0) {
         //
         const upNote = await this.noteModel.findByIdAndUpdate(id, updatedNote, {
@@ -129,12 +128,10 @@ export class NotesService {
         }); // ACTUALIZAMOS L ANOTA
         if (upNote) {
           const refreshedBill = await this.BillsModel.findById(
-            //SI L ANOTA SE ACTUALIZO BUSCAMOS LA CUIENTA DE NUEVO
             accountId,
           ).populate({ path: 'notes' });
-
           const newTotal = refreshedBill.notes.reduce(
-            (total, element) => total + parseFloat(element.checkTotal), //CALCULAMOS EL NUIEVO TOTAL
+            (total, element) => total + parseFloat(element.checkTotal),
             0,
           );
           const sumProducts = [].concat(
@@ -144,11 +141,10 @@ export class NotesService {
           const refreshData = { checkTotal: newTotal, products: sumProducts };
 
           const refreshTotalInBill = await this.BillsModel.findByIdAndUpdate(
-            //ACTUALIZAMOS LA CUENTA CON EL NUEVO TOTAL // y los nuevos productos
             accountId,
             refreshData,
           );
-          return refreshTotalInBill; //RETORNAMOS LA CUENTA ACTUALIZADA
+          return refreshTotalInBill;
         }
       }
     }
