@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ClientSession } from 'mongoose';
 import { CreateBillDto } from 'src/dto/ventas/bills/createBill.Dto';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
 import { Bills, BillsDocument } from 'src/schemas/ventas/bills.schema';
+import { BILL_TO_BILL } from './cases';
+import { Console } from 'console';
+import { Products } from 'src/schemas/catalogo/products.schema';
 
 @Injectable()
 export class BillsService {
@@ -110,6 +113,73 @@ export class BillsService {
     return await this.billsModel.findByIdAndUpdate(id, updatedBill, {
       new: true,
     });
+  }
+
+  async transferProducts(body: any) {
+    const session = await this.billsModel.startSession();
+    session.startTransaction();
+    try {
+      switch (body.case) {
+        case BILL_TO_BILL:
+          // hacemos los cambios en la cuenta principal
+          const newProducts = body.receivingBill.products; // ✅
+          const checkTotalNew = newProducts
+            .reduce(
+              (a, b) =>
+                a +
+                parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+              0,
+            )
+            .toFixed(2)
+            .toString();
+
+          const updateBill = {
+            products: newProducts,
+            checkTotal: checkTotalNew,
+          };
+
+          const currentReceivingBill = await this.billsModel.findByIdAndUpdate(
+            body.receivingBill._id,
+            updateBill,
+          );
+          // Hasta uya actualizamos la cuenta que recibe
+          // Ahora vamos a actualizar la cuenta que envia
+          const newSendBillProducts = body.sendBill.products;
+          console.log('checamos los productos de la cuenta que esta enviando ');
+          console.log(newSendBillProducts);
+          const sendBillcheckTotalNew = newSendBillProducts
+            .reduce(
+              (a, b) =>
+                a +
+                parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+              0,
+            )
+            .toFixed(2)
+            .toString();
+
+          const updateSendBill = {
+            products: newSendBillProducts,
+            checkTotal: sendBillcheckTotalNew,
+          };
+          const currentSendBill = await this.billsModel.findByIdAndUpdate(
+            body.sendBill._id,
+            updateSendBill,
+          );
+
+          if (!currentReceivingBill) {
+            throw new NotFoundException(`No se encuentra la cuenta, error`);
+          }
+          await session.commitTransaction();
+          session.endSession();
+        // actuyalizamos el nuevo total
+        // los productos
+        default:
+          throw new Error('No existe el caso');
+      }
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+    }
   }
   /*
 
