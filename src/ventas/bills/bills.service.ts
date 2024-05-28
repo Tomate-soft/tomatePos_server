@@ -4,14 +4,21 @@ import { Model, ClientSession } from 'mongoose';
 import { CreateBillDto } from 'src/dto/ventas/bills/createBill.Dto';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
 import { Bills, BillsDocument } from 'src/schemas/ventas/bills.schema';
-import { BILL_TO_BILL } from './cases';
+import {
+  BILL_TO_BILL,
+  BILL_TO_NOTE,
+  NOTE_TO_BILL,
+  NOTE_TO_NOTE,
+} from './cases';
 import { Console } from 'console';
 import { Products } from 'src/schemas/catalogo/products.schema';
+import { Notes } from 'src/schemas/ventas/notes.schema';
 
 @Injectable()
 export class BillsService {
   constructor(
     @InjectModel(Bills.name) private billsModel: Model<BillsDocument>,
+    @InjectModel(Notes.name) private noteModel: Model<Notes>,
   ) {}
 
   async findAll() {
@@ -118,49 +125,48 @@ export class BillsService {
   async transferProducts(body: any) {
     const session = await this.billsModel.startSession();
     session.startTransaction();
+
+    // receiving data
+    const receivingProducts = body.receivingBill.products; // ✅
+    const receivingTotal = receivingProducts
+      .reduce(
+        (a, b) =>
+          a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+        0,
+      )
+      .toFixed(2)
+      .toString();
+
+    const receivingUpdate = {
+      products: receivingProducts,
+      checkTotal: receivingTotal,
+    };
+
+    // send data
+    const sendBillProducts = body.sendBill.products;
+    const sendBillcheckTotal = sendBillProducts
+      .reduce(
+        (a, b) =>
+          a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+        0,
+      )
+      .toFixed(2)
+      .toString();
+
+    const updateSendBill = {
+      products: sendBillProducts,
+      checkTotal: sendBillcheckTotal,
+    };
+
     try {
       switch (body.case) {
         case BILL_TO_BILL:
           // hacemos los cambios en la cuenta principal
-          const newProducts = body.receivingBill.products; // ✅
-          const checkTotalNew = newProducts
-            .reduce(
-              (a, b) =>
-                a +
-                parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-              0,
-            )
-            .toFixed(2)
-            .toString();
-
-          const updateBill = {
-            products: newProducts,
-            checkTotal: checkTotalNew,
-          };
-
           const currentReceivingBill = await this.billsModel.findByIdAndUpdate(
             body.receivingBill._id,
-            updateBill,
+            receivingUpdate,
           );
-          // Hasta uya actualizamos la cuenta que recibe
-          // Ahora vamos a actualizar la cuenta que envia
-          const newSendBillProducts = body.sendBill.products;
-          console.log('checamos los productos de la cuenta que esta enviando ');
-          console.log(newSendBillProducts);
-          const sendBillcheckTotalNew = newSendBillProducts
-            .reduce(
-              (a, b) =>
-                a +
-                parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-              0,
-            )
-            .toFixed(2)
-            .toString();
 
-          const updateSendBill = {
-            products: newSendBillProducts,
-            checkTotal: sendBillcheckTotalNew,
-          };
           const currentSendBill = await this.billsModel.findByIdAndUpdate(
             body.sendBill._id,
             updateSendBill,
@@ -171,8 +177,155 @@ export class BillsService {
           }
           await session.commitTransaction();
           session.endSession();
-        // actuyalizamos el nuevo total
-        // los productos
+          return currentReceivingBill;
+
+        case NOTE_TO_NOTE:
+          const updateReceivingNote = await this.noteModel.findByIdAndUpdate(
+            body.receivingBill._id,
+            receivingUpdate,
+          );
+          const currentBill = await this.billsModel
+            .findById(body.receivingBill.accountId)
+            .populate({ path: 'notes' });
+
+          const noteToNoteTotal = currentBill.notes
+            .reduce((a, b) => {
+              return a + parseInt(b.checkTotal);
+            }, 0)
+            .toString();
+          const noteToNoteProducts = currentBill.notes.flatMap(
+            (element) => element.products,
+          );
+          const updateDataBillToNote = {
+            products: noteToNoteProducts,
+            checkTotal: noteToNoteTotal,
+          };
+
+          const updateReceivingBillToNote =
+            await this.billsModel.findByIdAndUpdate(
+              currentBill._id,
+              updateDataBillToNote,
+              { new: true },
+            );
+
+          // Ahora actualizamos la mesa que envio
+          const updateSendNote = await this.noteModel.findByIdAndUpdate(
+            body.sendBill._id,
+            updateSendBill,
+          );
+
+          const currentSendBillNoteToNote = await this.billsModel
+            .findById(body.sendBill.accountId)
+            .populate({ path: 'notes' });
+
+          const noteToNoteSendTotal = currentBill.notes
+            .reduce((a, b) => {
+              return a + parseInt(b.checkTotal);
+            }, 0)
+            .toString();
+
+          const noteToNoteSendProducts =
+            currentSendBillNoteToNote.notes.flatMap(
+              (element) => element.products,
+            );
+          const updateDatasSendBillToNote = {
+            products: noteToNoteSendProducts,
+            checkTotal: noteToNoteSendTotal,
+          };
+
+          const updateSendBillToNote = await this.billsModel.findByIdAndUpdate(
+            currentBill._id,
+            updateDatasSendBillToNote,
+            { new: true },
+          );
+          await session.commitTransaction();
+          session.endSession();
+          return updateReceivingNote;
+
+        case BILL_TO_NOTE:
+          // actualizamos la nota que recibe
+          const updateReceivingBillToNoteCase =
+            await this.noteModel.findByIdAndUpdate(
+              body.receivingBill._id,
+              receivingUpdate,
+            );
+          const currentBillToNote = await this.billsModel
+            .findById(body.receivingBill.accountId)
+            .populate({ path: 'notes' });
+
+          const billToNoteTotal = currentBillToNote.notes
+            .reduce((a, b) => {
+              return a + parseInt(b.checkTotal);
+            }, 0)
+            .toString();
+          const BillToNoteProducts = currentBillToNote.notes.flatMap(
+            (element) => element.products,
+          );
+          const updateDataBillToNoteCase = {
+            products: BillToNoteProducts,
+            checkTotal: billToNoteTotal,
+          };
+
+          const updReceivingBillToNoteCase =
+            await this.billsModel.findByIdAndUpdate(
+              currentBillToNote._id,
+              updateDataBillToNoteCase,
+              { new: true },
+            );
+
+          // ahora actualizamos la cuenta que envia
+          const currentSendBilltoNote = await this.billsModel.findByIdAndUpdate(
+            body.sendBill._id,
+            updateSendBill,
+          );
+
+          await session.commitTransaction();
+          session.endSession();
+          return updateReceivingBillToNoteCase;
+
+        case NOTE_TO_BILL:
+          console.log('Ultimo metodo funciona'); ////////////////
+          const currentReceivingNoteToBill =
+            await this.billsModel.findByIdAndUpdate(
+              body.receivingBill._id,
+              receivingUpdate,
+            );
+
+          // actualizamos la nota que envia por ultimo
+          const updateSendNoteToBill = await this.noteModel.findByIdAndUpdate(
+            body.sendBill._id,
+            updateSendBill,
+          );
+
+          const currentNoteToBill = await this.billsModel
+            .findById(body.sendBill.accountId)
+            .populate({ path: 'notes' });
+
+          const noteToBillSendTotal = currentNoteToBill.notes
+            .reduce((a, b) => {
+              return a + parseInt(b.checkTotal);
+            }, 0)
+            .toString();
+
+          const noteToBillSendProducts = currentNoteToBill.notes.flatMap(
+            (element) => element.products,
+          );
+          const updateDatasSendNoteToBill = {
+            products: noteToBillSendProducts,
+            checkTotal: noteToBillSendTotal,
+          };
+
+          const updateSendNoteToBillCase =
+            await this.billsModel.findByIdAndUpdate(
+              currentBill._id,
+              updateDatasSendNoteToBill,
+              { new: true },
+            );
+
+          await session.commitTransaction();
+          session.endSession();
+          return currentReceivingNoteToBill;
+
         default:
           throw new Error('No existe el caso');
       }
@@ -181,8 +334,8 @@ export class BillsService {
       session.endSession();
     }
   }
-  /*
 
+  /*
   async getNextBillCodeCounter(session?: ClientSession): Promise<number> {
     const result = await this.billsModel.findOneAndUpdate(
       {},
@@ -199,7 +352,7 @@ export class BillsService {
       { $inc: { billCodeCounter: 1 } },
       { session },
     );
-  }
+  }P
 
   private formatBillCode(counter: number): string {
     // Formatear el contador como "001"

@@ -42,6 +42,7 @@ export class BillsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
   @Post()
   async create(@Body() body: CreateBillDto) {
     try {

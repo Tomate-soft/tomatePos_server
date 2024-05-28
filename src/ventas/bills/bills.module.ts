@@ -17,10 +17,7 @@ import {
         name: Bills.name,
         schema: BillSchema,
       },
-      {
-        name: Payment.name,
-        schema: PaymentSchema,
-      },
+
       {
         name: Notes.name,
         schema: NoteSchema,
