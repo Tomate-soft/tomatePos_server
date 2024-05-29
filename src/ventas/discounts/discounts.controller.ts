@@ -45,9 +45,9 @@ export class DiscountsController {
   }
 
   @Post()
-  async create(@Body() body: CreateDiscountDto) {
+  async create(@Body() payload: { accountApt: any; body: CreateDiscountDto }) {
     try {
-      const newDiscount = await this.discountService.create(body);
+      const newDiscount = await this.discountService.create(payload);
       return newDiscount;
     } catch (error) {
       if (error.code === 11000) {
