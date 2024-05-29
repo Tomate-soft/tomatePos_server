@@ -3,16 +3,19 @@ import { IsString, IsDefined } from 'class-validator';
 export class CreateDiscountDto {
   @IsString()
   @IsDefined()
-  checkCode: string;
+  accountId: string;
+
+  @IsString()
+  @IsDefined()
+  discountType: string;
+
   @IsDefined()
   @IsString()
-  sellType: string; // este sera un enum
-
-  @IsString()
-  checkTotal: string;
-
-  @IsString()
   discountMount: string;
+
+  @IsDefined()
+  @IsString()
+  setting: string;
 
   @IsString()
   discountByUser: string;
@@ -22,12 +25,4 @@ export class CreateDiscountDto {
 
   @IsString()
   discountReason: string;
-
-  // Verificar si esta prop se va quedar
-  @IsString()
-  discountDate: string;
-
-  // verificar si esta prop se va quedar
-  @IsString()
-  checkStatus: 'enabled' | 'disabled';
 }

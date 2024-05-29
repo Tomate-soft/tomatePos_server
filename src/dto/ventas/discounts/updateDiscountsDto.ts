@@ -1,41 +1,24 @@
 import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateDiscountDto {
-  @IsOptional()
   @IsString()
-  checkCode?: string;
+  accountId?: string;
 
-  @IsOptional()
   @IsString()
-  sellType?: string; // este sera un enum
+  discountType?: string;
 
-  @IsOptional()
-  @IsString()
-  checkTotal?: string;
-
-  @IsOptional()
   @IsString()
   discountMount?: string;
 
-  @IsOptional()
+  @IsString()
+  setting?: string;
+
   @IsString()
   discountByUser?: string;
 
-  @IsOptional()
   @IsString()
   discountFor?: string;
 
-  @IsOptional()
   @IsString()
   discountReason?: string;
-
-  // Verificar si esta prop se va quedar
-  @IsOptional()
-  @IsString()
-  discountDate?: string;
-
-  // verificar si esta prop se va quedar
-  @IsOptional()
-  @IsString()
-  checkStatus?: 'enabled' | 'disabled';
 }
