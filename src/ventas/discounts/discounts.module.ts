@@ -5,6 +5,7 @@ import { InjectModel, MongooseModule } from '@nestjs/mongoose';
 import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -20,6 +21,10 @@ import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
       {
         name: Notes.name,
         schema: NoteSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
       },
     ]),
   ],
