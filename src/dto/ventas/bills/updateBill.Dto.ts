@@ -53,6 +53,10 @@ export class UpdateBillDto {
   @IsOptional()
   cashierSession?: string;
 
+  @IsOptional()
+  @IsString()
+  discount?: string;
+
   /*
   @IsDefined()
   @IsString()

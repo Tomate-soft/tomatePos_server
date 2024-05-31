@@ -1,4 +1,6 @@
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Discount } from './discounts.schema';
 
 @Schema({ timestamps: true })
 export class Notes {
@@ -72,6 +74,12 @@ export class Notes {
     trim: true,
   })
   paymentDate: string;
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Discount',
+  })
+  discount?: Discount;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Notes);

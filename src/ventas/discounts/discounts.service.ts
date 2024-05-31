@@ -4,7 +4,12 @@ import { Model } from 'mongoose';
 import { CreateDiscountDto } from 'src/dto/ventas/discounts/createDiscountDto';
 import { UpdateDiscountDto } from 'src/dto/ventas/discounts/updateDiscountsDto';
 import { Discount } from 'src/schemas/ventas/discounts.schema';
-import { NOTES_DISCOUNTS, PRODUCTS_DISCOUNTS } from './cases';
+import {
+  BILL_DISCOUNTS,
+  COURTESY_APPLY_PRODUCTS,
+  NOTES_DISCOUNTS,
+  PRODUCTS_DISCOUNTS,
+} from './cases';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
 
@@ -29,6 +34,7 @@ export class DiscountsService {
     session.startTransaction();
     try {
       switch (payload.body.discountType) {
+        case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
             const newDiscountNote = await this.discountModel.create(
@@ -68,7 +74,6 @@ export class DiscountsService {
             const newProductsForBill = currentBillNote.notes.flatMap(
               (element) => element.products,
             );
-            console.log(currentBillNote.notes);
             return updatedNote;
           }
           const newDiscount = await this.discountModel.create(payload.body);
@@ -91,19 +96,51 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
+          return;
 
         case NOTES_DISCOUNTS:
-          console.log('Descuento de notas');
-      }
+          console.log(payload);
+          const newDiscountNote = await this.discountModel.create(payload.body);
 
-      await session.commitTransaction();
-      session.endSession();
+          if (!newDiscountNote) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('No se pudo completar');
+          }
+
+          const updateNote = await this.noteModel.findByIdAndUpdate(
+            newDiscountNote.accountId,
+            { discount: newDiscountNote._id },
+          );
+          await session.commitTransaction();
+          session.endSession();
+          return newDiscountNote;
+
+        case BILL_DISCOUNTS:
+          const newDiscountBill = await this.discountModel.create(payload.body);
+
+          if (!newDiscountBill) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('No se pudo completar');
+          }
+
+          const updatedBillDiscount = await this.billsModel.findByIdAndUpdate(
+            newDiscountBill.accountId,
+            { discount: newDiscountBill._id },
+          );
+          await session.commitTransaction();
+          session.endSession();
+          return newDiscountBill;
+
+        default:
+          return;
+      }
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
     }
   }
-
   async delete(id: string) {
     return await this.discountModel.findByIdAndDelete(id);
   }

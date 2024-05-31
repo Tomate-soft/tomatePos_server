@@ -44,4 +44,8 @@ export class updateNoteDto {
   @IsOptional()
   @IsString()
   paymentDate?: string;
+
+  @IsOptional()
+  @IsString()
+  discount?: string;
 }
