@@ -58,6 +58,10 @@ export class CreateBillDto {
   @IsOptional()
   cashierSession?: string;
 
+  @IsOptional()
+  @IsString()
+  discount?: string;
+
   /*
   @IsDefined()
   @IsString()

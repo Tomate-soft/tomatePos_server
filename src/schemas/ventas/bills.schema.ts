@@ -4,6 +4,7 @@ import { Payment } from './payment.schema';
 import { Notes } from './notes.schema';
 import { CashierSession } from '../cashierSession/cashierSession';
 import { Table } from '../tables/tableSchema';
+import { Discount } from './discounts.schema';
 
 @Schema({ timestamps: true })
 export class Bills {
@@ -85,6 +86,9 @@ export class Bills {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'CashierSession' })
   cashierSession?: CashierSession;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount' })
+  discount?: Discount;
 
   /* 
 
