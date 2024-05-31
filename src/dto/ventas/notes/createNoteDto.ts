@@ -47,4 +47,8 @@ export class createNoteDto {
 
   @IsString()
   paymentDate: string;
+
+  @IsOptional()
+  @IsString()
+  discount?: string;
 }
