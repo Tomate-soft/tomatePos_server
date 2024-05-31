@@ -66,7 +66,7 @@ export class NotesService {
           const upNote = await this.noteModel.findByIdAndUpdate(
             id,
             updatedNote,
-            { new: true, session },
+            { new: true /* session */ },
           );
           const searchAccount = await this.BillsModel.findById(
             accountId,
@@ -76,9 +76,7 @@ export class NotesService {
             const pendingNotes = searchAccount.notes.filter(
               (element) => element.status === ENABLE_STATUS,
             );
-            searchAccount.notes.forEach((element) =>
-              console.log(element.status),
-            );
+
             if (pendingNotes.length <= 1) {
               // aqui cambiamos el status de la mesa
               const table = await this.tableModel.findByIdAndUpdate(

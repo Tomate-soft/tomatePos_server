@@ -6,12 +6,19 @@ import { UpdateDiscountDto } from 'src/dto/ventas/discounts/updateDiscountsDto';
 import { Discount } from 'src/schemas/ventas/discounts.schema';
 import {
   BILL_DISCOUNTS,
+  COURTESY_APPLY_NOTES,
   COURTESY_APPLY_PRODUCTS,
   NOTES_DISCOUNTS,
   PRODUCTS_DISCOUNTS,
 } from './cases';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
+import {
+  ENABLE_STATUS,
+  FOR_PAYMENT_STATUS,
+  FREE_STATUS,
+} from 'src/libs/status.libs';
+import { Table } from 'src/schemas/tables/tableSchema';
 
 @Injectable()
 export class DiscountsService {
@@ -19,6 +26,7 @@ export class DiscountsService {
     @InjectModel(Discount.name) private discountModel: Model<Discount>,
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private noteModel: Model<Notes>,
+    @InjectModel(Table.name) private tableModel: Model<Table>,
   ) {}
 
   async findAll() {
@@ -132,6 +140,46 @@ export class DiscountsService {
           await session.commitTransaction();
           session.endSession();
           return newDiscountBill;
+
+        case COURTESY_APPLY_NOTES:
+          console.log(payload);
+          const newCourtesyNote = await this.discountModel.create(payload.body);
+
+          if (!newCourtesyNote) {
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('No se pudo completar');
+          }
+
+          const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
+            newCourtesyNote.accountId,
+            { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
+          );
+
+          const courtesyBill = await this.billsModel
+            .findById(newCourtesyNote.accountId)
+            .populate({ path: 'notes' }); // encontramos la cuenta
+
+          const enableNotes = courtesyBill.notes.filter(
+            (note) =>
+              note.status === ENABLE_STATUS ||
+              note.status === FOR_PAYMENT_STATUS,
+          );
+          /////////////////////////////////////////////////////////////////
+          if (enableNotes.length <= 0) {
+            const tableUpdated = await this.tableModel.findByIdAndUpdate(
+              courtesyBill.table,
+              { status: FOR_PAYMENT_STATUS },
+            );
+          }
+
+          /*  const currentPeriod: any =
+            await this.operatingPeriodService.getCurrent(); */
+
+          //
+          await session.commitTransaction();
+          session.endSession();
+          return newDiscountNote;
 
         default:
           return;
