@@ -48,10 +48,23 @@ export class CancellationsController {
 
   @Post()
   async create(@Body() body: CreateCancellationDto) {
-    console.log('llegue el controller');
     try {
       const newCancellation = await this.cancellationService.create(body);
       return newCancellation;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('Esta nota ya fue cancelada');
+      }
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+  @Post('products')
+  async cancelProduct(@Body() body: any) {
+    console.log('body del controller');
+    console.log(body.body);
+    try {
+      const cancelProduct = await this.cancellationService.cancelProducts(body);
+      return cancelProduct;
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException('Esta nota ya fue cancelada');

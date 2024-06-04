@@ -16,8 +16,8 @@ export class Cancellations {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Notes' })
   noteId?: Notes;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Product' })
-  productId?: Product;
+  @Prop({ type: MongooseSchema.Types.Mixed, required: false })
+  product?: any;
 
   @Prop({
     required: true,

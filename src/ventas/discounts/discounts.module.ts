@@ -6,6 +6,15 @@ import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import {
+  OperatingPeriod,
+  OperatingPeriodSchema,
+} from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import {
+  CashierSession,
+  CashierSessionSchema,
+} from 'src/schemas/cashierSession/cashierSession';
 
 @Module({
   imports: [
@@ -26,9 +35,17 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
         name: Table.name,
         schema: TableSchema,
       },
+      {
+        name: OperatingPeriod.name,
+        schema: OperatingPeriodSchema,
+      },
+      {
+        name: CashierSession.name,
+        schema: CashierSessionSchema,
+      },
     ]),
   ],
   controllers: [DiscountsController],
-  providers: [DiscountsService],
+  providers: [DiscountsService, OperatingPeriodService],
 })
 export class DiscountsModule {}
