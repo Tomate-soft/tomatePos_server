@@ -10,8 +10,7 @@ export class UpdateCancellationDto {
   noteId?: string;
 
   @IsOptional()
-  @IsString()
-  productId?: string;
+  product?: {};
 
   @IsOptional()
   @IsString()

@@ -39,7 +39,7 @@ export class CancellationsService {
       if (
         createdCancellation.accountId &&
         !createdCancellation.noteId &&
-        !createdCancellation.productId
+        !createdCancellation.product
       ) {
         const currentBill = await this.billsModel.findByIdAndUpdate(
           createdCancellation.accountId,
@@ -53,7 +53,7 @@ export class CancellationsService {
         );
       }
       // Notes cancel
-      if (createdCancellation.noteId && !createdCancellation.productId) {
+      if (createdCancellation.noteId && !createdCancellation.product) {
         const updateNote = await this.notesModel.findByIdAndUpdate(
           createdCancellation.noteId,
           { status: CANCELLED_STATUS },
@@ -99,6 +99,72 @@ export class CancellationsService {
       await session.abortTransaction();
       session.endSession();
       throw new NotFoundException(`No se pudo completar. ${error}`);
+    }
+  }
+
+  async cancelProducts(body: { aptAccount: any; body: CreateCancellationDto }) {
+    console.log('body en el servgice');
+    console.log(body);
+    const session = await this.cancellationModel.startSession();
+    session.startTransaction();
+    try {
+      const newCancelproduct = new this.cancellationModel(body.body);
+      await newCancelproduct.save();
+
+      if (newCancelproduct && !body.body.noteId) {
+        // aca la cuenta sin notas
+        const checkTotalNew = body.aptAccount.products
+          .reduce(
+            (a, b) =>
+              a +
+              parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+            0,
+          )
+          .toFixed(2)
+          .toString();
+        const updateBill = await this.billsModel.findByIdAndUpdate(
+          body.body.accountId,
+          { products: body.aptAccount.products, checkTotal: checkTotalNew },
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+        return updateBill;
+      }
+      const checkTotalNewNote = body.aptAccount.products
+        .reduce(
+          (a, b) =>
+            a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
+          0,
+        )
+        .toFixed(2)
+        .toString();
+      // aca es el precio de la nota
+      const updateNote = await this.notesModel.findByIdAndUpdate(
+        body.body.noteId,
+        { products: body.aptAccount.products, checkTotal: checkTotalNewNote },
+      );
+      // toca actualizar la cuenta despues de modificar la nota:
+      const currentBill = await this.billsModel
+        .findById(body.body.accountId)
+        .populate({ path: 'notes' });
+
+      const newTotalBill = currentBill.notes
+        .reduce((a, b) => a + parseFloat(b.checkTotal), 0)
+        .toString();
+      console.log('Nueva prueba de ver si entindi el reduce');
+      console.log(newTotalBill);
+      const updateBillWithNote = await this.billsModel.findByIdAndUpdate({
+        products: body.aptAccount.products,
+        checkTotal: newTotalBill,
+      });
+      await session.commitTransaction();
+      session.endSession();
+      return newCancelproduct;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw new Error('no se completo');
     }
   }
 

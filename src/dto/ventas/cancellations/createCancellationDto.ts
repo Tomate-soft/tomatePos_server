@@ -10,8 +10,7 @@ export class CreateCancellationDto {
   noteId?: string;
 
   @IsOptional()
-  @IsString()
-  productId?: string;
+  product?: {};
 
   @IsDefined()
   @IsString()

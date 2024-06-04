@@ -6,6 +6,7 @@ import { UpdateDiscountDto } from 'src/dto/ventas/discounts/updateDiscountsDto';
 import { Discount } from 'src/schemas/ventas/discounts.schema';
 import {
   BILL_DISCOUNTS,
+  COURTESY_APPLY_BILL,
   COURTESY_APPLY_NOTES,
   COURTESY_APPLY_PRODUCTS,
   NOTES_DISCOUNTS,
@@ -19,6 +20,9 @@ import {
   FREE_STATUS,
 } from 'src/libs/status.libs';
 import { Table } from 'src/schemas/tables/tableSchema';
+import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 
 @Injectable()
 export class DiscountsService {
@@ -27,6 +31,11 @@ export class DiscountsService {
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private noteModel: Model<Notes>,
     @InjectModel(Table.name) private tableModel: Model<Table>,
+    @InjectModel(CashierSession.name)
+    private cashierSessionModel: Model<CashierSession>,
+    @InjectModel(OperatingPeriod.name)
+    private operatingPeriod: Model<OperatingPeriod>,
+    private readonly operatingPeriodService: OperatingPeriodService,
   ) {}
 
   async findAll() {
@@ -109,21 +118,20 @@ export class DiscountsService {
         case NOTES_DISCOUNTS:
           console.log(payload);
           const newDiscountNote = await this.discountModel.create(payload.body);
-
           if (!newDiscountNote) {
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
-
           const updateNote = await this.noteModel.findByIdAndUpdate(
             newDiscountNote.accountId,
             { discount: newDiscountNote._id },
           );
+
           await session.commitTransaction();
           session.endSession();
           return newDiscountNote;
-
+        case COURTESY_APPLY_BILL:
         case BILL_DISCOUNTS:
           const newDiscountBill = await this.discountModel.create(payload.body);
 
@@ -137,46 +145,116 @@ export class DiscountsService {
             newDiscountBill.accountId,
             { discount: newDiscountBill._id },
           );
+          // falta actualizar el estatus de la mesa
+          if (payload.body.discountType === COURTESY_APPLY_BILL) {
+            //Cambiar el status de la mesa
+            const updateTable = await this.tableModel.findByIdAndUpdate(
+              updatedBillDiscount.table,
+              { status: FOR_PAYMENT_STATUS },
+            );
+
+            // mandar la cuenta a cobrar
+            const currentPeriod: any =
+              await this.operatingPeriodService.getCurrent();
+            const randomIndex = Math.floor(
+              Math.random() * currentPeriod[0].sellProcess.length,
+            );
+            const cashierSessionId =
+              currentPeriod[0].sellProcess[randomIndex]._id;
+            const selectSession =
+              await this.cashierSessionModel.findById(cashierSessionId);
+            const updatedSession =
+              await this.cashierSessionModel.findByIdAndUpdate(
+                cashierSessionId,
+                {
+                  bills: [...selectSession.bills, updatedBillDiscount._id],
+                },
+              );
+
+            const updateBill = await this.billsModel.findByIdAndUpdate(
+              updatedBillDiscount._id,
+              { cashierSession: cashierSessionId },
+              { new: true },
+            );
+          }
           await session.commitTransaction();
           session.endSession();
           return newDiscountBill;
 
-        case COURTESY_APPLY_NOTES:
-          console.log(payload);
+        case COURTESY_APPLY_NOTES: //
           const newCourtesyNote = await this.discountModel.create(payload.body);
-
           if (!newCourtesyNote) {
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
+          console.log('Nueva cortesia:');
+          console.log(newCourtesyNote);
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
             newCourtesyNote.accountId,
             { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
+            { new: true },
           );
+          if (!updateCourtesyNote) {
+            console.log('trono...');
+            await session.abortTransaction();
+            session.endSession();
+            throw new Error('No se pudo completar');
+          }
+          console.log('Note actualizada');
+          console.log(updateCourtesyNote);
 
           const courtesyBill = await this.billsModel
-            .findById(newCourtesyNote.accountId)
+            .findById(updateCourtesyNote.accountId)
             .populate({ path: 'notes' }); // encontramos la cuenta
 
+          console.log('Cuenta encontrada para actualizar');
+          console.log(courtesyBill);
+
           const enableNotes = courtesyBill.notes.filter(
-            (note) =>
-              note.status === ENABLE_STATUS ||
-              note.status === FOR_PAYMENT_STATUS,
+            (note) => note.status === ENABLE_STATUS, // checar este metodo
           );
-          /////////////////////////////////////////////////////////////////
+          if (courtesyBill.cashierSession) {
+            /////////////////////////////////////////////////////////////////
+            if (enableNotes.length <= 0) {
+              const tableUpdated = await this.tableModel.findByIdAndUpdate(
+                courtesyBill.table,
+                { status: FOR_PAYMENT_STATUS },
+              );
+            }
+            await session.commitTransaction();
+            session.endSession();
+            return updateCourtesyNote;
+          }
           if (enableNotes.length <= 0) {
+            console.log('Entre al cambiar el estatus de la mesa');
             const tableUpdated = await this.tableModel.findByIdAndUpdate(
               courtesyBill.table,
               { status: FOR_PAYMENT_STATUS },
             );
           }
+          // ocupo clavar el id de la cuenta en la cashier session
+          const currentPeriod: any =
+            await this.operatingPeriodService.getCurrent();
+          const randomIndex = Math.floor(
+            Math.random() * currentPeriod[0].sellProcess.length,
+          );
+          const cashierSessionId =
+            currentPeriod[0].sellProcess[randomIndex]._id;
+          const selectSession =
+            await this.cashierSessionModel.findById(cashierSessionId);
+          const updatedSession =
+            await this.cashierSessionModel.findByIdAndUpdate(cashierSessionId, {
+              bills: [...selectSession.bills, courtesyBill._id],
+            });
 
-          /*  const currentPeriod: any =
-            await this.operatingPeriodService.getCurrent(); */
+          const updateBill = await this.billsModel.findByIdAndUpdate(
+            courtesyBill._id,
+            { cashierSession: cashierSessionId },
+            { new: true },
+          );
 
-          //
           await session.commitTransaction();
           session.endSession();
           return newDiscountNote;
