@@ -87,10 +87,19 @@ export class User {
   })
   admin: boolean;
 
-  @Prop({
-    default: false,
-  })
-  authorizations: boolean;
+  @Prop({ type: Object, default: {} })
+  authorizations?: {
+    admin: {
+      active: boolean;
+      modules: Record<string, any>; // Objeto para almacenar módulos específicos del admin
+    };
+    pos: {
+      active: boolean;
+      sellTypes: {
+        restaurant: string[]; // Array de cadenas para los tipos de venta de restaurante
+      };
+    };
+  };
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Table' }],

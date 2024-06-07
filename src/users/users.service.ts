@@ -7,6 +7,7 @@ import { User } from 'src/schemas/users.schema';
 import { CreateUserDto } from 'src/dto/users/createUser.dto';
 import { UpdateUserDto } from 'src/dto/users/updateUserDto';
 import { Bills } from 'src/schemas/ventas/bills.schema';
+import { path } from 'pdfkit';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +28,7 @@ export class UsersService {
       })
       .populate({
         path: 'tables',
+        populate: { path: 'bill' },
       })
       .populate({
         path: 'dailyRegister',
@@ -118,6 +120,7 @@ export class UsersService {
   }
 
   async update(id: any, body: any) {
+    console.log(body);
     return this.UserModel.findByIdAndUpdate(id, body, { new: true });
   }
 
