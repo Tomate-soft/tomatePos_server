@@ -7,7 +7,6 @@ import { User } from 'src/schemas/users.schema';
 import { CreateUserDto } from 'src/dto/users/createUser.dto';
 import { UpdateUserDto } from 'src/dto/users/updateUserDto';
 import { Bills } from 'src/schemas/ventas/bills.schema';
-import { path } from 'pdfkit';
 
 @Injectable()
 export class UsersService {
