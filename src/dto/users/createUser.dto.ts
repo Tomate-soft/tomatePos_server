@@ -20,6 +20,9 @@ export class CreateUserDto {
   @Length(2, 45)
   lastName: string;
 
+  @IsOptional()
+  autorizations?: any;
+
   @IsString()
   @IsNotEmpty()
   @IsEmail()

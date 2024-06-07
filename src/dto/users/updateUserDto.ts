@@ -22,6 +22,9 @@ export class UpdateUserDto {
   @IsOptional()
   lastName?: string;
 
+  @IsOptional()
+  autorizations?: any;
+
   @IsString()
   @IsEmail()
   @IsOptional()

@@ -76,4 +76,19 @@ export class UsersController {
       throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
     }
   }
+
+  @Put('apt/:id')
+  async updateAuth(@Param('id') id: string, @Body() body: UpdateUserDto) {
+    try {
+      const userUpdated = await this.usersService.update(id, body);
+      if (!userUpdated) {
+        throw new NotFoundException(
+          'No se encontro el usuario que deseas actualizar',
+        );
+      }
+      return userUpdated;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 }

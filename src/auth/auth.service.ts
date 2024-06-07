@@ -90,6 +90,18 @@ export class AuthService {
 
   async loginPos({ employeeNumber, pinPos }: any) {
     const user = await this.UsersService.findByEmployeeNumber(employeeNumber);
+
+    await user.populate({
+      path: 'tables',
+      populate: {
+        path: 'bill',
+        populate: [
+          { path: 'discount' },
+          { path: 'notes', populate: { path: 'discount' } },
+        ],
+      },
+    });
+
     if (!user) {
       throw new UnauthorizedException(
         'El email y/o contraseña son incorrectos',
