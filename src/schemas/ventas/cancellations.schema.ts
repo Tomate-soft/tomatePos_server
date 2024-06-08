@@ -36,6 +36,9 @@ export class Cancellations {
     trim: true,
   })
   cancellationReason: string;
+
+  @Prop({ trim: true })
+  description?: string;
 }
 
 export const CancellationSchema = SchemaFactory.createForClass(Cancellations);

@@ -76,9 +76,27 @@ export class DiscountsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, body: UpdateDiscountDto) {
+  async update(@Param('id') id: string, @Body() body: UpdateDiscountDto) {
     try {
       const updatedDiscount = await this.discountService.update(id, body);
+      if (!updatedDiscount) {
+        throw new NotFoundException(
+          'No se encuentra el descuento que se desea actualizar',
+        );
+      }
+      return updatedDiscount;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
+  @Put('d/:id')
+  async deleteDiscount(@Param('id') id: string, @Body() body: any) {
+    try {
+      const updatedDiscount = await this.discountService.deleteDiscounte(
+        id,
+        body,
+      );
       if (!updatedDiscount) {
         throw new NotFoundException(
           'No se encuentra el descuento que se desea actualizar',

@@ -46,7 +46,6 @@ export class DiscountsService {
     return await this.discountModel.findById(id);
   }
   async create(payload: { accountApt: any; body: CreateDiscountDto }) {
-    console.log(payload);
     const session = await this.discountModel.startSession();
     session.startTransaction();
     try {
@@ -116,7 +115,6 @@ export class DiscountsService {
           return;
 
         case NOTES_DISCOUNTS:
-          console.log(payload);
           const newDiscountNote = await this.discountModel.create(payload.body);
           if (!newDiscountNote) {
             await session.abortTransaction();
@@ -197,20 +195,14 @@ export class DiscountsService {
             { new: true },
           );
           if (!updateCourtesyNote) {
-            console.log('trono...');
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
-          console.log('Note actualizada');
-          console.log(updateCourtesyNote);
 
           const courtesyBill = await this.billsModel
             .findById(updateCourtesyNote.accountId)
             .populate({ path: 'notes' }); // encontramos la cuenta
-
-          console.log('Cuenta encontrada para actualizar');
-          console.log(courtesyBill);
 
           const enableNotes = courtesyBill.notes.filter(
             (note) => note.status === ENABLE_STATUS, // checar este metodo
@@ -228,7 +220,6 @@ export class DiscountsService {
             return updateCourtesyNote;
           }
           if (enableNotes.length <= 0) {
-            console.log('Entre al cambiar el estatus de la mesa');
             const tableUpdated = await this.tableModel.findByIdAndUpdate(
               courtesyBill.table,
               { status: FOR_PAYMENT_STATUS },
@@ -275,5 +266,34 @@ export class DiscountsService {
     return await this.discountModel.findByIdAndUpdate(id, updatedDiscount, {
       new: true,
     });
+  }
+
+  async deleteDiscounte(id: string, body: any) {
+    const NOTE_CASE = 'NOTE_CASE';
+    const BILL_CASE = 'BILL_CASE';
+    const PRODUCT_CASE = 'PRODUCT_CASE';
+
+    switch (body.case) {
+      case NOTE_CASE:
+        const uptNOte = await this.noteModel.findByIdAndUpdate(
+          id,
+          {
+            discount: null,
+          },
+          { new: true },
+        );
+        return uptNOte;
+      case BILL_CASE:
+        const uptBill = await this.billsModel.findByIdAndUpdate(
+          id,
+          { discount: null },
+          { new: true },
+        );
+        return uptBill;
+      case PRODUCT_CASE:
+        return;
+      default:
+        return;
+    }
   }
 }

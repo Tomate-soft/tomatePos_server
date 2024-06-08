@@ -23,4 +23,8 @@ export class UpdateCancellationDto {
   @IsOptional()
   @IsString()
   cancellationReason: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 }
