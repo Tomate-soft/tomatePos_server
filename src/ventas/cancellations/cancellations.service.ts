@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Console } from 'console';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
 import { UpdateCancellationDto } from 'src/dto/ventas/cancellations/updateCancellationDto';
@@ -103,8 +104,6 @@ export class CancellationsService {
   }
 
   async cancelProducts(body: { aptAccount: any; body: CreateCancellationDto }) {
-    console.log('body en el servgice');
-    console.log(body);
     const session = await this.cancellationModel.startSession();
     session.startTransaction();
     try {
@@ -129,7 +128,7 @@ export class CancellationsService {
 
         await session.commitTransaction();
         session.endSession();
-        return updateBill;
+        return newCancelproduct;
       }
       const checkTotalNewNote = body.aptAccount.products
         .reduce(
@@ -148,16 +147,16 @@ export class CancellationsService {
       const currentBill = await this.billsModel
         .findById(body.body.accountId)
         .populate({ path: 'notes' });
-
       const newTotalBill = currentBill.notes
         .reduce((a, b) => a + parseFloat(b.checkTotal), 0)
         .toString();
-      console.log('Nueva prueba de ver si entindi el reduce');
-      console.log(newTotalBill);
-      const updateBillWithNote = await this.billsModel.findByIdAndUpdate({
-        products: body.aptAccount.products,
-        checkTotal: newTotalBill,
-      });
+      const updateBillWithNote = await this.billsModel.findByIdAndUpdate(
+        currentBill._id,
+        {
+          products: body.aptAccount.products,
+          checkTotal: newTotalBill,
+        },
+      );
       await session.commitTransaction();
       session.endSession();
       return newCancelproduct;
