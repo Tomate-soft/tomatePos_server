@@ -23,6 +23,7 @@ import { Table } from 'src/schemas/tables/tableSchema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
+import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
 
 @Injectable()
 export class DiscountsService {
@@ -61,6 +62,7 @@ export class DiscountsService {
               session.endSession();
               throw new Error('No se pudo completar');
             }
+
             const restoreDtaNote = {
               products: payload.accountApt.products,
               checkTotal: payload.accountApt.checkTotal,
@@ -83,13 +85,21 @@ export class DiscountsService {
               session.endSession();
               throw new Error('No se pudo encontrar la cuenta para actualizar');
             }
-            const newBillTotal = currentBillNote.notes.reduce((a, b) => {
-              return a + parseFloat(b.checkTotal);
-            }, 0);
+            const newBillTotal = currentBillNote.notes
+              .reduce((a, b) => {
+                return a + parseFloat(b.checkTotal);
+              }, 0)
+              .toFixed(2)
+              .toString();
 
             const newProductsForBill = currentBillNote.notes.flatMap(
               (element) => element.products,
             );
+            const aptBill = await this.billsModel.findByIdAndUpdate(
+              currentBillNote._id,
+              { checkTotal: newBillTotal, products: newProductsForBill },
+            );
+            console.log(aptBill);
             return updatedNote;
           }
           const newDiscount = await this.discountModel.create(payload.body);
@@ -143,15 +153,12 @@ export class DiscountsService {
             newDiscountBill.accountId,
             { discount: newDiscountBill._id },
           );
-          // falta actualizar el estatus de la mesa
           if (payload.body.discountType === COURTESY_APPLY_BILL) {
-            //Cambiar el status de la mesa
             const updateTable = await this.tableModel.findByIdAndUpdate(
               updatedBillDiscount.table,
               { status: FOR_PAYMENT_STATUS },
             );
 
-            // mandar la cuenta a cobrar
             const currentPeriod: any =
               await this.operatingPeriodService.getCurrent();
             const randomIndex = Math.floor(
@@ -186,8 +193,6 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
-          console.log('Nueva cortesia:');
-          console.log(newCourtesyNote);
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
             newCourtesyNote.accountId,
@@ -225,7 +230,6 @@ export class DiscountsService {
               { status: FOR_PAYMENT_STATUS },
             );
           }
-          // ocupo clavar el id de la cuenta en la cashier session
           const currentPeriod: any =
             await this.operatingPeriodService.getCurrent();
           const randomIndex = Math.floor(
@@ -291,9 +295,83 @@ export class DiscountsService {
         );
         return uptBill;
       case PRODUCT_CASE:
+        // De momento se cancela este metodo, se tendra que cancelar toda la cuenta.
+        // Se evaluara si se activa proximamente.
         return;
       default:
         return;
+    }
+  }
+
+  /**
+   * Deletes a discount product in a note.
+   *
+   * @param id - The ID of the note.
+   * @param body - The updated note data.
+   * @returns The updated note data with the products and check total.
+   * @throws Error if the operation fails.
+   */
+
+  async deleteDiscountProductInNote(id: string, body: updateNoteDto) {
+    const session = await this.noteModel.startSession();
+    session.startTransaction();
+    try {
+      const updatedNote = await this.noteModel.findByIdAndUpdate(id, body, {
+        new: true,
+      });
+      const currentBill = await this.billsModel
+        .findById(updatedNote.accountId)
+        .populate({ path: 'notes' });
+
+      const newTotal = currentBill.notes.reduce(
+        (a, b) => a + parseFloat(b.checkTotal),
+        0,
+      );
+      const noteToBillSendProducts = currentBill.notes.flatMap(
+        (element) => element.products,
+      );
+      const updateDatasSendNoteToBill = {
+        products: noteToBillSendProducts,
+        checkTotal: newTotal,
+      };
+
+      const updateSendNoteToBillCase = await this.billsModel.findByIdAndUpdate(
+        currentBill._id,
+        updateDatasSendNoteToBill,
+        { new: true },
+      );
+      await session.commitTransaction();
+      session.endSession();
+      return updateDatasSendNoteToBill;
+    } catch (error) {
+      throw new Error(`No se pudo completar. mas informacion: ${error}`);
+    }
+  }
+
+  async deleteDiscountProductInBill(id: string, body: updateNoteDto) {
+    const session = await this.billsModel.startSession();
+    session.startTransaction();
+    try {
+      console.log('pase por el cuerpo');
+      const updateBill = await this.billsModel.findByIdAndUpdate(id, body, {
+        new: true,
+      });
+      console.log('Esto regresa despues de');
+      /*
+      const newTotal = updateBill.products.reduce(
+        (a: any, b: any) => a + parseFloat(b.checkTotal),
+        0,
+      );
+      const updateBillTotal = await this.billsModel.findByIdAndUpdate(id, {
+        checkTotal: newTotal,
+
+      
+      }); */
+      await session.commitTransaction();
+      session.endSession();
+      return updateBill;
+    } catch (error) {
+      throw new Error(`No se pudo completar. mas informacion: ${error}`);
     }
   }
 }
