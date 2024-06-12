@@ -32,6 +32,14 @@ export class DiscountsController {
   }
 
   @Get(':id')
+  /**
+   * Retrieves a discount by its ID.
+   *
+   * @param id - The ID of the discount to retrieve.
+   * @returns A Promise that resolves to the selected discount.
+   * @throws NotFoundException if the discount with the specified ID is not found.
+   * @throws NotFoundException if an unexpected error occurs.
+   */
   async findOne(@Param('id') id: string) {
     try {
       const selectedDiscount = await this.discountService.findOne(id);
@@ -45,6 +53,13 @@ export class DiscountsController {
   }
 
   @Post()
+  /**
+   * Creates a new discount.
+   * @param payload - The payload containing the accountApt and body properties.
+   * @returns The newly created discount.
+   * @throws {ConflictException} If the discount has already been applied.
+   * @throws {NotFoundException} If the discount could not be applied.
+   */
   async create(@Body() payload: { accountApt: any; body: CreateDiscountDto }) {
     try {
       const newDiscount = await this.discountService.create(payload);
@@ -103,6 +118,40 @@ export class DiscountsController {
         );
       }
       return updatedDiscount;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
+  @Put('d/note/:id')
+  async deleteDiscountProductInNote(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    try {
+      const updateDiscount =
+        await this.discountService.deleteDiscountProductInNote(id, body);
+      if (!updateDiscount) {
+        throw new NotFoundException('No se puso completar');
+      }
+      return updateDiscount;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
+  @Put('d/bill/:id')
+  async deleteDiscountProductInBill(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    try {
+      const updateDiscount =
+        await this.discountService.deleteDiscountProductInBill(id, body);
+      if (!updateDiscount) {
+        throw new NotFoundException('No se puso completar');
+      }
+      return updateDiscount;
     } catch (error) {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
