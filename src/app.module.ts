@@ -38,6 +38,8 @@ import { RoleModule } from './role/role.module';
 import { DailyRegisterModule } from './daily-register/daily-register.module';
 import { CronModule } from './cron/cron.module';
 import { TogoOrderModule } from './ventas/orders/togo-order/togo-order.module';
+import { ClousuresOfOperationsModule } from './clousures-of-operations/clousures-of-operations.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -82,6 +84,8 @@ import { TogoOrderModule } from './ventas/orders/togo-order/togo-order.module';
     DailyRegisterModule,
     CronModule,
     TogoOrderModule,
+    ClousuresOfOperationsModule,
+    ReportsModule,
   ],
   controllers: [],
   providers: [],

@@ -33,8 +33,12 @@ export class PaymentsService {
   }
 
   async create(createdPayment: CreatePaymentDto) {
+    console.log(
+      'Por aca el createdPayment si llega al create de payments.service',
+    );
+    const session = await this.paymentModel.startSession();
+    session.startTransaction();
     try {
-      // Obtenemos el ultimo pago insertado
       const lastPaymentCode = await this.paymentModel
         .findOne({})
         .sort({ createdAt: -1 })
@@ -46,19 +50,35 @@ export class PaymentsService {
 
       const newCode = nextPaymentCode.toString();
 
-      // Crear nueva solicitud de pago con el folio calculado
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
         paymentCode: newCode,
       });
-      console.log(createdPayment.paymentCode);
+      await newPaymentCode.save();
+      const billCurrent = await this.billModel
+        .findById(createdPayment.accountId)
+        .populate({ path: 'payment' });
 
-      return await newPaymentCode.save();
+      const updatedBillData = {
+        payment: [...billCurrent.payment, newPaymentCode._id],
+        status: FINISHED_STATUS,
+      };
+      const updatedBill = await this.billModel.findByIdAndUpdate(
+        billCurrent._id,
+        updatedBillData,
+      );
+
+      if (!updatedBill) {
+        throw new NotFoundException('No se pudo actualizar la factura');
+      }
+      await session.commitTransaction();
+      session.endSession();
+
+      return;
     } catch (error) {
       console.error(error);
     }
   }
-
   async delete(id: string) {
     return await this.paymentModel.findByIdAndDelete(id);
   }
@@ -69,7 +89,6 @@ export class PaymentsService {
     });
   }
   async paymentNote(
-    // ACA EL METODO PARA PAGAR LA NOTA
     id: string,
     body: { accountId: string; body: CreatePaymentDto },
   ) {
@@ -89,27 +108,24 @@ export class PaymentsService {
       await this.noteModel.findByIdAndUpdate(id, dataInjectInNote); // cambiamos la nota
       const currentBill = await this.billModel
         .findById(body.accountId)
-        .populate({ path: 'notes' });
-      /* const newTotal = (
-        parseFloat(currentBill.checkTotal) - parseFloat(newPayment.paymentTotal)
-      ).toString();
-      */ // Este metodo estab restando lo que se pagaba de la nota la cuenta apero no es necesario revisar su borrado
+        .populate({ path: 'notes' })
+        .populate({ path: 'payment' });
 
       const enableNotes = currentBill.notes.filter(
         (note) =>
           note.status === ENABLE_STATUS || note.status === FOR_PAYMENT_STATUS,
       );
-      enableNotes.forEach((element) => element.status);
       if (enableNotes.length <= 0) {
-        //aca ACA LIBERREMOS MESA Y CAMBIAMOS EL ESTUSA DE LA CUENTA;
-        console.log(currentBill.table);
         const tableUpdated = await this.tableModel.findByIdAndUpdate(
           currentBill.table,
           { status: FREE_STATUS, bill: [] },
         );
 
         const updatedBillData = {
-          payment: [...currentBill.payment, newPayment._id],
+          payment:
+            currentBill.payment.length > 0
+              ? [...currentBill.payment, newPayment._id]
+              : [newPayment._id],
           status: FINISHED_STATUS,
         };
         await this.billModel.findByIdAndUpdate(
@@ -121,7 +137,11 @@ export class PaymentsService {
       }
 
       const updatedBillData = {
-        payment: [...currentBill.payment, newPayment._id],
+        payment:
+          currentBill.payment.length > 0
+            ? [...currentBill.payment, newPayment._id]
+            : [newPayment._id],
+        status: FINISHED_STATUS,
       };
       await this.billModel.findByIdAndUpdate(currentBill._id, updatedBillData);
       await session.commitTransaction();

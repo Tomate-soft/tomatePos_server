@@ -2,6 +2,7 @@ import { SchemaFactory, Schema, Prop, MongooseModule } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { User } from '../users.schema';
 import { Bills } from '../ventas/bills.schema';
+import { CashWithdraw } from './cashWithdraw';
 
 @Schema({ timestamps: true })
 export class CashierSession {
@@ -37,6 +38,17 @@ export class CashierSession {
 
   @Prop({ trim: true, default: '0.00' })
   totalCash?: string;
+
+  @Prop({ trim: true, default: 'active' })
+  status?: string;
+
+  @Prop({
+    trim: true,
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'CashWithdraw' }],
+    ref: 'CashWithdraw',
+    default: [],
+  })
+  cashWithdraw?: CashWithdraw[];
 }
 
 export const CashierSessionSchema =

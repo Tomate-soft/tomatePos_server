@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
 export interface Transaction {
   paymentType: string;
   quantity: string;
+  payQuantity: string;
 }
 
 @Schema({ timestamps: true })

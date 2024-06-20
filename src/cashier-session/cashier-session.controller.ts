@@ -99,9 +99,6 @@ export class CashierSessionController {
     @Param('id') id: string,
     @Body() body: updateCashierSessionDto,
   ) {
-    console.log('LLegue al metodo adecuado con la data:');
-    console.log(id);
-    console.log(body);
     try {
       const updatedData = await this.cashierSessionService.updateBillForPayment(
         id,
@@ -114,6 +111,19 @@ export class CashierSessionController {
     } catch (error) {
       throw new NotFoundException(
         `Ha ocurrido un error inepserado, mas informacion: ${error}`,
+      );
+    }
+  }
+
+  @Post('/cash-withdrawal')
+  async cashWithdrawal(@Body() body: any) {
+    console.log('LLegue al metodo adecuado con la data:');
+    try {
+      const withdrawal = await this.cashierSessionService.cashWithdrawal(body);
+      return withdrawal;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado, mas informacion: ${error}`,
       );
     }
   }

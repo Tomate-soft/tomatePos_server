@@ -10,12 +10,14 @@ export class Table {
     trim: true,
   })
   tableNum: string;
+
   @Prop({
-    default: 'N/A',
+    default: 1,
     required: true,
     trim: true,
   })
-  server: string;
+  diners: number;
+
   @Prop({
     default: 'free',
     required: true,
@@ -49,6 +51,12 @@ export class Table {
     default: true,
   })
   active: boolean;
+
+  @Prop({ default: true })
+  availability: boolean;
+
+  @Prop({ default: [] })
+  joinedTables: string[];
 }
 
 export const TableSchema = SchemaFactory.createForClass(Table);

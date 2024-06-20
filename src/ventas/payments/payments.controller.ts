@@ -49,14 +49,9 @@ export class PaymentsController {
 
   @Post()
   async create(@Body() body: CreatePaymentDto) {
+    console.log('Por aca el body que llega al create de payments.controller');
     try {
       const newPayment = await this.paymentService.create(body);
-      const id = newPayment._id;
-      console.log(newPayment._id); // Creamos el pago
-      const accountForPayment = await this.billService.findOne(body.accountId);
-      const payInBill = await this.billService.update(accountForPayment._id, {
-        payment: [id.toString()],
-      });
 
       return newPayment;
     } catch (error) {
@@ -93,6 +88,7 @@ export class PaymentsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
   @Post('p/note/:id')
   async paymentNote(
     @Param('id') id: string,
