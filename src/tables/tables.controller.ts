@@ -119,4 +119,17 @@ export class TablesController {
       throw new NotFoundException('Ha ocurrido un error inesperado');
     }
   }
+
+  @Put('split/:id')
+  async splitTables(@Param('id') id: string) {
+    try {
+      const splitTables = await this.tableService.separateTables(id);
+      if (!splitTables) {
+        throw new NotFoundException('No se pudieron dividir las mesas');
+      }
+      return splitTables;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido un error inesperado');
+    }
+  }
 }

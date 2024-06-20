@@ -1,4 +1,5 @@
-import PDFDocument from 'pdfkit-table';
+/*
+ import PDFDocument from 'pdfkit-table';
 
 export const buildPDF = (dataCallback: () => void, endCallback: () => void) => {
   const doc = new PDFDocument();
@@ -7,3 +8,5 @@ export const buildPDF = (dataCallback: () => void, endCallback: () => void) => {
   doc.text('Funciona! como pedrada!');
   doc.end();
 };
+
+*/
