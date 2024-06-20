@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { parse } from 'path';
-import { path } from 'pdfkit';
+
 import { createCashierSessionDto } from 'src/dto/cashierSession/createCashierSession';
 import { updateCashierSessionDto } from 'src/dto/cashierSession/updateCashierSession';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
@@ -153,11 +152,6 @@ export class CashierSessionService {
       parseFloat(currentSession.initialQuantity) -
       parseFloat(withdrawalsTotal);
     const isAllowed = parseFloat(body.amount) <= cashAvailable;
-
-    console.log('cashTotal', cashTotal);
-    console.log('withdrawalsTotal', withdrawalsTotal);
-    console.log('cashAvailable', cashAvailable);
-    console.log('isAllowed', isAllowed);
 
     if (isAllowed) {
       try {

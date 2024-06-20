@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { path } from 'pdfkit';
-import { buildPDF } from 'src/libs/pdfKit';
+
 import { ReportsService } from 'src/reports/reports.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
