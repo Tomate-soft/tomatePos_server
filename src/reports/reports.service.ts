@@ -10,10 +10,6 @@ import {
   PrinterTypes,
   ThermalPrinter,
 } from 'node-thermal-printer';
-import fs from 'fs';
-import path from 'path';
-import { title } from 'process';
-import { content } from 'pdfkit/js/page';
 
 @Injectable()
 export class ReportsService {
