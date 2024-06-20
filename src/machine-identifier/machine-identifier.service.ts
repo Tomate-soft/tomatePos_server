@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-// import * as fs from 'fs';
-// import * as path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class MachineIdentifierService {
-  /*
   async generateAndSaveIdentifier() {
     const uniqueCode = 'codigoUnico';
     const fileContent = `Identificador de máquina: ${uniqueCode}`;
@@ -28,5 +27,4 @@ export class MachineIdentifierService {
     console.log('FUNCIONA COMO PEDRADA!!!!');
     console.log('FUNCIONA COMO PEDRADA!!!!');
   }
-    */
 }
