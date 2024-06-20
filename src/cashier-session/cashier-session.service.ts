@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { parse } from 'path';
+import { path } from 'pdfkit';
 import { createCashierSessionDto } from 'src/dto/cashierSession/createCashierSession';
 import { updateCashierSessionDto } from 'src/dto/cashierSession/updateCashierSession';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { CashWithdraw } from 'src/schemas/cashierSession/cashWithdraw';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { User } from 'src/schemas/users.schema';
@@ -15,8 +18,11 @@ export class CashierSessionService {
     private cashierSessionModel: Model<CashierSession>,
     @InjectModel(OperatingPeriod.name)
     private readonly operatingPeriodModel: Model<OperatingPeriod>,
+    private readonly operatingPeriodService: OperatingPeriodService,
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    @InjectModel(CashWithdraw.name)
+    private readonly cashWithdrawModel: Model<CashWithdraw>,
   ) {}
 
   async findAll() {
@@ -82,9 +88,6 @@ export class CashierSessionService {
   }
 
   async updateBillForPayment(id: string, body: updateCashierSessionDto) {
-    console.log('si estoy llegando el metrodo correcto');
-    // Primero vamos a clavar el ID de la cuenta aqui en el cashier session
-
     const session = await this.cashierSessionModel.startSession();
     session.startTransaction();
     try {
@@ -109,5 +112,98 @@ export class CashierSessionService {
         `Hubo un error inesperado surante la sesion, mas informacion: ${error}`,
       );
     }
+  }
+
+  async cashWithdrawal(body: any) {
+    const session = await this.cashWithdrawModel.startSession();
+    session.startTransaction();
+    console.log(body);
+    // nec4sitamos saber si el monto que se esta retirando es menor al monto que se tiene en caja
+    const currentOperatingPeriod =
+      await this.operatingPeriodService.getCurrent();
+    // una ves creado el retiro vamos meterlo a la session del cajero
+    const currentUser = await this.userModel.findById(body.user);
+    if (!currentUser) {
+      throw new NotFoundException('No se encontro el usuario');
+    }
+    const currentSession = await this.cashierSessionModel
+      .findById(currentUser.cashierSession)
+      .populate({ path: 'cashWithdraw' });
+    const finishedBills = currentSession.bills.filter(
+      (bill) => bill.status === 'finished',
+    );
+    const totalpayments = finishedBills.flatMap((bill) => bill.payment);
+    const transactionsArray = totalpayments.flatMap(
+      (payment) => payment.transactions,
+    );
+    const cashTransactions = transactionsArray.filter(
+      (transaction) => transaction.paymentType === 'cash',
+    );
+    const cashTotal = cashTransactions.reduce(
+      (acc, transaction) => acc + parseFloat(transaction.payQuantity),
+      0,
+    );
+    const withdrawalsTotal =
+      currentSession.cashWithdraw
+        .reduce((acc, withdraw) => acc + parseFloat(withdraw.amount), 0)
+        .toFixed(2)
+        .toString() ?? '0.00';
+    const cashAvailable =
+      cashTotal +
+      parseFloat(currentSession.initialQuantity) -
+      parseFloat(withdrawalsTotal);
+    const isAllowed = parseFloat(body.amount) <= cashAvailable;
+
+    console.log('cashTotal', cashTotal);
+    console.log('withdrawalsTotal', withdrawalsTotal);
+    console.log('cashAvailable', cashAvailable);
+    console.log('isAllowed', isAllowed);
+
+    if (isAllowed) {
+      try {
+        const newWithdraw = new this.cashWithdrawModel(body);
+        await newWithdraw.save();
+
+        const updateSession = await this.cashierSessionModel.findByIdAndUpdate(
+          currentUser.cashierSession,
+          { cashWithdraw: [...currentSession.cashWithdraw, newWithdraw._id] },
+          { new: true },
+        );
+
+        console.log('currentOperatingPeriod', currentOperatingPeriod);
+
+        // tenemos aqui el periodo operativo /vamos a calcular el total de retiros parciales
+        const totalPartialWithdrawals = (
+          parseFloat(currentOperatingPeriod[0].withdrawals) +
+          parseFloat(body.amount)
+        )
+          .toFixed(2)
+          .toString();
+
+        // vamos a actualizar el periodo operativo con el nuevo total de retiros
+        const updatedOperatingPeriod =
+          await this.operatingPeriodModel.findByIdAndUpdate(
+            currentOperatingPeriod[0]._id,
+            { withdrawals: totalPartialWithdrawals },
+            { new: true },
+          );
+
+        await session.commitTransaction();
+        session.endSession();
+        return updatedOperatingPeriod;
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error(
+          `Hubo un error inesperado durante la sesion, mas informacion: ${error}`,
+        );
+      }
+    }
+    await session.abortTransaction();
+    session.endSession();
+    console.error(
+      'No hay efectivo suficiente para realizar el retiro, por favor verifique el monto a retirar',
+    );
+    return { message: 'No hay efectivo suficiente para realizar el retiro' };
   }
 }

@@ -73,4 +73,77 @@ export class TablesService {
       { $set: { assigned: false, user: null } },
     );
   }
+
+  async joinTables(body: any) {
+    console.log('body', body);
+
+    // Copia profunda de body.tables para evitar modificar el original
+    const tablesCopy = JSON.parse(JSON.stringify(body.tables));
+
+    // Verificar si hay mesas con cuentas activas
+    const accountEnable = tablesCopy.some((table) => table.bill.length > 0);
+    const tableWithAccount = tablesCopy.filter(
+      (table) => table.bill.length > 0,
+    );
+    console.log('accountEnable', accountEnable);
+    console.log('tableWithAccount', tableWithAccount);
+
+    switch (accountEnable) {
+      case true:
+        // Si hay mesas con cuentas activas, retornar un mensaje y las mesas con cuentas activas
+        return {
+          message: 'No se puede unir mesas con cuentas activas',
+          tables: tableWithAccount,
+        };
+
+      case false:
+        // Si no hay mesas con cuentas activas, buscar la mesa con el número más bajo
+        const tableMin = tablesCopy.reduce(
+          (min, table) =>
+            parseFloat(table.tableNum) < parseFloat(min.tableNum) ? table : min,
+          tablesCopy[0],
+        );
+        console.log('tableMin', tableMin);
+
+        // Filtrar las mesas restantes que no son la mínima
+        const tablesNoMin = tablesCopy.filter(
+          (table) => table._id !== tableMin._id,
+        );
+        const tableNums = tablesNoMin.map((table) => table.tableNum);
+        const objectIds = tablesNoMin.map((table) => table._id);
+
+        // Crear el filtro para seleccionar las mesas por sus IDs
+        const filter = { _id: { $in: objectIds } };
+        // Definir la actualización que quieres aplicar
+        const update = { $set: { availability: false } };
+
+        // Iniciar una sesión y transacción en MongoDB
+        const session = await this.tableModel.startSession();
+        session.startTransaction();
+
+        try {
+          // Actualizar las mesas restantes para establecer su disponibilidad a false
+          await this.tableModel.updateMany(filter, update, { session });
+
+          // Actualizar la mesa mínima para incluir las mesas unidas
+          await this.tableModel.updateOne(
+            { _id: tableMin._id },
+            { $set: { joinedTables: tableNums } },
+            { session },
+          );
+
+          // Confirmar la transacción
+          await session.commitTransaction();
+          session.endSession();
+
+          return { message: 'Mesas unidas correctamente' };
+        } catch (error) {
+          // Manejo de errores y reversión de la transacción en caso de fallo
+          await session.abortTransaction();
+          session.endSession();
+          console.error('Error uniendo mesas:', error);
+          throw new Error('Error uniendo mesas');
+        }
+    }
+  }
 }

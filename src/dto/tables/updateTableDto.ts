@@ -12,4 +12,16 @@ export class UpdateTableDto {
   status?: string;
   @IsOptional()
   bill?: string[];
+  @IsOptional()
+  assigned?: boolean;
+  @IsOptional()
+  user?: string;
+  @IsOptional()
+  zone?: string;
+  @IsOptional()
+  active?: boolean;
+  @IsOptional()
+  availability?: boolean;
+  @IsOptional()
+  joinedTables?: string[];
 }

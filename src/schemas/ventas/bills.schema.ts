@@ -35,7 +35,7 @@ export class Bills {
   @Prop({
     required: true,
   })
-  status: 'enable' | 'disabled' | 'cancelled';
+  status: 'enable' | 'disabled' | 'cancelled' | 'finished';
 
   @Prop({
     default: [],
@@ -91,7 +91,6 @@ export class Bills {
   discount?: Discount;
 
   /* 
-
   device: string;
   */
 }

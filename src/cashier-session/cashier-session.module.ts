@@ -12,6 +12,9 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { User, UserSchema } from 'src/schemas/users.schema';
+import CashWithdrawSchema, {
+  CashWithdraw,
+} from 'src/schemas/cashierSession/cashWithdraw';
 
 @Module({
   imports: [
@@ -28,9 +31,13 @@ import { User, UserSchema } from 'src/schemas/users.schema';
         name: User.name,
         schema: UserSchema,
       },
+      {
+        name: CashWithdraw.name,
+        schema: CashWithdrawSchema,
+      },
     ]),
   ],
   controllers: [CashierSessionController],
-  providers: [CashierSessionService],
+  providers: [CashierSessionService, OperatingPeriodService],
 })
 export class CashierSessionModule {}

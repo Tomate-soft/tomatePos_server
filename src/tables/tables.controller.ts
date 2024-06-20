@@ -106,4 +106,17 @@ export class TablesController {
       throw new NotFoundException('Ha ocurrido un error inesperado');
     }
   }
+
+  @Put('join')
+  async joinTables(@Body() body: any) {
+    try {
+      const joinedTables = await this.tableService.joinTables(body);
+      if (!joinedTables) {
+        throw new NotFoundException('No se pudieron unir las mesas');
+      }
+      return joinedTables;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido un error inesperado');
+    }
+  }
 }

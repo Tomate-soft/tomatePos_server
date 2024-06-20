@@ -3,32 +3,40 @@ import { IsOptional, IsString } from 'class-validator';
 export class updateCashierSessionDto {
   @IsOptional()
   @IsString()
-  startDate: string;
+  startDate?: string;
 
   @IsOptional()
   @IsString()
-  user: string;
+  user?: string;
 
   @IsOptional()
   bills?: [];
 
   @IsOptional()
   @IsString()
-  endDate: string;
+  endDate?: string;
 
   @IsOptional()
   @IsString()
-  enable: string;
+  enable?: string;
 
   @IsOptional()
   @IsString()
-  totalDebit: string;
+  totalDebit?: string;
 
   @IsOptional()
   @IsString()
-  totalCredit: string;
+  totalCredit?: string;
 
   @IsOptional()
   @IsString()
-  totalCash: string;
+  totalCash?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  cashRequest?: string;
 }

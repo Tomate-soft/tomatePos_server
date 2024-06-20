@@ -20,10 +20,8 @@ export class OperatingPeriod {
   })
   sellProcess: CashierSession[];
 
-  /*
-  @Prop({ required: true })
-  totalRevenue: string;
-  */
+  @Prop({ required: true, default: '0.00' })
+  withdrawals?: string;
 }
 
 export const OperatingPeriodSchema =
