@@ -1,27 +1,24 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
-export class updateToGoOrderDto {
-  @IsOptional()
+export class createRappiOrderDto {
   @IsString()
   code: string;
 
-  @IsOptional()
   @IsString()
   user: string;
 
-  @IsOptional()
+  @IsString()
+  userId: string;
+
   @IsString()
   checkTotal: string;
 
-  @IsOptional()
   @IsString()
   status: string;
 
-  @IsOptional()
   @IsArray()
   products: [];
 
-  @IsOptional()
   @IsArray()
   payment: [];
 

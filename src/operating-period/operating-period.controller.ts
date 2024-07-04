@@ -34,4 +34,19 @@ export class OperatingPeriodController {
       );
     }
   }
+  @Get('/total-sells')
+  async totalSells() {
+    try {
+      const totalSells =
+        await this.operatingPeriodService.getTotalSellsService();
+      if (!totalSells) {
+        throw new NotFoundException('No se han iniciado operaciones');
+      }
+      return totalSells;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido algo inesperado. Mas informacion: ${error}`,
+      );
+    }
+  }
 }

@@ -40,6 +40,7 @@ import { CronModule } from './cron/cron.module';
 import { TogoOrderModule } from './ventas/orders/togo-order/togo-order.module';
 import { ClousuresOfOperationsModule } from './clousures-of-operations/clousures-of-operations.module';
 import { ReportsModule } from './reports/reports.module';
+import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module';
 
 @Module({
   imports: [
@@ -86,6 +87,7 @@ import { ReportsModule } from './reports/reports.module';
     TogoOrderModule,
     ClousuresOfOperationsModule,
     ReportsModule,
+    RappiOrderModule,
   ],
   controllers: [],
   providers: [],

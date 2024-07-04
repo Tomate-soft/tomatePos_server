@@ -30,6 +30,12 @@ export class Bills {
     required: true,
     trim: true,
   })
+  userId: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
   checkTotal: string;
 
   @Prop({

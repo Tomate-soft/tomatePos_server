@@ -127,4 +127,19 @@ export class CashierSessionController {
       );
     }
   }
+
+  @Put('pause/resume/:id')
+  async pauseResume(@Param('id') id: string) {
+    try {
+      const updatedData = await this.cashierSessionService.pauseResume(id);
+      if (!updatedData) {
+        throw new NotFoundException('No se pudo actualizar');
+      }
+      return updatedData;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado, mas informacion: ${error}`,
+      );
+    }
+  }
 }

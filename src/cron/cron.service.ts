@@ -46,7 +46,15 @@ export class CronService {
     cron.schedule('0 2 * * * ', async () => {
       const tableUpdated = await this.tableModel.updateMany(
         {},
-        { $set: { status: FREE_STATUS, bill: [] } },
+        {
+          $set: {
+            status: FREE_STATUS,
+            bill: [],
+            availability: true,
+            joinedTables: [],
+            diners: 1,
+          },
+        },
       );
       if (tableUpdated) {
         console.log('Mesas liberadas con exito');

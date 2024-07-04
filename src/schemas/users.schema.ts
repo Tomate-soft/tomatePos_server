@@ -5,6 +5,14 @@ import { Profile } from './usuarios/profiles.Schema';
 import { Table } from './tables/tableSchema';
 import { DailyRegister } from './dailyRegister/createDailyRegister';
 import { CashierSession } from './cashierSession/cashierSession';
+import { ToGoOrder } from './ventas/orders/toGoOrder.schema';
+
+export interface Transaction {
+  paymentType: string;
+  quantity: string;
+  payQuantity: string;
+  tips: string;
+}
 
 @Schema({
   timestamps: true,
@@ -120,5 +128,14 @@ export class User {
     default: null,
   })
   cashierSession?: CashierSession;
+
+  @Prop({ trim: true, default: [] })
+  tips?: Transaction[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ToGoOrder' }],
+    default: [],
+  })
+  togoorders?: ToGoOrder[];
 }
 export const UserSchema = SchemaFactory.createForClass(User);

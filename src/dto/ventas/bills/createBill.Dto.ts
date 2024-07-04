@@ -17,6 +17,9 @@ export class CreateBillDto {
   @IsString()
   user: string;
 
+  @IsString()
+  userId: string;
+
   @IsDefined()
   @IsString()
   checkTotal: string;

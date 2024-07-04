@@ -7,6 +7,17 @@ import { BillsService } from '../bills/bills.service';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import {
+  ToGoOrder,
+  ToGoOrderSchema,
+} from 'src/schemas/ventas/orders/toGoOrder.schema';
+import { User, UserSchema } from 'src/schemas/users.schema';
+import {
+  CashierSession,
+  CashierSessionSchema,
+} from 'src/schemas/cashierSession/cashierSession';
+import { report } from 'process';
+import { ReportsService } from 'src/reports/reports.service';
 
 @Module({
   imports: [
@@ -27,9 +38,21 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
         name: Table.name,
         schema: TableSchema,
       },
+      {
+        name: ToGoOrder.name,
+        schema: ToGoOrderSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+      {
+        name: CashierSession.name,
+        schema: CashierSessionSchema,
+      },
     ]),
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService, BillsService],
+  providers: [PaymentsService, BillsService, ReportsService],
 })
 export class PaymentsModule {}

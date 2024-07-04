@@ -3,6 +3,7 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { User } from '../users.schema';
 import { Bills } from '../ventas/bills.schema';
 import { CashWithdraw } from './cashWithdraw';
+import { ToGoOrder } from '../ventas/orders/toGoOrder.schema';
 
 @Schema({ timestamps: true })
 export class CashierSession {
@@ -20,6 +21,12 @@ export class CashierSession {
     default: [],
   })
   bills: Bills[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'ToGoOrder' }],
+    default: [],
+  })
+  togoorders?: ToGoOrder[];
 
   @Prop({ trim: true })
   endDate: string;

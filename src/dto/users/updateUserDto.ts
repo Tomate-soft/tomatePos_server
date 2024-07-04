@@ -71,8 +71,14 @@ export class UpdateUserDto {
   tables?: string[];
 
   @IsOptional()
-  dailyRegister: string;
+  dailyRegister?: string;
 
   @IsOptional()
-  cashierSession: string;
+  cashierSession?: string;
+
+  @IsOptional()
+  tips?: string[];
+
+  @IsOptional()
+  togoOrders?: string[];
 }

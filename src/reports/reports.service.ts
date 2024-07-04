@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
-import puppeter from 'puppeteer';
-import pdf from 'html-pdf';
+import puppeteer from 'puppeteer';
+import * as fs from 'fs/promises';
 import { cashierSessionReport } from './reportsTemplates/cashierSessionReport';
 import {
   CharacterSet,
   PrinterTypes,
   ThermalPrinter,
 } from 'node-thermal-printer';
+import { printPayTipsReport } from './reportsTemplates/tipsReport';
+import { printShiftTemplate } from './reportsTemplates/printShift';
+import { format, getISOWeek, startOfWeek } from 'date-fns';
+import { mojeReportTemplate } from './reportsTemplates/mojeReport';
 
 @Injectable()
 export class ReportsService {
@@ -18,97 +22,168 @@ export class ReportsService {
     private cashierSessionModel: Model<CashierSession>,
   ) {}
 
-  async closeCashierSession(body: any) {
-    console.log('llegue hasta la impresion bandita');
-
+  private async ensureReportsFolderExists(folderPath: string) {
     try {
-      const printer = new ThermalPrinter({
-        type: PrinterTypes.EPSON,
-        interface: `tcp://192.168.1.70`,
-        characterSet: CharacterSet.SLOVENIA,
-        removeSpecialCharacters: false,
-        width: 42,
-        options: {
-          timeout: 10000,
-        },
-        // Adjust the timeout value in milliseconds
-      });
+      await fs.access(folderPath); // Verifica si la carpeta existe
+    } catch (error) {
+      await fs.mkdir(folderPath, { recursive: true }); // Crea la carpeta si no existe
+    }
+  }
+
+  private async getWeekFolderName() {
+    const today = new Date();
+    const weekStart = startOfWeek(today);
+    const weekNumber = getISOWeek(today);
+    const formattedDate = format(weekStart, 'yyyy-MM-dd'); // Formato para nombre de carpeta
+    return `Week-${weekNumber}_${formattedDate}`;
+  }
+
+  private async createPrinter() {
+    return new ThermalPrinter({
+      type: PrinterTypes.EPSON,
+      interface: `tcp://192.168.1.74`,
+      characterSet: CharacterSet.SLOVENIA,
+      removeSpecialCharacters: false,
+      width: 42,
+      options: {
+        timeout: 100000,
+      },
+    });
+  }
+
+  async closeCashierSession(body: any) {
+    try {
+      const weekFolder = await this.getWeekFolderName();
+      const folderPath = `C:/Reports/TillSession/${weekFolder}`;
+      await this.ensureReportsFolderExists(folderPath);
 
       const html = cashierSessionReport(body);
+      const reportName = `till_session-${new Date().getTime()}.png`;
+      const savePath = `${folderPath}/${reportName}`;
 
-      ///////////////////////////////////////
-      /* Proceso de impresion             */
-      ///////////////////////////////////////
-
-      const reportName = `${new Date().getTime()}.png`;
-
-      // generamos imagen con puppeteer
-      const browser = await puppeter.launch();
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(html);
       await page.screenshot({
-        path: reportName,
+        path: savePath,
         fullPage: true,
       });
       await browser.close();
+
+      const printer = await this.createPrinter();
       printer.alignCenter();
-      await printer.printImage('./src/assets/icon/TomateTaqueria.png');
-
-      await printer.printImage(`./${reportName}`);
-
-      // Ahora vamos a imprimir la imagen
-
-      ///////////////////////////////////////
-      /* Proceso de impresion             */
-      ///////////////////////////////////////
-
-      // Cortar el papel
+      await printer.printImage(savePath);
+      printer.alignLeft();
+      await printer.printImage('./src/assets/icon/tomatelogoticket.png');
       printer.partialCut();
       await printer.execute();
-      await printer.execute();
 
-      console.log('Ticket impreso correctamente');
+      console.log('Ticket de sesión de caja impreso correctamente');
     } catch (error) {
-      console.log('Error al imprimir');
+      console.log('Error al imprimir el ticket de sesión de caja');
       console.log(error);
     }
+  }
 
-    //////////////////////////////////////////////////////
-    /*    cierre de metodo de caja                      */
-    ////////////////////////////////////////////////////////
+  async payTipsReport(body: any) {
+    try {
+      const weekFolder = await this.getWeekFolderName();
+      const folderPath = `C:/Reports/tips/${weekFolder}`;
+      await this.ensureReportsFolderExists(folderPath);
 
-    // aca qvamos a seguir lo que vamos ha hacer es empezar a crear los templkates para los reportes
-    /* const report = cashierSessionReport(body.data);
-    pdf.create(report).toStream(async (err, stream) => {
-      if (err) return console.error(err);
+      const html = printPayTipsReport(body);
+      const reportName = `tips_${new Date().getTime()}.png`;
+      const savePath = `${folderPath}/${reportName}`;
 
-      // Leer el archivo PDF y enviarlo a la impresora
-      fs.readFile('./ticket.pdf', async (err, data) => {
-        if (err) return console.error(err);
-
-        // Configuración de la impresora
-        let printer = new ThermalPrinter({
-          type: PrinterTypes.EPSON,
-          interface: 'tcp://192.168.192.168',
-        });
-
-        try {
-          let isConnected = await printer.isPrinterConnected();
-          if (!isConnected) {
-            console.log('Impresora no conectada');
-            throw new Error('Impresora no conectada');
-          }
-
-          printer.print('funciona perfecto');
-          await printer.execute();
-          console.log('Impresora no conectada');
-          throw new Error('Ticket impreso correctamente');
-        } catch (error) {
-          console.log('Impresora no conectada');
-          throw new Error('Error al imprimir: ' + error.message);
-        }
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(html);
+      await page.screenshot({
+        path: savePath,
+        fullPage: true,
       });
-    });
-    */
+      await browser.close();
+
+      const printer = await this.createPrinter();
+      printer.alignCenter();
+      await printer.printImage(savePath);
+      printer.alignLeft();
+      await printer.printImage('./src/assets/icon/tomatelogoticket.png');
+      printer.partialCut();
+      await printer.execute();
+
+      console.log('Ticket de reporte de tips impreso correctamente');
+    } catch (error) {
+      console.log('Error al imprimir el ticket de reporte de tips');
+      console.log(error);
+    }
+  }
+
+  async printShift(body: any) {
+    try {
+      const weekFolder = await this.getWeekFolderName();
+      const folderPath = `C:/Reports/shifts/${weekFolder}`;
+      await this.ensureReportsFolderExists(folderPath);
+
+      const html = printShiftTemplate(body);
+      const reportName = `shift-${new Date().getTime()}.png`;
+      const savePath = `${folderPath}/${reportName}`;
+
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(html);
+      await page.screenshot({
+        path: savePath,
+        fullPage: true,
+      });
+      await browser.close();
+
+      const printer = await this.createPrinter();
+      printer.alignCenter();
+      await printer.printImage(savePath);
+      printer.alignLeft();
+      await printer.printImage('./src/assets/icon/tomatelogoticket.png');
+      printer.partialCut();
+      await printer.execute();
+
+      return 'Ticket de turno impreso correctamente';
+    } catch (error) {
+      console.log('Error al imprimir el ticket de turno');
+      console.log(error);
+    }
+  }
+
+  async printMojeReport(body: any) {
+    try {
+      const weekFolder = await this.getWeekFolderName();
+      const folderPath = `C:/Reports/Moje/${weekFolder}`;
+      await this.ensureReportsFolderExists(folderPath);
+
+      const html = mojeReportTemplate(body);
+      const reportName = `Moje-${new Date().getTime()}.png`;
+      const savePath = `${folderPath}/${reportName}`;
+
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(html);
+      await page.screenshot({
+        path: savePath,
+        fullPage: true,
+      });
+      await browser.close();
+
+      const printer = await this.createPrinter();
+      printer.alignCenter();
+      await printer.printImage(savePath);
+      printer.alignLeft();
+      await printer.printImage('./src/assets/icon/tomatelogoticket.png');
+      printer.partialCut();
+      await printer.execute();
+
+      return 'Ticket de turno impreso correctamente';
+    } catch (error) {
+      console.log('Error al imprimir el ticket de turno');
+      console.log(error);
+    }
   }
 }
