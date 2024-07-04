@@ -200,4 +200,31 @@ export class CashierSessionService {
     );
     return { message: 'No hay efectivo suficiente para realizar el retiro' };
   }
+
+  async pauseResume(id: string) {
+    const session = await this.cashierSessionModel.startSession();
+    session.startTransaction();
+    try {
+      const currentSession = await this.cashierSessionModel.findById(id);
+      if (!currentSession) {
+        throw new NotFoundException('No se pudo actualizar');
+      }
+      const res = await this.cashierSessionModel.findByIdAndUpdate(
+        id,
+        { enable: currentSession.enable === true ? false : true },
+        {
+          new: true,
+        },
+      );
+      await session.commitTransaction();
+      session.endSession();
+      return res;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.error(
+        `Hubo un error inesperado surante la sesion, mas informacion: ${error}`,
+      );
+    }
+  }
 }

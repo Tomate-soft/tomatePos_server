@@ -3,7 +3,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Payment } from '../payment.schema';
 
 @Schema({ timestamps: true, versionKey: false })
-export class ToGoOrder {
+export class RappiOrder {
   @Prop({ required: true, trim: true })
   code: string;
 
@@ -43,7 +43,7 @@ export class ToGoOrder {
   })
   payment?: Payment[];
 
-  @Prop({ default: 'TOGO_ORDER' })
+  @Prop({ default: 'RAPPI_ORDER' })
   sellType: string;
 
   @Prop({
@@ -52,4 +52,4 @@ export class ToGoOrder {
   orderName?: string;
 }
 
-export const ToGoOrderSchema = SchemaFactory.createForClass(ToGoOrder);
+export const RappiOrderSchema = SchemaFactory.createForClass(RappiOrder);

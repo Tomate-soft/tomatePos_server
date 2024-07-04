@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { reduce } from 'rxjs';
+import { UpdateUserDto } from 'src/dto/users/updateUserDto';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
+import { updateToGoOrderDto } from 'src/dto/ventas/orders/updateToGoOrder.dto';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
 import {
@@ -10,9 +13,13 @@ import {
   FOR_PAYMENT_STATUS,
   FREE_STATUS,
 } from 'src/libs/status.libs';
+import { ReportsService } from 'src/reports/reports.service';
+import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { Table } from 'src/schemas/tables/tableSchema';
+import { User } from 'src/schemas/users.schema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
+import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
 
 @Injectable()
@@ -22,6 +29,12 @@ export class PaymentsService {
     @InjectModel(Notes.name) private readonly noteModel: Model<Notes>,
     @InjectModel(Bills.name) private readonly billModel: Model<Bills>,
     @InjectModel(Table.name) private readonly tableModel: Model<Table>,
+    @InjectModel(ToGoOrder.name)
+    private readonly toGoOrderModel: Model<ToGoOrder>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(CashierSession.name)
+    private readonly cashierSessionModel: Model<CashierSession>,
+    private reportsService: ReportsService,
   ) {}
 
   async findAll() {
@@ -88,6 +101,7 @@ export class PaymentsService {
       new: true,
     });
   }
+
   async paymentNote(
     id: string,
     body: { accountId: string; body: CreatePaymentDto },
@@ -147,6 +161,84 @@ export class PaymentsService {
       await session.commitTransaction();
       session.endSession();
       return newPayment;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.error(error);
+    }
+  }
+
+  async paymentToGo(data: { waiterId: string; body: any }) {
+    const session = await this.paymentModel.startSession();
+    session.startTransaction();
+    try {
+      const newPayment = new this.paymentModel(data.body);
+      await newPayment.save();
+
+      await session.commitTransaction();
+      session.endSession();
+
+      // la togo order
+      const currentBill = await this.toGoOrderModel.findById(
+        data.body.accountId,
+      );
+
+      const updatedToGoOrder = {
+        payment: [...currentBill.payment, newPayment._id],
+        status: FINISHED_STATUS,
+      };
+
+      const toGoOrderUpdated = await this.toGoOrderModel.findByIdAndUpdate(
+        currentBill._id,
+        updatedToGoOrder,
+      );
+
+      const waiter = await this.userModel.findById(data.waiterId);
+      const totalTransactions = newPayment.transactions;
+      console.log(totalTransactions);
+
+      // a{adiremos las propinas al mesero
+      const totalTips =
+        waiter.tips.length > 0
+          ? waiter.tips.concat(totalTransactions)
+          : totalTransactions;
+      const updatedWaiter = {
+        toGoOrder: [...waiter.togoorders, toGoOrderUpdated._id],
+        tips: totalTips,
+      };
+
+      await this.userModel.findByIdAndUpdate(data.waiterId, updatedWaiter);
+
+      // falta el cashierSession actualizado
+      const cashier = await this.userModel.findById(data.body.cashier);
+      const sessionCashier = await this.cashierSessionModel.findById(
+        cashier.cashierSession,
+      );
+      const updatedCashierSession = {
+        togoorders: [...sessionCashier.togoorders, currentBill._id],
+      };
+
+      const cashierSessionUpdated =
+        await this.cashierSessionModel.findByIdAndUpdate(
+          sessionCashier._id,
+          updatedCashierSession,
+        );
+      return { message: 'Funciona perfecto' };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+    }
+  }
+
+  async paymentTips(id: string, body: any) {
+    const session = await this.paymentModel.startSession();
+    session.startTransaction();
+    try {
+      await session.commitTransaction();
+      session.endSession();
+      console.log('Por aca si llega al paymentTips de payments.service');
+      await this.reportsService.payTipsReport(body);
+      return { message: 'Funciona perfecto' };
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

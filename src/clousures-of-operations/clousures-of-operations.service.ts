@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-
 import { ReportsService } from 'src/reports/reports.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
@@ -21,8 +20,6 @@ export class ClousuresOfOperationsService {
   }
 
   async closeCashierSession(body: any) {
-    const receivedData = {};
-
     // Requested Data
     const currentSession = await this.cashierSessionModel
       .findOne({
@@ -82,13 +79,6 @@ export class ClousuresOfOperationsService {
   // como la fecha
   // el nombre dle cajero
   // Folio de corte
-
-
-
-
-
-
-
 
 */
 

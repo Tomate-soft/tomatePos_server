@@ -13,6 +13,9 @@ export class updateCashierSessionDto {
   bills?: [];
 
   @IsOptional()
+  togoorders?: string[];
+
+  @IsOptional()
   @IsString()
   endDate?: string;
 

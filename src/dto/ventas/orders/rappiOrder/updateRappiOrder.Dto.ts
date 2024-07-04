@@ -1,6 +1,6 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
-export class updateToGoOrderDto {
+export class updateRappiOrderDto {
   @IsOptional()
   @IsString()
   code: string;

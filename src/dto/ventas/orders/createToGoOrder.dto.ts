@@ -1,4 +1,4 @@
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class createToGoOrderDto {
   @IsString()
@@ -6,6 +6,9 @@ export class createToGoOrderDto {
 
   @IsString()
   user: string;
+
+  @IsString()
+  userId: string;
 
   @IsString()
   checkTotal: string;
@@ -18,4 +21,8 @@ export class createToGoOrderDto {
 
   @IsArray()
   payment: [];
+
+  @IsString()
+  @IsOptional()
+  orderName: string;
 }
