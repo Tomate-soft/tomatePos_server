@@ -4,6 +4,8 @@ import { User } from '../users.schema';
 import { Bills } from '../ventas/bills.schema';
 import { CashWithdraw } from './cashWithdraw';
 import { ToGoOrder } from '../ventas/orders/toGoOrder.schema';
+import { RappiOrder } from '../ventas/orders/rappiOrder.schema';
+import { PhoneOrder } from '../ventas/orders/phoneOrder.schema';
 
 @Schema({ timestamps: true })
 export class CashierSession {
@@ -27,6 +29,18 @@ export class CashierSession {
     default: [],
   })
   togoorders?: ToGoOrder[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'RappiOrder' }],
+    default: [],
+  })
+  rappiOrders?: RappiOrder[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'PhoneOrder' }],
+    default: [],
+  })
+  phoneOrders?: PhoneOrder[];
 
   @Prop({ trim: true })
   endDate: string;

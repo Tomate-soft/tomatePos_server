@@ -41,6 +41,9 @@ import { TogoOrderModule } from './ventas/orders/togo-order/togo-order.module';
 import { ClousuresOfOperationsModule } from './clousures-of-operations/clousures-of-operations.module';
 import { ReportsModule } from './reports/reports.module';
 import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module';
+import { PhoneOrderModule } from './ventas/orders/phone-order/phone-order.module';
+import { ProcessModule } from './process/process.module';
+import { BusinessModule } from './business/business.module';
 
 @Module({
   imports: [
@@ -88,6 +91,9 @@ import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module
     ClousuresOfOperationsModule,
     ReportsModule,
     RappiOrderModule,
+    PhoneOrderModule,
+    ProcessModule,
+    BusinessModule,
   ],
   controllers: [],
   providers: [],

@@ -6,6 +6,8 @@ import { Table } from './tables/tableSchema';
 import { DailyRegister } from './dailyRegister/createDailyRegister';
 import { CashierSession } from './cashierSession/cashierSession';
 import { ToGoOrder } from './ventas/orders/toGoOrder.schema';
+import { RappiOrder } from './ventas/orders/rappiOrder.schema';
+import { PhoneOrder } from './ventas/orders/phoneOrder.schema';
 
 export interface Transaction {
   paymentType: string;
@@ -137,5 +139,18 @@ export class User {
     default: [],
   })
   togoorders?: ToGoOrder[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'RappiOrder' }],
+    default: [],
+  })
+  rappiOrders?: RappiOrder[];
+
+  @Prop({
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'PhoneOrder' }],
+    default: [],
+  })
+  phoneOrders?: PhoneOrder[];
 }
+
 export const UserSchema = SchemaFactory.createForClass(User);

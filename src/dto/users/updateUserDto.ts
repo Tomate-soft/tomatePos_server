@@ -81,4 +81,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   togoOrders?: string[];
+
+  @IsOptional()
+  rappiOrders?: string[];
+
+  @IsOptional()
+  phoneOrders?: string[];
 }

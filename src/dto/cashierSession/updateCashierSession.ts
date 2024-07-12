@@ -16,6 +16,12 @@ export class updateCashierSessionDto {
   togoorders?: string[];
 
   @IsOptional()
+  rappiOrders?: string[];
+
+  @IsOptional()
+  phoneOrders?: string[];
+
+  @IsOptional()
   @IsString()
   endDate?: string;
 

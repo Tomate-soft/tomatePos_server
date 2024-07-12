@@ -14,8 +14,6 @@ import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
 import { BillsService } from '../bills/bills.service';
-import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
-import { updateToGoOrderDto } from 'src/dto/ventas/orders/updateToGoOrder.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -122,6 +120,48 @@ export class PaymentsController {
         throw new NotFoundException('No se completo el pago a domicilio');
       }
       return payToGo;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado, no se pudo completar el pago, mas informacion: ${error}`,
+      );
+    }
+  }
+
+  @Post('rappi/pay')
+  async paymentRappi(
+    @Body()
+    data: {
+      waiterId: any;
+      body: any;
+    },
+  ) {
+    try {
+      const payToGo = await this.paymentService.paymentRappiService(data);
+      if (!payToGo) {
+        throw new NotFoundException('No se completo el pago a domicilio');
+      }
+      return payToGo;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado, no se pudo completar el pago, mas informacion: ${error}`,
+      );
+    }
+  }
+
+  @Post('phone/pay')
+  async paymentPhone(
+    @Body()
+    data: {
+      waiterId: any;
+      body: any;
+    },
+  ) {
+    try {
+      const payPhone = await this.paymentService.paymentPhoneOrder(data);
+      if (!payPhone) {
+        throw new NotFoundException('No se completo el pago a domicilio');
+      }
+      return payPhone;
     } catch (error) {
       throw new NotFoundException(
         `Ha ocurrido un error inesperado, no se pudo completar el pago, mas informacion: ${error}`,

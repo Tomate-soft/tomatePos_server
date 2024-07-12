@@ -8,18 +8,17 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { RappiOrderService } from './rappi-order.service';
-import { updateRappiOrderDto } from 'src/dto/ventas/orders/rappiOrder/updateRappiOrder.Dto';
-import { createRappiOrderDto } from 'src/dto/ventas/orders/rappiOrder/createRappiOrder.Dto';
+import { PhoneOrderService } from './phone-order.service';
+import { createPhoneDto } from 'src/dto/ventas/orders/phoneOrder/createPhoneOrder.dto';
 
-@Controller('rappi-order')
-export class RappiOrderController {
-  constructor(private rappiOrderService: RappiOrderService) {}
+@Controller('phone-order')
+export class PhoneOrderController {
+  constructor(private phoneOrderService: PhoneOrderService) {}
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: updateRappiOrderDto) {
+  async update(@Param('id') id: string, @Body() body: createPhoneDto) {
     try {
-      const orderUpdated = await this.rappiOrderService.update(id, body);
+      const orderUpdated = await this.phoneOrderService.update(id, body);
       if (!orderUpdated) {
         throw new NotFoundException(`No se pudo actualizar la cuenta`);
       }
@@ -32,9 +31,9 @@ export class RappiOrderController {
   }
 
   @Post()
-  async create(@Body() body: createRappiOrderDto) {
+  async create(@Body() body: createPhoneDto) {
     try {
-      const newOrder = await this.rappiOrderService.create(body);
+      const newOrder = await this.phoneOrderService.create(body);
       return newOrder;
     } catch (error) {
       if (error.code === 11000) {
@@ -49,7 +48,7 @@ export class RappiOrderController {
   @Get()
   async findAll() {
     try {
-      const orderArray = await this.rappiOrderService.findAll();
+      const orderArray = await this.phoneOrderService.findAll();
       if (!orderArray) {
         throw new NotFoundException(`No encontraron ordenes`);
       }

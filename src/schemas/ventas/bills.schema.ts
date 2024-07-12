@@ -12,13 +12,14 @@ export class Bills {
     required: true,
     trim: true,
   })
-  billCode: number;
+  code: number;
 
   @Prop({
     required: true,
     trim: true,
+    default: 'ON_SITE_ORDER',
   })
-  sellType: 'onSite' | 'toGo' | 'rappi' | 'phone' | 'n/A';
+  sellType?: string;
 
   @Prop({
     required: true,
@@ -47,7 +48,7 @@ export class Bills {
     default: [],
     trim: true,
   })
-  products: {}[];
+  products: object[];
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Payment' }],
