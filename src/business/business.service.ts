@@ -1,4 +1,3 @@
-/*
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -26,7 +25,10 @@ export class BusinessService {
 
     const apiInstance = new brevo.TransactionalEmailsApi();
 
-    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, '');
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      'aqui va l akey',
+    );
 
     const sendEmail = new brevo.SendSmtpEmail();
     sendEmail.subject = 'Confirmacion: Bienvenido a TomateSoft';
@@ -52,5 +54,3 @@ export class BusinessService {
     }
   }
 }
-
-*/
