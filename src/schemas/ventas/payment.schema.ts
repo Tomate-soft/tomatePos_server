@@ -20,7 +20,7 @@ export class Payment {
     /* unique: true, */
     trim: true,
   })
-  paymentCode?: string;
+  paymentCode: string;
 
   @Prop({
     required: true,

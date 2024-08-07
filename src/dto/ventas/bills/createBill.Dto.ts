@@ -3,16 +3,10 @@ import {
   IsDefined,
   Length,
   IsOptional,
-  IsNumber,
   IsArray,
 } from 'class-validator';
 
 export class CreateBillDto {
-  @IsDefined()
-  @IsString()
-  @Length(1, 6)
-  sellType: 'onSite' | 'toGo' | 'rappi' | 'phone';
-
   @IsDefined()
   @IsString()
   user: string;
@@ -23,6 +17,11 @@ export class CreateBillDto {
   @IsDefined()
   @IsString()
   checkTotal: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 6)
+  sellType?: string;
 
   @IsDefined()
   @IsString()

@@ -1,69 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongodb';
 import { Model } from 'mongoose';
-import { CreateCategoryDto } from 'src/dto/catalogo/categories/createCategory.dto';
 import { UpdateCategoryDto } from 'src/dto/catalogo/categories/updateCategory.dto';
-import { SubCategoryFour } from 'src/schemas/catalogo/subcategories/subCategoryFour.Schema';
+import { Category } from 'src/schemas/catalogo/categories.schema';
 import { SubCategoryOne } from 'src/schemas/catalogo/subcategories/subCategoryOne.Schema';
-import { SubCategoryThree } from 'src/schemas/catalogo/subcategories/subCategoryThree.Schema';
-import { SubCategoryTwo } from 'src/schemas/catalogo/subcategories/subCategoryTwo.schema';
 
 @Injectable()
 export class SubcategoryOneService {
   constructor(
     @InjectModel(SubCategoryOne.name)
     private subcategoryOneModel: Model<SubCategoryOne>,
-    @InjectModel(SubCategoryTwo.name)
-    private subcategoryTwoModel: Model<SubCategoryTwo>,
-    @InjectModel(SubCategoryThree.name)
-    private subcategoryThreeModel: Model<SubCategoryThree>,
-    @InjectModel(SubCategoryFour.name)
-    private subcategoryFourModel: Model<SubCategoryFour>,
+    @InjectModel(Category.name)
+    private categoryModel: Model<Category>,
   ) {}
 
   async findAll() {
     try {
-      return await this.subcategoryOneModel
-        .find()
-        .populate({
-          path: 'subCategories',
-          populate: {
-            path: 'subCategories',
-            populate: {
-              path: 'subCategories',
-            },
-          },
-        })
-        .exec();
+      return await this.subcategoryOneModel.find();
     } catch (error) {
       console.error('Error al buscar categorías:', error);
       throw error;
     }
   }
-  /*create(createCategory: any){
-         const newCtegory = this.categoryModel.create(createCategory);
-         return newCtegory;
-      } */
-
-  async create(createCategory: CreateCategoryDto) {
-    /* const lastCategory = await this.categoryModel.findOne(
-        {},
-        { code: 1 },
-        { sort: { code: -1 } },
-      ); // encontramos la ultima categoria creada
-      let newCode: string;
-      if (lastCategory) {
-        const lastCode = lastCategory.code;
-        const nextNumber = lastCode + 1;
-        newCode = nextNumber.toString().padStart(2, '0'); // Asegura que el código tenga al menos 2 dígitos.
-      } else {
-        newCode = '01';
+  async create(createCategory: SubCategoryOne) {
+    const session = await this.subcategoryOneModel.startSession();
+    session.startTransaction();
+    try {
+      const category = await this.categoryModel.findById(
+        createCategory.categoryId,
+      );
+      if (!category) {
+        throw new Error('No se encontró la categoría');
       }
-      console.log(newCode);
-      createCategory.code = newCode; */
-    const newCategory = new this.subcategoryOneModel(createCategory);
-    return await newCategory.save();
+
+      const nextCode = await this.getNextCode(createCategory.categoryId);
+      const newCategory = new this.subcategoryOneModel({
+        ...createCategory,
+        code: nextCode,
+      });
+
+      await newCategory.save({ session });
+
+      const subApt = [...category.subCategories, newCategory._id];
+      const updatedCategory = await this.categoryModel.findByIdAndUpdate(
+        category._id,
+        { subCategories: subApt },
+        { session, new: true },
+      );
+
+      if (!updatedCategory) {
+        throw new Error('No se pudo actualizar la categoría');
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+      return newCategory;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      console.error(error);
+      throw new Error('Error al crear la subcategoría');
+    }
   }
 
   async findOne(id: string) {
@@ -83,68 +81,26 @@ export class SubcategoryOneService {
     return await this.subcategoryOneModel.deleteMany({}).exec();
   }
 
-  async discontinue(id: string, category: UpdateCategoryDto) {
-    const updatedCategory = await this.subcategoryOneModel
-      .findOneAndUpdate({ _id: id }, category, { new: true })
-      .populate({
-        path: 'subCategories',
-        populate: {
-          path: 'subCategories',
-          populate: {
-            path: 'subCategories',
-          },
-        },
-      })
+  private async getNextCode(categoryId: string): Promise<string> {
+    const category = await this.categoryModel.findById(categoryId);
+    if (!category) {
+      throw new Error('Categoría padre no encontrada');
+    }
+
+    const lastSubcategory = await this.subcategoryOneModel
+      .findOne({ categoryId })
+      .sort({ code: -1 })
       .exec();
 
-    if (!updatedCategory) {
-      throw new NotFoundException('Categoría no encontrada');
+    let subcategoryCode = '01';
+    if (lastSubcategory) {
+      const lastCode = lastSubcategory.code.slice(-2);
+      const nextNumericCode = parseInt(lastCode, 10) + 1;
+      subcategoryCode = nextNumericCode.toString().padStart(2, '0');
     }
 
-    await this.updateSubcategoriesStatus(
-      updatedCategory.subCategories,
-      category.status,
-    );
+    const parentCode = category.code.padStart(2, '0');
 
-    return updatedCategory;
-  }
-
-  private async updateSubcategoriesStatus(
-    subcategories: any[],
-    status: string,
-  ) {
-    for (const subcategorytwo of subcategories) {
-      if (
-        subcategorytwo.subCategories &&
-        subcategorytwo.subCategories.length >= 1
-      ) {
-        for (const subcategorythree of subcategorytwo.subCategories) {
-          if (
-            subcategorythree.subCategories &&
-            subcategorythree.subCategories.length >= 1
-          ) {
-            for (const subcategoryfour of subcategorythree.subCategories) {
-              await this.subcategoryFourModel.findByIdAndUpdate(
-                subcategoryfour._id,
-                {
-                  status,
-                },
-              );
-            }
-          }
-
-          await this.subcategoryThreeModel.findByIdAndUpdate(
-            subcategorythree._id,
-            {
-              status,
-            },
-          );
-        }
-      }
-
-      await this.subcategoryTwoModel.findByIdAndUpdate(subcategorytwo._id, {
-        status,
-      });
-    }
+    return `${parentCode}${subcategoryCode}`;
   }
 }

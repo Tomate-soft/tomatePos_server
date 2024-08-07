@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
-import { InjectModel, MongooseModule } from '@nestjs/mongoose';
+import { InjectModel, MongooseModule, Schema } from '@nestjs/mongoose';
 import { Payment, PaymentSchema } from 'src/schemas/ventas/payment.schema';
 import { BillsService } from '../bills/bills.service';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
@@ -16,8 +16,15 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
-import { report } from 'process';
 import { ReportsService } from 'src/reports/reports.service';
+import {
+  RappiOrder,
+  RappiOrderSchema,
+} from 'src/schemas/ventas/orders/rappiOrder.schema';
+import {
+  PhoneOrder,
+  PhoneOrderSchema,
+} from 'src/schemas/ventas/orders/phoneOrder.schema';
 
 @Module({
   imports: [
@@ -49,6 +56,14 @@ import { ReportsService } from 'src/reports/reports.service';
       {
         name: CashierSession.name,
         schema: CashierSessionSchema,
+      },
+      {
+        name: RappiOrder.name,
+        schema: RappiOrderSchema,
+      },
+      {
+        name: PhoneOrder.name,
+        schema: PhoneOrderSchema,
       },
     ]),
   ],

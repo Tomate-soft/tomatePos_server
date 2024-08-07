@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ClientSession } from 'mongoose';
+import { Model } from 'mongoose';
 import { CreateBillDto } from 'src/dto/ventas/bills/createBill.Dto';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
 import { Bills, BillsDocument } from 'src/schemas/ventas/bills.schema';
@@ -10,8 +10,6 @@ import {
   NOTE_TO_BILL,
   NOTE_TO_NOTE,
 } from './cases';
-import { Console } from 'console';
-import { Products } from 'src/schemas/catalogo/products.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
 
 @Injectable()
@@ -58,17 +56,15 @@ export class BillsService {
         .sort({ createdAt: -1 })
         .exec();
 
-      const nextBillCode = lastBill
-        ? this.getNextBillCode(lastBill.billCode)
-        : 1;
+      const nextBillCode = lastBill ? this.getNextBillCode(lastBill.code) : 1;
+      console.log('nextBillCode', nextBillCode);
 
       const billToCreate = new this.billsModel({
         ...createBill,
-        billCode: nextBillCode,
+        code: nextBillCode,
       });
-
+      console.log('billToCreate', billToCreate);
       await billToCreate.save();
-
       return billToCreate;
     } catch (error) {
       throw error;

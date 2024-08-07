@@ -10,9 +10,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CreateCategoryDto } from 'src/dto/catalogo/categories/createCategory.dto';
 import { UpdateCategoryDto } from 'src/dto/catalogo/categories/updateCategory.dto';
 import { SubcategoryOneService } from './subcategory-one.service';
+import { SubCategoryOne } from 'src/schemas/catalogo/subcategories/subCategoryOne.Schema';
 
 @Controller('subcategory-one')
 export class SubcategoryOneController {
@@ -32,32 +32,21 @@ export class SubcategoryOneController {
     }
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    try {
-      const category = await this.subcategoryOneService.findOne(id);
-      if (!category) throw new NotFoundException('Esta categoria no existe');
-      return category;
-    } catch (error) {
-      throw new ConflictException('Ocurrio algo inesperado');
-    }
-  }
-
   @Post()
-  async create(@Body() body: CreateCategoryDto | CreateCategoryDto[]) {
+  async create(@Body() body: SubCategoryOne | SubCategoryOne[]) {
     try {
-      const subcategoryOneService = this.subcategoryOneService; // Captura de this en una variable
+      const subcategoryOneService = this.subcategoryOneService;
 
       if (Array.isArray(body)) {
         await this.subcategoryOneService.replace();
         const createdCategories = await Promise.all(
-          body.map(async (element: CreateCategoryDto) => {
-            return await subcategoryOneService.create(element); // Usar la variable subcategoryOneService
+          body.map(async (element: SubCategoryOne) => {
+            return await subcategoryOneService.create(element);
           }),
         );
         return createdCategories;
       } else {
-        const createdCategory = await subcategoryOneService.create(body); // Usar la variable subcategoryOneService
+        const createdCategory = await subcategoryOneService.create(body);
         return createdCategory;
       }
     } catch (error) {
@@ -66,6 +55,17 @@ export class SubcategoryOneController {
       } else {
         throw new NotFoundException('Ha ocurrido algo inesperado');
       }
+    }
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    try {
+      const category = await this.subcategoryOneService.findOne(id);
+      if (!category) throw new NotFoundException('Esta categoria no existe');
+      return category;
+    } catch (error) {
+      throw new ConflictException('Ocurrio algo inesperado');
     }
   }
 
@@ -86,21 +86,6 @@ export class SubcategoryOneController {
   async update(@Param('id') id: string, @Body() body: UpdateCategoryDto) {
     try {
       const categoryUpdated = await this.subcategoryOneService.update(id, body);
-      if (!categoryUpdated)
-        throw new NotFoundException('No se encontro la categoria');
-      return categoryUpdated;
-    } catch (error) {
-      throw new NotFoundException('Ocurrio algo inesperado');
-    }
-  }
-
-  @Put('discontinue/:id')
-  async discontinue(@Param('id') id: string, @Body() body: UpdateCategoryDto) {
-    try {
-      const categoryUpdated = await this.subcategoryOneService.discontinue(
-        id,
-        body,
-      );
       if (!categoryUpdated)
         throw new NotFoundException('No se encontro la categoria');
       return categoryUpdated;

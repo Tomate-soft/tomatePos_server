@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from '../../schemas/catalogo/categories.schema';
@@ -6,9 +6,6 @@ import { CreateCategoryDto } from 'src/dto/catalogo/categories/createCategory.dt
 import { UpdateCategoryDto } from 'src/dto/catalogo/categories/updateCategory.dto';
 import { DeleteResult } from 'mongodb';
 import { SubCategoryOne } from 'src/schemas/catalogo/subcategories/subCategoryOne.Schema';
-import { SubCategoryTwo } from 'src/schemas/catalogo/subcategories/subCategoryTwo.schema';
-import { SubCategoryThree } from 'src/schemas/catalogo/subcategories/subCategoryThree.Schema';
-import { SubCategoryFour } from 'src/schemas/catalogo/subcategories/subCategoryFour.Schema';
 
 @Injectable()
 export class CategoriesService {
@@ -16,12 +13,6 @@ export class CategoriesService {
     @InjectModel(Category.name) private categoryModel: Model<Category>,
     @InjectModel(SubCategoryOne.name)
     private subcategoryOneModel: Model<SubCategoryOne>,
-    @InjectModel(SubCategoryTwo.name)
-    private subcategoryTwoModel: Model<SubCategoryTwo>,
-    @InjectModel(SubCategoryThree.name)
-    private subcategoryThreeModel: Model<SubCategoryThree>,
-    @InjectModel(SubCategoryFour.name)
-    private subcategoryFourModel: Model<SubCategoryFour>,
   ) {}
 
   async findAll() {
@@ -30,15 +21,6 @@ export class CategoriesService {
         .find()
         .populate({
           path: 'subCategories',
-          populate: {
-            path: 'subCategories',
-            populate: {
-              path: 'subCategories',
-              populate: {
-                path: 'subCategories',
-              },
-            },
-          },
         })
         .exec();
     } catch (error) {
@@ -48,8 +30,35 @@ export class CategoriesService {
   }
 
   async create(createCategory: CreateCategoryDto) {
-    const newCategory = new this.categoryModel(createCategory);
-    return await newCategory.save();
+    const session = await this.categoryModel.startSession();
+    session.startTransaction();
+    try {
+      const lastCategory = await this.categoryModel
+        .findOne({})
+        .sort({ code: -1 })
+        .exec();
+
+      const nextCode = this.getNextCode(lastCategory?.code);
+      const newCategory = new this.categoryModel({
+        ...createCategory,
+        code: nextCode,
+      });
+      const category = await newCategory.save();
+      if (!category) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error('No se pudo completar la operación');
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+      return newCategory;
+    } catch (error) {
+      console.error(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw new Error('Error al crear la categoría');
+    }
   }
 
   async findOne(id: string) {
@@ -70,79 +79,12 @@ export class CategoriesService {
     return await this.categoryModel.deleteMany({}).exec();
   }
 
-  async discontinue(id: string, category: UpdateCategoryDto) {
-    const updatedCategory = await this.categoryModel
-      .findOneAndUpdate({ _id: id }, category, { new: true })
-      .populate({
-        path: 'subCategories',
-        populate: {
-          path: 'subCategories',
-          populate: {
-            path: 'subCategories',
-            populate: {
-              path: 'subCategories',
-            },
-          },
-        },
-      })
-      .exec();
-
-    if (!updatedCategory) {
-      throw new NotFoundException('Categoría no encontrada');
+  private getNextCode(lastCode: string): string {
+    if (!lastCode) {
+      return '01';
     }
-
-    await this.updateSubcategoriesStatus(
-      updatedCategory.subCategories,
-      category.status,
-    );
-
-    return updatedCategory;
-  }
-
-  private async updateSubcategoriesStatus(
-    subcategories: any[],
-    status: string,
-  ) {
-    for (const subcategory of subcategories) {
-      if (subcategory.subCategories && subcategory.subCategories.length >= 1) {
-        for (const subcategorytwo of subcategory.subCategories) {
-          if (
-            subcategorytwo.subCategories &&
-            subcategorytwo.subCategories.length >= 1
-          ) {
-            for (const subcategorythree of subcategorytwo.subCategories) {
-              if (
-                subcategorythree.subCategories &&
-                subcategorythree.subCategories.length >= 1
-              ) {
-                for (const subcategoryfour of subcategorythree.subCategories) {
-                  await this.subcategoryFourModel.findByIdAndUpdate(
-                    subcategoryfour._id,
-                    {
-                      status,
-                    },
-                  );
-                }
-              }
-
-              await this.subcategoryThreeModel.findByIdAndUpdate(
-                subcategorythree._id,
-                {
-                  status,
-                },
-              );
-            }
-          }
-
-          await this.subcategoryTwoModel.findByIdAndUpdate(subcategorytwo._id, {
-            status,
-          });
-        }
-      }
-
-      await this.subcategoryOneModel.findByIdAndUpdate(subcategory._id, {
-        status,
-      });
-    }
+    const numericCode = parseInt(lastCode, 10);
+    const nextNumericCode = numericCode + 1;
+    return nextNumericCode.toString().padStart(2, '0');
   }
 }

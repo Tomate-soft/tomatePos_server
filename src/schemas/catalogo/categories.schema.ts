@@ -2,12 +2,16 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { SubCategoryOne } from './subcategories/subCategoryOne.Schema';
 
+enum CategoryStatus {
+  DISABLED = 'disabled',
+  ENABLED = 'enabled',
+}
+
 @Schema({ timestamps: true })
 export class Category {
   @Prop({
     unique: true,
     required: true,
-    trim: true,
   })
   code: string;
 
@@ -24,13 +28,10 @@ export class Category {
   })
   subCategories: SubCategoryOne[];
 
-  @Prop()
-  parentCategory: string | null;
-
   @Prop({
-    default: 'enabled',
+    default: CategoryStatus.ENABLED,
   })
-  status: 'disabled' | 'enabled';
+  status: CategoryStatus;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

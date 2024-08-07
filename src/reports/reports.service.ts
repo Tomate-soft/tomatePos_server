@@ -41,7 +41,7 @@ export class ReportsService {
   private async createPrinter() {
     return new ThermalPrinter({
       type: PrinterTypes.EPSON,
-      interface: `tcp://192.168.1.74`,
+      interface: `tcp://192.168.1.73`,
       characterSet: CharacterSet.SLOVENIA,
       removeSpecialCharacters: false,
       width: 42,
@@ -68,8 +68,8 @@ export class ReportsService {
         path: savePath,
         fullPage: true,
       });
-      await browser.close();
 
+      await browser.close();
       const printer = await this.createPrinter();
       printer.alignCenter();
       await printer.printImage(savePath);

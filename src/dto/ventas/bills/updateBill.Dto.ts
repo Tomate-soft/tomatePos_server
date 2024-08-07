@@ -4,7 +4,7 @@ export class UpdateBillDto {
   @IsOptional()
   @IsString()
   @Length(1, 6)
-  sellType?: 'onSite' | 'toGo' | 'rappi' | 'phone';
+  sellType?: string;
 
   @IsOptional()
   @IsString()

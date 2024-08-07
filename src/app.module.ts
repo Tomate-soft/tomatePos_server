@@ -20,9 +20,6 @@ import { ShiftsModule } from './usuarios/shifts/shifts.module';
 import { DepartamentsModule } from './usuarios/departaments/departaments.module';
 import { ProfilesModule } from './usuarios/profiles/profiles.module';
 import { SubcategoryOneModule } from './catalogo/categories/subcategory-one/subcategory-one.module';
-import { SubcategoryTwoModule } from './catalogo/categories/subcategory-two/subcategory-two.module';
-import { SubcategoryFourModule } from './catalogo/categories/subcategory-four/subcategory-four.module';
-import { SubcategoryThreeModule } from './catalogo/categories/subcategory-three/subcategory-three.module';
 import { SellTypesModule } from './sell-types/sell-types.module';
 import { EmployeesModule } from './usuarios/employees/employees.module';
 import { XlsModule } from './exports/xls/xls.module';
@@ -41,6 +38,9 @@ import { TogoOrderModule } from './ventas/orders/togo-order/togo-order.module';
 import { ClousuresOfOperationsModule } from './clousures-of-operations/clousures-of-operations.module';
 import { ReportsModule } from './reports/reports.module';
 import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module';
+import { PhoneOrderModule } from './ventas/orders/phone-order/phone-order.module';
+import { ProcessModule } from './process/process.module';
+import { BusinessModule } from './business/business.module';
 
 @Module({
   imports: [
@@ -67,9 +67,6 @@ import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module
     DepartamentsModule,
     ProfilesModule,
     SubcategoryOneModule,
-    SubcategoryTwoModule,
-    SubcategoryThreeModule,
-    SubcategoryFourModule,
     SellTypesModule,
     EmployeesModule,
     XlsModule,
@@ -88,6 +85,9 @@ import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module
     ClousuresOfOperationsModule,
     ReportsModule,
     RappiOrderModule,
+    PhoneOrderModule,
+    ProcessModule,
+    BusinessModule,
   ],
   controllers: [],
   providers: [],
