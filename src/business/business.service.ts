@@ -25,10 +25,7 @@ export class BusinessService {
 
     const apiInstance = new brevo.TransactionalEmailsApi();
 
-    apiInstance.setApiKey(
-      brevo.TransactionalEmailsApiApiKeys.apiKey,
-      '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',
-    );
+    apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, '');
 
     const sendEmail = new brevo.SendSmtpEmail();
     sendEmail.subject = 'Confirmacion: Bienvenido a TomateSoft';
