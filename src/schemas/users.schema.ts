@@ -1,6 +1,5 @@
-import { Schema, Prop, SchemaFactory, MongooseModule } from '@nestjs/mongoose';
-import { Role } from './role/role';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 import { Profile } from './usuarios/profiles.Schema';
 import { Table } from './tables/tableSchema';
 import { DailyRegister } from './dailyRegister/createDailyRegister';

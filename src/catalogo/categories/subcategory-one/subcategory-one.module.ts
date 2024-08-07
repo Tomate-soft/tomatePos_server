@@ -8,17 +8,9 @@ import {
   SubCategoryOneSchema,
 } from 'src/schemas/catalogo/subcategories/subCategoryOne.Schema';
 import {
-  SubCategoryTwo,
-  SubCategoryTwoSchema,
-} from 'src/schemas/catalogo/subcategories/subCategoryTwo.schema';
-import {
-  SubCategoryThree,
-  SubCategoryThreeSchema,
-} from 'src/schemas/catalogo/subcategories/subCategoryThree.Schema';
-import {
-  SubCategoryFour,
-  SubCategoryFourSchema,
-} from 'src/schemas/catalogo/subcategories/subCategoryFour.Schema';
+  Category,
+  CategorySchema,
+} from 'src/schemas/catalogo/categories.schema';
 
 @Module({
   imports: [
@@ -28,16 +20,8 @@ import {
         schema: SubCategoryOneSchema,
       },
       {
-        name: SubCategoryTwo.name,
-        schema: SubCategoryTwoSchema,
-      },
-      {
-        name: SubCategoryThree.name,
-        schema: SubCategoryThreeSchema,
-      },
-      {
-        name: SubCategoryFour.name,
-        schema: SubCategoryFourSchema,
+        name: Category.name,
+        schema: CategorySchema,
       },
     ]),
   ],

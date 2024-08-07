@@ -5,7 +5,7 @@ import { Branch } from 'src/schemas/business/branchSchema';
 import { Business } from 'src/schemas/business/businessSchema';
 import { LicenseKey } from 'src/schemas/business/licenseKeySchema';
 import { emailTemplate } from './html/email.template';
-import brevo from '@getbrevo/brevo';
+import * as brevo from '@getbrevo/brevo';
 
 @Injectable()
 export class BusinessService {
@@ -24,7 +24,6 @@ export class BusinessService {
     const htmlContent = emailTemplate(businessEx);
 
     const apiInstance = new brevo.TransactionalEmailsApi();
-    console.log(apiInstance);
 
     apiInstance.setApiKey(
       brevo.TransactionalEmailsApiApiKeys.apiKey,
@@ -46,7 +45,12 @@ export class BusinessService {
   }
 
   async createBusiness(business: any) {
-    const res = this.sendMail();
-    return res;
+    try {
+      const res = this.sendMail();
+      console.log(res);
+      return res;
+    } catch (error) {
+      console.error('NOPservbice');
+    }
   }
 }

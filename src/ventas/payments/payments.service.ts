@@ -1,10 +1,6 @@
-import { Body, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { reduce } from 'rxjs';
-import { UpdateUserDto } from 'src/dto/users/updateUserDto';
-import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
-import { updateToGoOrderDto } from 'src/dto/ventas/orders/updateToGoOrder.dto';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
 import {
@@ -52,9 +48,6 @@ export class PaymentsService {
   }
 
   async create(createdPayment: CreatePaymentDto) {
-    console.log(
-      'Por aca el createdPayment si llega al create de payments.service',
-    );
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {

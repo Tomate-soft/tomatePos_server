@@ -20,9 +20,6 @@ import { ShiftsModule } from './usuarios/shifts/shifts.module';
 import { DepartamentsModule } from './usuarios/departaments/departaments.module';
 import { ProfilesModule } from './usuarios/profiles/profiles.module';
 import { SubcategoryOneModule } from './catalogo/categories/subcategory-one/subcategory-one.module';
-import { SubcategoryTwoModule } from './catalogo/categories/subcategory-two/subcategory-two.module';
-import { SubcategoryFourModule } from './catalogo/categories/subcategory-four/subcategory-four.module';
-import { SubcategoryThreeModule } from './catalogo/categories/subcategory-three/subcategory-three.module';
 import { SellTypesModule } from './sell-types/sell-types.module';
 import { EmployeesModule } from './usuarios/employees/employees.module';
 import { XlsModule } from './exports/xls/xls.module';
@@ -70,9 +67,6 @@ import { BusinessModule } from './business/business.module';
     DepartamentsModule,
     ProfilesModule,
     SubcategoryOneModule,
-    SubcategoryTwoModule,
-    SubcategoryThreeModule,
-    SubcategoryFourModule,
     SellTypesModule,
     EmployeesModule,
     XlsModule,
