@@ -8,6 +8,7 @@ import {
   ConflictException,
   Param,
   Body,
+  Query,
 } from '@nestjs/common';
 import { DishesService } from './dishes.service';
 import { createDishesDto } from 'src/dto/catalogo/dishes/createdDishes.dto';
@@ -19,9 +20,9 @@ export class DishesController {
   constructor(private dishesService: DishesService) {}
 
   @Get()
-  async findAll() {
+  async findAll(@Query('skip') skip: number) {
     try {
-      const dishesArray = await this.dishesService.findAll();
+      const dishesArray = await this.dishesService.findAll(skip);
       if (!dishesArray || dishesArray.length === 0)
         throw new NotFoundException('No se han encontrado complementos');
       return dishesArray;
@@ -57,7 +58,7 @@ export class DishesController {
         );
         return createdDishes;
       } else {
-        const createdDishes = await this.dishesService.create(body); // Usar la variable categoriesService
+        const createdDishes = await this.dishesService.create(body);
         return createdDishes;
       }
     } catch (error) {

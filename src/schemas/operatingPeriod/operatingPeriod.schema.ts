@@ -1,6 +1,6 @@
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
 import { DailyRegister } from '../dailyRegister/createDailyRegister';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 import { CashierSession } from '../cashierSession/cashierSession';
 
 @Schema({ timestamps: true })

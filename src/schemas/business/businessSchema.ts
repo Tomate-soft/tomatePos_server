@@ -43,11 +43,8 @@ export class Business {
   })
   licenseKey: LicenseKey;
 
-  @Prop()
-  operatingPeriodStart: string;
-
-  @Prop()
-  operatingPeriodEnd: string;
+  @Prop({ default: false })
+  status: boolean;
 }
 
 export const BusinessSchema = SchemaFactory.createForClass(Business);

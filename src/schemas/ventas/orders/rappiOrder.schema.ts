@@ -1,6 +1,7 @@
 import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 import { Payment } from '../payment.schema';
+import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class RappiOrder {
@@ -35,7 +36,7 @@ export class RappiOrder {
     default: [],
     trim: true,
   })
-  products: {}[];
+  products: [];
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Payment' }],
@@ -50,6 +51,12 @@ export class RappiOrder {
     trim: true,
   })
   orderName?: string;
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'OperatingPeriod',
+  })
+  operatingPeriod: OperatingPeriod;
 }
 
 export const RappiOrderSchema = SchemaFactory.createForClass(RappiOrder);

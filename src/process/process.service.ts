@@ -14,6 +14,7 @@ export class ProcessService {
     private operatingPeriodService: OperatingPeriodService,
   ) {}
 
+  // analizaremos bien este metodo debemos de sacar en formatro completo todas las cuentas
   getTotalCurrentBills = async () => {
     const session = await this.operatingModel.startSession();
     session.startTransaction();
@@ -36,4 +37,18 @@ export class ProcessService {
       return allOrders;
     } catch (error) {}
   };
+  /*
+  // vamos a traernos todas las cuentas activas
+  getAllActiveBills = async () => {
+    const session = await this.operatingModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      await session.commitTransaction();
+      session.endSession();
+      return allOrders;
+    } catch (error) {}
+  };
+
+  */
 }

@@ -57,6 +57,10 @@ export class UpdateBillDto {
   @IsString()
   discount?: string;
 
+  @IsOptional()
+  @IsString()
+  operatingPeriod?: string;
+
   /*
   @IsDefined()
   @IsString()
