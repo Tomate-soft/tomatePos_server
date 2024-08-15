@@ -20,4 +20,17 @@ export class ClousuresOfOperationsController {
       throw new NotFoundException('No se ha podido cerrar la caja');
     }
   }
+
+  @Post('period')
+  async closePeriod(@Body() body: any) {
+    try {
+      const result = await this.clousuresOfOperationsService.closePeriod(body);
+      if (!result) {
+        throw new NotFoundException('No se ha podido cerrar la caja');
+      }
+      return result;
+    } catch (error) {
+      throw new NotFoundException('No se ha podido cerrar la caja');
+    }
+  }
 }

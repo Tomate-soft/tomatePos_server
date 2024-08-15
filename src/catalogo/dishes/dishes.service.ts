@@ -10,8 +10,10 @@ import { DeleteResult } from 'mongodb';
 export class DishesService {
   constructor(@InjectModel(Dishes.name) private dishesModel: Model<Dishes>) {}
 
-  async findAll() {
-    return await this.dishesModel.find();
+  async findAll(skip: number) {
+    const skipValue = skip ? skip : 0;
+    const limitValue = skip ? 1 : 0;
+    return await this.dishesModel.find().skip(skipValue).limit(limitValue);
   }
 
   async findOne(id: string) {

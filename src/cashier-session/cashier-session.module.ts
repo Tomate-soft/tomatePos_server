@@ -15,6 +15,7 @@ import { User, UserSchema } from 'src/schemas/users.schema';
 import CashWithdrawSchema, {
   CashWithdraw,
 } from 'src/schemas/cashierSession/cashWithdraw';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 
 @Module({
   imports: [
@@ -34,6 +35,10 @@ import CashWithdrawSchema, {
       {
         name: CashWithdraw.name,
         schema: CashWithdrawSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
       },
     ]),
   ],

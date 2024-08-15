@@ -6,6 +6,7 @@ import {
   OperatingPeriod,
   OperatingPeriodSchema,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 
 @Module({
   imports: [
@@ -13,6 +14,10 @@ import {
       {
         name: OperatingPeriod.name,
         schema: OperatingPeriodSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
       },
     ]),
   ],

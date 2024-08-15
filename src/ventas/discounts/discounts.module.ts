@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DiscountsController } from './discounts.controller';
 import { DiscountsService } from './discounts.service';
-import { InjectModel, MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
@@ -15,6 +15,7 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 
 @Module({
   imports: [
@@ -42,6 +43,10 @@ import {
       {
         name: CashierSession.name,
         schema: CashierSessionSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
       },
     ]),
   ],

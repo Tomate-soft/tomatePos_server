@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ReportsService } from 'src/reports/reports.service';
@@ -15,8 +15,21 @@ export class ClousuresOfOperationsService {
     private reportsService: ReportsService,
   ) {}
 
-  async getClousuresOfOperations() {
-    return await this.operatingPeriodModel.find();
+  async closePeriod(body: any) {
+    const session = await this.operatingPeriodModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodModel.findOne();
+      if (!currentPeriod) {
+        throw new NotFoundException(
+          'No se encontro ningun periodo actualmente',
+        );
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return currentPeriod;
+    } catch (error) {}
+    // return await this.operatingPeriodModel.find();
   }
 
   async closeCashierSession(body: any) {

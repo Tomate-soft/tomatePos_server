@@ -122,6 +122,7 @@ export class CashierSessionController {
       const withdrawal = await this.cashierSessionService.cashWithdrawal(body);
       return withdrawal;
     } catch (error) {
+      console.log(error);
       throw new NotFoundException(
         `Ha ocurrido un error inesperado, mas informacion: ${error}`,
       );

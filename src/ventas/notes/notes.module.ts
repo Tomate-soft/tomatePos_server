@@ -15,6 +15,7 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 
 @Module({
   imports: [
@@ -38,6 +39,10 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
       {
         name: Table.name,
         schema: TableSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
       },
     ]),
   ],

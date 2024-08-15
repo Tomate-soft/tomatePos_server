@@ -5,6 +5,7 @@ import { Notes } from './notes.schema';
 import { CashierSession } from '../cashierSession/cashierSession';
 import { Table } from '../tables/tableSchema';
 import { Discount } from './discounts.schema';
+import { OperatingPeriod } from '../operatingPeriod/operatingPeriod.schema';
 
 @Schema({ timestamps: true })
 export class Bills {
@@ -96,6 +97,9 @@ export class Bills {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount' })
   discount?: Discount;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'OperatingPeriod' })
+  operatingPeriod?: OperatingPeriod;
 
   /* 
   device: string;
