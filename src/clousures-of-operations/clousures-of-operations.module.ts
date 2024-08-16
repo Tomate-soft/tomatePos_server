@@ -11,6 +11,21 @@ import {
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
 import { ReportsService } from 'src/reports/reports.service';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import { Bills, BillSchema } from 'src/schemas/ventas/bills.schema';
+import {
+  ToGoOrder,
+  ToGoOrderSchema,
+} from 'src/schemas/ventas/orders/toGoOrder.schema';
+import {
+  RappiOrder,
+  RappiOrderSchema,
+} from 'src/schemas/ventas/orders/rappiOrder.schema';
+import {
+  PhoneOrder,
+  PhoneOrderSchema,
+} from 'src/schemas/ventas/orders/phoneOrder.schema';
 
 /**
  * Module for handling closures of operations.
@@ -23,9 +38,18 @@ import { ReportsService } from 'src/reports/reports.service';
     MongooseModule.forFeature([
       { name: OperatingPeriod.name, schema: OperatingPeriodSchema },
       { name: CashierSession.name, schema: CashierSessionSchema },
+      { name: Branch.name, schema: BranchSchema },
+      { name: Bills.name, schema: BillSchema },
+      { name: ToGoOrder.name, schema: ToGoOrderSchema },
+      { name: RappiOrder.name, schema: RappiOrderSchema },
+      { name: PhoneOrder.name, schema: PhoneOrderSchema },
     ]),
   ],
   controllers: [ClousuresOfOperationsController],
-  providers: [ClousuresOfOperationsService, ReportsService],
+  providers: [
+    ClousuresOfOperationsService,
+    ReportsService,
+    OperatingPeriodService,
+  ],
 })
 export class ClousuresOfOperationsModule {}
