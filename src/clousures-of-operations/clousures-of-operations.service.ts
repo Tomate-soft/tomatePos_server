@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { ReportsService } from 'src/reports/reports.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { Bills } from 'src/schemas/ventas/bills.schema';
+import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
+import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 
 @Injectable()
 export class ClousuresOfOperationsService {
@@ -13,22 +18,83 @@ export class ClousuresOfOperationsService {
     @InjectModel(CashierSession.name)
     private cashierSessionModel: Model<CashierSession>,
     private reportsService: ReportsService,
+    private operatingPeriodService: OperatingPeriodService,
+    @InjectModel(Bills.name) private billsModel: Model<Bills>,
+    @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
+    @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
+    @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
   ) {}
 
   async closePeriod(body: any) {
     const session = await this.operatingPeriodModel.startSession();
     session.startTransaction();
     try {
-      const currentPeriod = await this.operatingPeriodModel.findOne();
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
       if (!currentPeriod) {
         throw new NotFoundException(
           'No se encontro ningun periodo actualmente',
         );
       }
-      await session.commitTransaction();
+      // traeremos todas  las cuentas que matching con el periodo actual
+      const bills = await this.billsModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      // traeremos todas las ordenes que matching con el periodo actual
+      const toGoOrders = await this.toGoOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('toGoOrders', toGoOrders);
+      const rappiOrders = await this.rappiOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('rappiOrders', rappiOrders);
+      const phoneOrders = await this.phoneOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('phoneOrders', phoneOrders);
+
+      const allOrders = [
+        ...bills,
+        ...toGoOrders,
+        ...rappiOrders,
+        ...phoneOrders,
+      ];
+      console.log(allOrders[0]);
       session.endSession();
-      return currentPeriod;
-    } catch (error) {}
+      return allOrders;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
     // return await this.operatingPeriodModel.find();
   }
 
