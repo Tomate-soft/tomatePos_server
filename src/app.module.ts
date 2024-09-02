@@ -90,6 +90,11 @@ import { BusinessModule } from './business/business.module';
     BusinessModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: 'USE_VALUE',
+      useValue: process.env.USE_VALUE === 'PROD' ? 'PROD' : 'DEV',
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule { }

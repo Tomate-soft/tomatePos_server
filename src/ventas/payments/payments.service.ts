@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
+import { branchId } from 'src/variablesProvisionales';
 import {
   ENABLE_STATUS,
   FINISHED_STATUS,
@@ -10,7 +11,9 @@ import {
   FREE_STATUS,
 } from 'src/libs/status.libs';
 import { ReportsService } from 'src/reports/reports.service';
+import { Branch } from 'src/schemas/business/branchSchema';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
+import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { User } from 'src/schemas/users.schema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
@@ -19,6 +22,7 @@ import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
+import { Console } from 'console';
 
 @Injectable()
 export class PaymentsService {
@@ -27,6 +31,9 @@ export class PaymentsService {
     @InjectModel(Notes.name) private readonly noteModel: Model<Notes>,
     @InjectModel(Bills.name) private readonly billModel: Model<Bills>,
     @InjectModel(Table.name) private readonly tableModel: Model<Table>,
+    @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
+    @InjectModel(OperatingPeriod.name)
+    private readonly operatingPeriodModel: Model<OperatingPeriod>,
     @InjectModel(RappiOrder.name)
     private readonly rappiOrderModel: Model<RappiOrder>,
     @InjectModel(ToGoOrder.name)
@@ -47,6 +54,39 @@ export class PaymentsService {
     return await this.paymentModel.findById(id);
   }
 
+  async findCurrent() {
+    const session = await this.paymentModel.startSession();
+    session.startTransaction();
+    try {
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      console.log('periodId');
+      console.log(periodId);
+      const period = await this.operatingPeriodModel.findById(periodId);
+      const payments = await this.paymentModel.find({
+        operatingPeriod: periodId,
+      });
+      if (!payments) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro el periodo operativo');
+      }
+      await session.commitTransaction();
+      session.endSession();
+
+      return payments;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
+
   async create(createdPayment: CreatePaymentDto) {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
@@ -61,16 +101,19 @@ export class PaymentsService {
         : 1;
 
       const newCode = nextPaymentCode.toString();
+      const branchId = '66bd36e5a107f6584ef54dca';
+      const OperatingPeriod = await this.branchModel.findById(branchId);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
         paymentCode: newCode,
+        operatingPeriod: OperatingPeriod._id,
       });
+
       await newPaymentCode.save();
       const billCurrent = await this.billModel
         .findById(createdPayment.accountId)
         .populate({ path: 'payment' });
-
       const updatedBillData = {
         payment: [...billCurrent.payment, newPaymentCode._id],
         status: FINISHED_STATUS,
@@ -79,7 +122,6 @@ export class PaymentsService {
         billCurrent._id,
         updatedBillData,
       );
-
       if (!updatedBill) {
         throw new NotFoundException('No se pudo actualizar la factura');
       }

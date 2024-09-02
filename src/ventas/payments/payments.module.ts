@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
-import { InjectModel, MongooseModule, Schema } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
 import { Payment, PaymentSchema } from 'src/schemas/ventas/payment.schema';
 import { BillsService } from '../bills/bills.service';
 import { BillSchema, Bills } from 'src/schemas/ventas/bills.schema';
@@ -25,6 +25,11 @@ import {
   PhoneOrder,
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import {
+  OperatingPeriod,
+  OperatingPeriodSchema,
+} from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 
 @Module({
   imports: [
@@ -64,6 +69,14 @@ import {
       {
         name: PhoneOrder.name,
         schema: PhoneOrderSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
+      },
+      {
+        name: OperatingPeriod.name,
+        schema: OperatingPeriodSchema,
       },
     ]),
   ],
