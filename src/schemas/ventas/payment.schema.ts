@@ -1,7 +1,7 @@
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { OperatingPeriod } from '../operatingPeriod/operatingPeriod.schema';
-
+import { Bills } from './bills.schema';
 
 export interface Transaction {
   paymentType: string;
@@ -15,8 +15,10 @@ export class Payment {
   @Prop({
     required: true,
     trim: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Bills',
   })
-  accountId: string;
+  accountId: Bills;
 
   @Prop({
     /* unique: true, */
@@ -91,4 +93,3 @@ export class Payment {
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
-
