@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreatePaymentDto } from 'src/dto/ventas/payments/createPaymentDto';
 import { UpdatePaymentDto } from 'src/dto/ventas/payments/updatePaymentDto';
 import { branchId } from 'src/variablesProvisionales';
+import { branchId } from 'src/variablesProvisionales';
 import {
   ENABLE_STATUS,
   FINISHED_STATUS,
@@ -12,7 +13,9 @@ import {
 } from 'src/libs/status.libs';
 import { ReportsService } from 'src/reports/reports.service';
 import { Branch } from 'src/schemas/business/branchSchema';
+import { Branch } from 'src/schemas/business/branchSchema';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
+import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { User } from 'src/schemas/users.schema';
@@ -31,6 +34,9 @@ export class PaymentsService {
     @InjectModel(Notes.name) private readonly noteModel: Model<Notes>,
     @InjectModel(Bills.name) private readonly billModel: Model<Bills>,
     @InjectModel(Table.name) private readonly tableModel: Model<Table>,
+    @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
+    @InjectModel(OperatingPeriod.name)
+    private readonly operatingPeriodModel: Model<OperatingPeriod>,
     @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
     @InjectModel(OperatingPeriod.name)
     private readonly operatingPeriodModel: Model<OperatingPeriod>,
