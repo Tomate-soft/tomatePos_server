@@ -10,6 +10,7 @@ import {
   FREE_STATUS,
 } from 'src/libs/status.libs';
 import { ReportsService } from 'src/reports/reports.service';
+import { Branch } from 'src/schemas/business/branchSchema';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { User } from 'src/schemas/users.schema';
@@ -37,7 +38,8 @@ export class PaymentsService {
     private reportsService: ReportsService,
     @InjectModel(PhoneOrder.name)
     private readonly phoneOrderModel: Model<PhoneOrder>,
-  ) {}
+    @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
+  ) { }
 
   async findAll() {
     return await this.paymentModel.find();
@@ -61,11 +63,15 @@ export class PaymentsService {
         : 1;
 
       const newCode = nextPaymentCode.toString();
+      const branchId = '66bd36e5a107f6584ef54dca';
+      const OperatingPeriod = await this.branchModel.findById(branchId);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
         paymentCode: newCode,
+        operatingPeriod: OperatingPeriod._id,
       });
+
       await newPaymentCode.save();
       const billCurrent = await this.billModel
         .findById(createdPayment.accountId)

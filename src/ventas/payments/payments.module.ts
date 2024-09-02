@@ -25,6 +25,7 @@ import {
   PhoneOrder,
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 
 @Module({
   imports: [
@@ -65,9 +66,13 @@ import {
         name: PhoneOrder.name,
         schema: PhoneOrderSchema,
       },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
+      },
     ]),
   ],
   controllers: [PaymentsController],
   providers: [PaymentsService, BillsService, ReportsService],
 })
-export class PaymentsModule {}
+export class PaymentsModule { }
