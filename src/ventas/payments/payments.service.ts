@@ -22,6 +22,7 @@ import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
+import { Console } from 'console';
 
 @Injectable()
 export class PaymentsService {
@@ -43,8 +44,7 @@ export class PaymentsService {
     private reportsService: ReportsService,
     @InjectModel(PhoneOrder.name)
     private readonly phoneOrderModel: Model<PhoneOrder>,
-    @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
-  ) { }
+  ) {}
 
   async findAll() {
     return await this.paymentModel.find();
@@ -65,6 +65,8 @@ export class PaymentsService {
         throw new NotFoundException('No se encontro la branch');
       }
       const periodId = branch.operatingPeriod;
+      console.log('periodId');
+      console.log(periodId);
       const period = await this.operatingPeriodModel.findById(periodId);
       const payments = await this.paymentModel.find({
         operatingPeriod: periodId,
