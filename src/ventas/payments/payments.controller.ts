@@ -34,6 +34,18 @@ export class PaymentsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+  @Get('current')
+  async findCurrent() {
+    try {
+      const paymentsArray = await this.paymentService.findCurrent();
+      if (!paymentsArray) {
+        throw new NotFoundException('No se encuentran registros de pagos');
+      }
+      return paymentsArray;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
