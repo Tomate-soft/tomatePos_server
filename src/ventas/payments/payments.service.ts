@@ -111,7 +111,8 @@ export class PaymentsService {
         throw new NotFoundException('No se encontro la branch');
       }
       const periodId = branch.operatingPeriod;
-      const OperatingPeriod = await this.branchModel.findById(periodId);
+      const OperatingPeriod =
+        await this.operatingPeriodModel.findById(periodId);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
