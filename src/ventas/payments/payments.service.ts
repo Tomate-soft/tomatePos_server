@@ -22,7 +22,6 @@ import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
-import { Console } from 'console';
 
 @Injectable()
 export class PaymentsService {
@@ -34,6 +33,7 @@ export class PaymentsService {
     @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
     @InjectModel(OperatingPeriod.name)
     private readonly operatingPeriodModel: Model<OperatingPeriod>,
+    @InjectModel(OperatingPeriod.name)
     @InjectModel(RappiOrder.name)
     private readonly rappiOrderModel: Model<RappiOrder>,
     @InjectModel(ToGoOrder.name)
@@ -68,9 +68,13 @@ export class PaymentsService {
       console.log('periodId');
       console.log(periodId);
       const period = await this.operatingPeriodModel.findById(periodId);
-      const payments = await this.paymentModel.find({
-        operatingPeriod: periodId,
-      });
+      const payments = await this.paymentModel
+        .find({
+          operatingPeriod: periodId,
+        })
+        .populate({
+          path: 'accountId',
+        });
       if (!payments) {
         await session.abortTransaction();
         session.endSession();
@@ -78,7 +82,6 @@ export class PaymentsService {
       }
       await session.commitTransaction();
       session.endSession();
-
       return payments;
     } catch (error) {
       await session.abortTransaction();
@@ -101,8 +104,14 @@ export class PaymentsService {
         : 1;
 
       const newCode = nextPaymentCode.toString();
-      const branchId = '66bd36e5a107f6584ef54dca';
-      const OperatingPeriod = await this.branchModel.findById(branchId);
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      const OperatingPeriod = await this.branchModel.findById(periodId);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
