@@ -56,14 +56,15 @@ export class BillsService {
         .sort({ createdAt: -1 })
         .exec();
 
-      const nextBillCode = lastBill ? this.getNextBillCode(lastBill.code) : 1;
-      console.log('nextBillCode', nextBillCode);
+      const nextBillCode = lastBill
+        ? this.getNextBillCode(parseFloat(lastBill.code))
+        : 1;
+      const formatCode = this.formatCode(nextBillCode.toString());
 
       const billToCreate = new this.billsModel({
         ...createBill,
-        code: nextBillCode,
+        code: formatCode,
       });
-      console.log('billToCreate', billToCreate);
       await billToCreate.save();
       return billToCreate;
     } catch (error) {
@@ -329,6 +330,12 @@ export class BillsService {
       await session.abortTransaction();
       session.endSession();
     }
+  }
+
+  private formatCode(code: string): string {
+    // todo
+    // formatear correctamente el codigo de la factura
+    return code.padStart(6, '0');
   }
 
   /*

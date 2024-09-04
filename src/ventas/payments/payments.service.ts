@@ -65,8 +65,6 @@ export class PaymentsService {
         throw new NotFoundException('No se encontro la branch');
       }
       const periodId = branch.operatingPeriod;
-      console.log('periodId');
-      console.log(periodId);
       const period = await this.operatingPeriodModel.findById(periodId);
       const payments = await this.paymentModel
         .find({
@@ -104,6 +102,8 @@ export class PaymentsService {
         : 1;
 
       const newCode = nextPaymentCode.toString();
+      const formatCode = this.formatCode(newCode);
+
       const branch = await this.branchModel.findById(branchId);
       if (!branch) {
         await session.abortTransaction();
@@ -116,7 +116,7 @@ export class PaymentsService {
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
-        paymentCode: newCode,
+        paymentCode: formatCode,
         operatingPeriod: OperatingPeriod._id,
       });
 
@@ -427,5 +427,9 @@ export class PaymentsService {
   private getNextPaymentCode(lastPaymentCode: number): number {
     // Incrementar el billCode actual en 1
     return lastPaymentCode + 1;
+  }
+
+  private formatCode(code: string): string {
+    return code.padStart(4, '0');
   }
 }
