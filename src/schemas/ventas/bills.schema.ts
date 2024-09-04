@@ -13,7 +13,7 @@ export class Bills {
     required: true,
     trim: true,
   })
-  code: number;
+  code: string;
 
   @Prop({
     required: true,
