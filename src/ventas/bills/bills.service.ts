@@ -11,12 +11,24 @@ import {
   NOTE_TO_NOTE,
 } from './cases';
 import { Notes } from 'src/schemas/ventas/notes.schema';
+import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { ENABLE_STATUS } from 'src/libs/status.libs';
+import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
+import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 
 @Injectable()
 export class BillsService {
   constructor(
+    @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
+    @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
+    @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
     @InjectModel(Bills.name) private billsModel: Model<BillsDocument>,
     @InjectModel(Notes.name) private noteModel: Model<Notes>,
+    @InjectModel(OperatingPeriod.name)
+    private operatingPeriodModel: Model<OperatingPeriod>,
+    private readonly operatingPeriodService: OperatingPeriodService,
   ) {}
 
   async findAll() {
@@ -33,6 +45,24 @@ export class BillsService {
       throw new Error(error);
     }
   }
+  /*
+  async findCurrent() {
+    try {
+      return await this.billsModel
+        .find({
+          status: ENABLE_STATUS,
+        })
+        .populate({
+          path: 'payment',
+        })
+        .populate({
+          path: 'notes',
+        });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+    */
 
   async findOne(id: string) {
     try {
@@ -329,6 +359,77 @@ export class BillsService {
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
+    }
+  }
+  // echar a andar este metodo
+  async findCurrent() {
+    const session = await this.operatingPeriodModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      if (!currentPeriod) {
+        throw new NotFoundException(
+          'No se encontro ningun periodo actualmente',
+        );
+      }
+      // traeremos todas  las cuentas que matching con el periodo actual
+      const bills = await this.billsModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      // traeremos todas las ordenes que matching con el periodo actual
+      const toGoOrders = await this.toGoOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('toGoOrders', toGoOrders);
+      const rappiOrders = await this.rappiOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('rappiOrders', rappiOrders);
+      const phoneOrders = await this.phoneOrderModel
+        .find({
+          operatingPeriod: currentPeriod[0]._id,
+        })
+        .populate({
+          path: 'payment',
+          populate: {
+            path: 'transactions',
+          },
+        });
+      console.log('phoneOrders', phoneOrders);
+
+      const allOrders = [
+        ...bills,
+        ...toGoOrders,
+        ...rappiOrders,
+        ...phoneOrders,
+      ];
+      session.endSession();
+      return allOrders;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
   }
 

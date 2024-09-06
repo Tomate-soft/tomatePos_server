@@ -30,6 +30,7 @@ import {
   OperatingPeriod,
   OperatingPeriodSchema,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 
 @Module({
   imports: [
@@ -81,6 +82,11 @@ import {
     ]),
   ],
   controllers: [PaymentsController],
-  providers: [PaymentsService, BillsService, ReportsService],
+  providers: [
+    PaymentsService,
+    BillsService,
+    ReportsService,
+    OperatingPeriodService,
+  ],
 })
 export class PaymentsModule {}

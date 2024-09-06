@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as cron from 'node-cron';
 import { FREE_STATUS } from 'src/libs/status.libs';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Table } from 'src/schemas/tables/tableSchema';
@@ -27,6 +28,7 @@ export class CronService {
     @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
     @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
     @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
+    private readonly operatingPeriodService: OperatingPeriodService,
   ) {
     this.initializeCronJobs();
   }
@@ -69,9 +71,21 @@ export class CronService {
       return;
     }
     // Programa el cron job para iniciar el período operativo
-    const startCronExpression = `0 ${openingMinute} ${openingHour} * * *`;
+    const startCronExpression = `${openingMinute} ${openingHour} * * *`;
     cron.schedule(startCronExpression, async () => {
-      console.log('ejecucion del cron start');
+      ///////////////////////////////////////////////////////////////////
+      // Aquí se cierra el actual periodo operativo actual
+      ///////////////////////////////////////////////////////////////////
+
+      const currentPeriod = await this.branchModel.findById(branchId);
+      if (!currentPeriod) {
+        throw new Error('No se encontro el periodo operativo actual');
+      }
+      const currentPeriodId = branch.operatingPeriod;
+
+      ////////////////////////////////////////////////////////////////////
+      // Aquí se crea el nuevo periodo operativo
+      ////////////////////////////////////////////////////////////////////
       const session = await this.branchModel.startSession();
       session.startTransaction();
       try {
@@ -145,8 +159,12 @@ export class CronService {
       session.startTransaction();
       try {
         // Lógica para manejar el fin del período operativo
-
+        const currentPeriod = this.operatingPeriodService.getCurrent();
+        if (!currentPeriod) {
+          throw new Error('No se encontro el periodo operativo actual');
+        }
         // Aquí podrías, por ejemplo, actualizar el estado de la sucursal en la base de datos
+
         await session.commitTransaction();
       } catch (error) {
         await session.abortTransaction();

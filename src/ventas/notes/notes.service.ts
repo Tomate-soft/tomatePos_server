@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, model } from 'mongoose';
-import { flatMap } from 'rxjs';
 import { createNoteDto } from 'src/dto/ventas/notes/createNoteDto';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
 import { ENABLE_STATUS } from 'src/libs/status.libs';
@@ -11,6 +10,9 @@ import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.sch
 import { Table } from 'src/schemas/tables/tableSchema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
+import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
+import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
+import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 
 @Injectable()
 export class NotesService {
@@ -23,6 +25,9 @@ export class NotesService {
     private operatingPeriodModel: Model<OperatingPeriod>,
     private readonly operatingPeriodService: OperatingPeriodService,
     @InjectModel(Table.name) private tableModel: Model<Table>,
+    @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
+    @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
+    @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
   ) {}
 
   async findAll() {

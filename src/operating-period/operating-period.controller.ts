@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Post } from '@nestjs/common';
 import { OperatingPeriodService } from './operating-period.service';
 
 @Controller('operating-period')
@@ -43,6 +43,21 @@ export class OperatingPeriodController {
         throw new NotFoundException('No se han iniciado operaciones');
       }
       return totalSells;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido algo inesperado. Mas informacion: ${error}`,
+      );
+    }
+  }
+
+  @Post('close-period')
+  async closePeriod() {
+    try {
+      const res = ''; //await this.operatingPeriodService.closePeriod();
+      if (!res) {
+        throw new NotFoundException('No se ha podido cerrar el periodo');
+      }
+      return res;
     } catch (error) {
       throw new NotFoundException(
         `Ha ocurrido algo inesperado. Mas informacion: ${error}`,

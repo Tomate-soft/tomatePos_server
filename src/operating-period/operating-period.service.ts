@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FINISHED_STATUS } from 'src/libs/status.libs';
+import { FINISHED_STATUS, FREE_STATUS } from 'src/libs/status.libs';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { branchId } from 'src/variablesProvisionales';
 
 @Injectable()
 export class OperatingPeriodService {

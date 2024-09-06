@@ -87,7 +87,6 @@ export class ClousuresOfOperationsService {
         ...rappiOrders,
         ...phoneOrders,
       ];
-      console.log(allOrders[0]);
       session.endSession();
       return allOrders;
     } catch (error) {
