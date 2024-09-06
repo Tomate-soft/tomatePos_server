@@ -9,6 +9,20 @@ import {
   OperatingPeriodSchema,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import { BillsService } from 'src/ventas/bills/bills.service';
+import {
+  ToGoOrder,
+  ToGoOrderSchema,
+} from 'src/schemas/ventas/orders/toGoOrder.schema';
+import {
+  RappiOrder,
+  RappiOrderSchema,
+} from 'src/schemas/ventas/orders/rappiOrder.schema';
+import {
+  PhoneOrder,
+  PhoneOrderSchema,
+} from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 
 @Module({
   imports: [
@@ -22,9 +36,33 @@ import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
         name: Branch.name,
         schema: BranchSchema,
       },
+      {
+        name: OperatingPeriod.name,
+        schema: OperatingPeriodSchema,
+      },
+      {
+        name: Branch.name,
+        schema: BranchSchema,
+      },
+      {
+        name: ToGoOrder.name,
+        schema: ToGoOrderSchema,
+      },
+      {
+        name: RappiOrder.name,
+        schema: RappiOrderSchema,
+      },
+      {
+        name: PhoneOrder.name,
+        schema: PhoneOrderSchema,
+      },
+      {
+        name: Notes.name,
+        schema: NoteSchema,
+      },
     ]),
   ],
   controllers: [ProcessController],
-  providers: [ProcessService, OperatingPeriodService],
+  providers: [ProcessService, OperatingPeriodService, BillsService],
 })
 export class ProcessModule {}

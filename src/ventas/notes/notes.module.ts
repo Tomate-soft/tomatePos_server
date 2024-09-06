@@ -16,6 +16,19 @@ import {
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import {
+  ToGoOrder,
+  ToGoOrderSchema,
+} from 'src/schemas/ventas/orders/toGoOrder.schema';
+import { TogoOrderService } from '../orders/togo-order/togo-order.service';
+import {
+  PhoneOrder,
+  PhoneOrderSchema,
+} from 'src/schemas/ventas/orders/phoneOrder.schema';
+import {
+  RappiOrder,
+  RappiOrderSchema,
+} from 'src/schemas/ventas/orders/rappiOrder.schema';
 
 @Module({
   imports: [
@@ -44,9 +57,26 @@ import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
         name: Branch.name,
         schema: BranchSchema,
       },
+      {
+        name: ToGoOrder.name,
+        schema: ToGoOrderSchema,
+      },
+      {
+        name: RappiOrder.name,
+        schema: RappiOrderSchema,
+      },
+      {
+        name: PhoneOrder.name,
+        schema: PhoneOrderSchema,
+      },
     ]),
   ],
   controllers: [NotesController],
-  providers: [NotesService, BillsService, OperatingPeriodService],
+  providers: [
+    NotesService,
+    BillsService,
+    OperatingPeriodService,
+    TogoOrderService,
+  ],
 })
 export class NotesModule {}

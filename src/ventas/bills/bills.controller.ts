@@ -30,6 +30,19 @@ export class BillsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
+  @Get('current')
+  async findCurrent() {
+    try {
+      const BillsArray = await this.billService.findCurrent();
+      if (!BillsArray) {
+        throw new NotFoundException('No se encuentran cuentas activas');
+      }
+      return BillsArray;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
   @Get(':id')
   async findOne(@Param('id') id: string) {
     try {

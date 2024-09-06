@@ -22,6 +22,7 @@ import {
   PhoneOrder,
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 
 @Module({
   imports: [
@@ -64,6 +65,6 @@ import {
       },
     ]),
   ],
-  providers: [CronService],
+  providers: [CronService, OperatingPeriodService],
 })
 export class CronModule {}

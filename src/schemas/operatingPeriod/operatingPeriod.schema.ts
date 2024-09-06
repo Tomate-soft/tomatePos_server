@@ -3,6 +3,11 @@ import { DailyRegister } from '../dailyRegister/createDailyRegister';
 import { Schema as MongooseSchema } from 'mongoose';
 import { CashierSession } from '../cashierSession/cashierSession';
 
+interface CashIn {
+  init: boolean;
+  amount: string;
+}
+
 @Schema({ timestamps: true })
 export class OperatingPeriod {
   @Prop({ default: true })
@@ -22,6 +27,15 @@ export class OperatingPeriod {
 
   @Prop({ required: true, default: '0.00' })
   withdrawals?: string;
+
+  @Prop({
+    type: {
+      init: { type: Boolean, default: false },
+      amount: { type: String, default: '$0.00' },
+    },
+    default: { init: false, amount: '$0.00' },
+  })
+  cashIn?: CashIn;
 }
 
 export const OperatingPeriodSchema =

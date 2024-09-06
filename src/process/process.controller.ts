@@ -5,16 +5,29 @@ import { ProcessService } from './process.service';
 export class ProcessController {
   constructor(private processService: ProcessService) {}
 
-  @Get('total-current-bills')
-  async getTotalCurrentBills() {
+  @Get('sell-current-total')
+  async getSellCurrentTotal() {
     try {
-      const totalBillsArray = await this.processService.getTotalCurrentBills();
-      if (!totalBillsArray) {
-        throw new NotFoundException('No bills found');
+      const totalCurrentSells = await this.processService.totalCurrentSells();
+      if (!totalCurrentSells) {
+        throw new NotFoundException('No se ha encontrado ninguna cuenta');
       }
-      return totalBillsArray;
+      return totalCurrentSells;
     } catch (error) {
-      throw new NotFoundException('No bills found');
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
+  @Get('income-current-total')
+  async getIncomeCurrentTotal() {
+    try {
+      const totalCurrentSells = await this.processService.getCurrentIncome();
+      if (!totalCurrentSells) {
+        throw new NotFoundException('No se ha encontrado ninguna cuenta');
+      }
+      return totalCurrentSells;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
 }
