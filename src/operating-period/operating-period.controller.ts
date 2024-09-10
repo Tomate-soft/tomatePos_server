@@ -1,4 +1,11 @@
-import { Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { OperatingPeriodService } from './operating-period.service';
 
 @Controller('operating-period')
@@ -34,6 +41,7 @@ export class OperatingPeriodController {
       );
     }
   }
+
   @Get('/total-sells')
   async totalSells() {
     try {
@@ -50,10 +58,10 @@ export class OperatingPeriodController {
     }
   }
 
-  @Post('close-period')
-  async closePeriod() {
+  @Put('close-period/:id')
+  async closePeriod(@Param('id') id: string) {
     try {
-      const res = ''; //await this.operatingPeriodService.closePeriod();
+      const res = await this.operatingPeriodService.closePeriod(id);
       if (!res) {
         throw new NotFoundException('No se ha podido cerrar el periodo');
       }

@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FINISHED_STATUS, FREE_STATUS } from 'src/libs/status.libs';
+import { FINISHED_STATUS } from 'src/libs/status.libs';
 import { Branch } from 'src/schemas/business/branchSchema';
-import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
-import { branchId } from 'src/variablesProvisionales';
+import { templateClosing } from './templateClosing';
+import {
+  OperatingPeriod,
+  State,
+} from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -83,5 +86,32 @@ export class OperatingPeriodService {
     );
 
     return completeOrders;
+  }
+
+  async closePeriod(id: string = '') {
+    const session = await this.operatingPeriodModel.startSession();
+    session.startTransaction();
+    try {
+      let periodId = id;
+      if (!id) {
+        const currentPeriod = await this.getCurrent();
+        periodId = currentPeriod[0]._id.toString();
+      }
+      console.log('el periodo es', periodId);
+      const updatedPeriod = await this.operatingPeriodModel.findByIdAndUpdate(
+        periodId,
+        { operationalClousure: { ...templateClosing, state: State.CLOSED } },
+        { new: true },
+      );
+      console.log(updatedPeriod);
+      if (!updatedPeriod) {
+        console.log('llegue aca');
+
+        throw new Error('No se pudo actualizar el periodo operativo');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return updatedPeriod;
+    } catch (error) {}
   }
 }
