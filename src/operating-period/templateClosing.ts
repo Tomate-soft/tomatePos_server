@@ -1,7 +1,7 @@
 export const templateClosing = {
-  state: 'ACTIVE',
-  totalSellsAmount: '1000.00',
-  totalRestaurantAmount: '500.00',
+  state: 'CLOSED', // ✅
+  totalSellsAmount: '1000.00', // ✅
+  totalRestaurantAmount: '500.00', // ✅
   totalToGoAmount: '200.00',
   totalPhoneAmount: '150.00',
   totalRappiAmount: '50.00',
@@ -14,7 +14,7 @@ export const templateClosing = {
   finishedAccounts: 90,
   togoOrdersTotal: 30,
   phoneOrdersTotal: 20,
-  restaurantOrdersTotal: 50,
+  restaurantOrdersTotal: 50, // ✅
   rappiOrdersTotal: 10,
   numberOfDiscounts: 5,
   discountTotalAmount: '50.00',

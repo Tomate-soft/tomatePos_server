@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CANCELLED_STATUS } from 'src/libs/status.libs';
@@ -13,7 +13,9 @@ export class ProcessService {
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(OperatingPeriod.name)
     private operatingModel: Model<OperatingPeriod>,
-    private operatingPeriodService: OperatingPeriodService,
+    @Inject(forwardRef(() => OperatingPeriodService))
+    private readonly operatingPeriodService: OperatingPeriodService,
+    @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
   ) {}
 
@@ -22,15 +24,70 @@ export class ProcessService {
     session.startTransaction();
     try {
       const allOrders = await this.billsService.findCurrent();
+      console.log('allOrders', allOrders);
       const filterOrders = allOrders.filter(
         (order) => order.status != CANCELLED_STATUS,
       );
-      const sellTotal = filterOrders?.reduce((acc, order) => {
-        return acc + parseFloat(order.checkTotal);
-      }, 0);
+      const sellTotal =
+        filterOrders?.reduce((acc, order) => {
+          return acc + parseFloat(order.checkTotal);
+        }, 0) ?? 0.0;
+
       await session.commitTransaction();
       session.endSession();
-      return sellTotal ?? 0;
+      return sellTotal ?? 0.0;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  };
+
+  totalPeriodSells = async (id: string) => {
+    const session = await this.operatingModel.startSession();
+    session.startTransaction();
+    try {
+      const allOrders = await this.billsService.findCurrent(id);
+      const filterOrders = allOrders.filter(
+        (order) => order.status != CANCELLED_STATUS,
+      );
+      const sellTotal =
+        filterOrders?.reduce((acc, order) => {
+          return acc + parseFloat(order.checkTotal);
+        }, 0) ?? 0.0;
+      await session.commitTransaction();
+      session.endSession();
+      const counterSells = allOrders.length ?? 0;
+
+      return { totalSellCount: counterSells, totalSellAmount: sellTotal };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  };
+
+  ///////////////////////////////////////////////
+  // totales  para solo el tipo de restaurante.//
+  ///////////////////////////////////////////////
+  especifTotalPeriodSells = async (id: string, type: string) => {
+    const session = await this.operatingModel.startSession();
+    session.startTransaction();
+    try {
+      const resOrders = await this.billsService.findCurrent(id);
+      const allOrders = resOrders.filter((order) => order.sellType === type);
+      const filterOrders = resOrders.filter(
+        (order) => order.status != CANCELLED_STATUS,
+      );
+      const sellTotal =
+        filterOrders?.reduce((acc, order) => {
+          return acc + parseFloat(order.checkTotal);
+        }, 0) ?? 0.0;
+      await session.commitTransaction();
+      session.endSession();
+      const counterSells = allOrders.length ?? 0;
+
+      return { totalSellCount: counterSells, totalSellAmount: sellTotal };
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
@@ -53,8 +110,6 @@ export class ProcessService {
           session.togoorders,
         );
       }, []);
-
-      console.log(allOrders.length);
 
       await session.commitTransaction();
       session.endSession();

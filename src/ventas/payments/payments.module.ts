@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -31,6 +31,8 @@ import {
   OperatingPeriodSchema,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { ProcessModule } from 'src/process/process.module';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 
 @Module({
   imports: [
@@ -80,6 +82,8 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
         schema: OperatingPeriodSchema,
       },
     ]),
+    forwardRef(() => ProcessModule), // Importa ProcessModule con forwardRef si es necesario
+    forwardRef(() => OperatingPeriodModule),
   ],
   controllers: [PaymentsController],
   providers: [

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ProcessController } from './process.controller';
 import { ProcessService } from './process.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -23,6 +23,8 @@ import {
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
+import { BillsModule } from 'src/ventas/bills/bills.module';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 
 @Module({
   imports: [
@@ -36,14 +38,7 @@ import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
         name: Branch.name,
         schema: BranchSchema,
       },
-      {
-        name: OperatingPeriod.name,
-        schema: OperatingPeriodSchema,
-      },
-      {
-        name: Branch.name,
-        schema: BranchSchema,
-      },
+
       {
         name: ToGoOrder.name,
         schema: ToGoOrderSchema,
@@ -61,8 +56,11 @@ import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
         schema: NoteSchema,
       },
     ]),
+    forwardRef(() => BillsModule),
+    forwardRef(() => OperatingPeriodModule),
   ],
   controllers: [ProcessController],
   providers: [ProcessService, OperatingPeriodService, BillsService],
+  exports: [ProcessService],
 })
 export class ProcessModule {}

@@ -1,5 +1,4 @@
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
-
 @Schema({ timestamps: true })
 export class SellType {
   @Prop({

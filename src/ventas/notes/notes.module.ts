@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { NotesController } from './notes.controller';
 import { NotesService } from './notes.service';
 import { NoteSchema, Notes } from 'src/schemas/ventas/notes.schema';
@@ -29,6 +29,8 @@ import {
   RappiOrder,
   RappiOrderSchema,
 } from 'src/schemas/ventas/orders/rappiOrder.schema';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { ProcessModule } from 'src/process/process.module';
 
 @Module({
   imports: [
@@ -70,6 +72,8 @@ import {
         schema: PhoneOrderSchema,
       },
     ]),
+    forwardRef(() => ProcessModule),
+    forwardRef(() => OperatingPeriodModule),
   ],
   controllers: [NotesController],
   providers: [

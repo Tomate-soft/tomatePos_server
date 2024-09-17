@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { DiscountsController } from './discounts.controller';
 import { DiscountsService } from './discounts.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -16,6 +16,8 @@ import {
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import { ProcessModule } from 'src/process/process.module';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 
 @Module({
   imports: [
@@ -49,6 +51,8 @@ import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
         schema: BranchSchema,
       },
     ]),
+    forwardRef(() => ProcessModule),
+    forwardRef(() => OperatingPeriodModule),
   ],
   controllers: [DiscountsController],
   providers: [DiscountsService, OperatingPeriodService],

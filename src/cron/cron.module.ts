@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
@@ -23,6 +23,8 @@ import {
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
+import { ProcessModule } from 'src/process/process.module';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 
 @Module({
   imports: [
@@ -64,6 +66,8 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
         schema: PhoneOrderSchema,
       },
     ]),
+    forwardRef(() => ProcessModule),
+    forwardRef(() => OperatingPeriodModule),
   ],
   providers: [CronService, OperatingPeriodService],
 })

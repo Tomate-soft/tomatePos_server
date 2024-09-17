@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ClousuresOfOperationsController } from './clousures-of-operations.controller';
 import { ClousuresOfOperationsService } from './clousures-of-operations.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -26,6 +26,8 @@ import {
   PhoneOrder,
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { ProcessModule } from 'src/process/process.module';
+import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 
 /**
  * Module for handling closures of operations.
@@ -44,6 +46,8 @@ import {
       { name: RappiOrder.name, schema: RappiOrderSchema },
       { name: PhoneOrder.name, schema: PhoneOrderSchema },
     ]),
+    forwardRef(() => ProcessModule),
+    forwardRef(() => OperatingPeriodModule),
   ],
   controllers: [ClousuresOfOperationsController],
   providers: [
