@@ -74,17 +74,14 @@ export class CronService {
     const startCronExpression = `${openingMinute} ${openingHour} * * *`;
     cron.schedule(startCronExpression, async () => {
       ///////////////////////////////////////////////////////////////////
-      // Aquí se cierra el actual periodo operativo actual
+      // Aquí se cierra el actual periodo operativo actual //////////////
       ///////////////////////////////////////////////////////////////////
 
-      const currentPeriod = await this.branchModel.findById(branchId);
-      if (!currentPeriod) {
-        throw new Error('No se encontro el periodo operativo actual');
-      }
       const currentPeriodId = branch.operatingPeriod;
+      await this.operatingPeriodService.closePeriod(currentPeriodId.toString());
 
       ////////////////////////////////////////////////////////////////////
-      // Aquí se crea el nuevo periodo operativo
+      // Aquí se crea el nuevo periodo operativo /////////////////////////
       ////////////////////////////////////////////////////////////////////
       const session = await this.branchModel.startSession();
       session.startTransaction();
@@ -136,12 +133,15 @@ export class CronService {
           session.endSession();
           throw new Error('No se pudieron actualizar las mesas');
         }
+        /*
         // Eliminar ordenes, esto sera solo en pruebas no en producción 🚩⚠
         await this.billsModel.deleteMany({});
         await this.notesModel.deleteMany({});
         await this.toGoOrderModel.deleteMany({});
         await this.rappiOrderModel.deleteMany({});
         await this.phoneOrderModel.deleteMany({});
+
+        */
 
         await session.commitTransaction();
         session.endSession();
