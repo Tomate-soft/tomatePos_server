@@ -2,21 +2,21 @@ export const templateClosing = {
   state: 'CLOSED', // ✅
   totalSellsAmount: '1000.00', // ✅
   totalRestaurantAmount: '500.00', // ✅
-  totalToGoAmount: '200.00',
-  totalPhoneAmount: '150.00',
-  totalRappiAmount: '50.00',
-  totalCashInAmount: '300.00',
+  totalToGoAmount: '200.00', // ✅
+  totalPhoneAmount: '150.00', // ✅
+  totalRappiAmount: '50.00', // ✅
+  totalCashInAmount: '300.00', // ✅
   totalDebitAmount: '250.00',
   totalCreditAmount: '450.00',
   totalTransferAmount: '100.00',
   totalDeliveryAmount: '75.00',
   totalDiners: 120,
   finishedAccounts: 90,
-  togoOrdersTotal: 30,
+  togoOrdersTotal: 30, // ✅
   phoneOrdersTotal: 20,
   restaurantOrdersTotal: 50, // ✅
-  rappiOrdersTotal: 10,
-  numberOfDiscounts: 5,
+  rappiOrdersTotal: 10, // ✅
+  numberOfDiscounts: 5, // ✅
   discountTotalAmount: '50.00',
   numberOfNotesWithDiscount: 3,
   notesWithDiscountTotalAmount: '30.00',

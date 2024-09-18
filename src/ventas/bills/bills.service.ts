@@ -360,7 +360,8 @@ export class BillsService {
       session.endSession();
     }
   }
-  // echar a andar este metodo
+  // TODO: POPULAR PAYMENTS
+  // METER EL ID A LAS CUNETAS DE DELIVERY
   async findCurrent(id?: string) {
     const session = await this.operatingPeriodModel.startSession();
     session.startTransaction();
@@ -386,7 +387,7 @@ export class BillsService {
             path: 'transactions',
           },
         });
-      // traeremos todas las ordenes que matching con el periodo actual
+      console.log('bills', bills);
       const toGoOrders = await this.toGoOrderModel
         .find({
           operatingPeriod: currentPeriod[0]._id,
@@ -397,7 +398,6 @@ export class BillsService {
             path: 'transactions',
           },
         });
-      console.log('toGoOrders', toGoOrders);
       const rappiOrders = await this.rappiOrderModel
         .find({
           operatingPeriod: currentPeriod[0]._id,
@@ -408,7 +408,6 @@ export class BillsService {
             path: 'transactions',
           },
         });
-      console.log('rappiOrders', rappiOrders);
       const phoneOrders = await this.phoneOrderModel
         .find({
           operatingPeriod: currentPeriod[0]._id,
@@ -419,7 +418,6 @@ export class BillsService {
             path: 'transactions',
           },
         });
-      console.log('phoneOrders', phoneOrders);
 
       const allOrders = [
         ...bills,
@@ -427,7 +425,6 @@ export class BillsService {
         ...rappiOrders,
         ...phoneOrders,
       ];
-      console.log(` allOrders ${allOrders}`);
       await session.commitTransaction();
       session.endSession();
       return allOrders;

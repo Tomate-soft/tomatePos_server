@@ -118,13 +118,42 @@ export class OperatingPeriodService {
       // todo: Total de ventas del tipo de venta restaurante MONTO EN DINERO
       const totalRestaurantSellsAmount =
         totalRestaurantSellsResponse.totalSellAmount;
+
       // todo: Total de ventas del tipo de venta to Go CANTIDAD
+      const totalToGoSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'TOGO_ORDER',
+        );
+      const totalToGoSellsCount = totalToGoSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta to Go MONTO EN DINERO
+      const totalToGoSellsAmount = totalToGoSellsCountResponse.totalSellAmount;
+
       // todo: Total de ventas del tipo de venta Phone CANTIDAD
+
+      const totalPhoneSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'PHONE_ORDER',
+        );
+      const totalPhoneSellsCount = totalPhoneSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta Phone MONTO EN DINERO
+      const totalPhoneSellsAmount =
+        totalPhoneSellsCountResponse.totalSellAmount;
       // todo: Total de ventas del tipo de venta rappi CANTIDAD
+      const totalRappiSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'RAPPI_ORDER',
+        );
+      const totalRappiSellsCount = totalRappiSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta rappi MONTO EN DINERO
+      const totalRappiSellsAmount =
+        totalRappiSellsCountResponse.totalSellAmount;
       // todo: Total de ventas del tipo de pago efectivo MONTO EN DINERO
+      const totalCashSellsResponse =
+        await this.processService.especificSellsForPayment(periodId, 'cash');
+      const totalCashSellsAmount = totalCashSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago tarjeta de debito CANTIDAD
       // todo: Total de ventas del tipo de pago tarjeta de credito MONTO EN DINERO
       // todo: Total de ventas del tipo de pago transferencia MONTO EN DINERO
@@ -180,6 +209,13 @@ export class OperatingPeriodService {
               .toFixed(2)
               .toString(),
             restaurantOrdersTotal: totalRestaurantSellsCount,
+            toGoOrdersTotal: totalToGoSellsCount,
+            toGoOrdersAmount: totalToGoSellsAmount.toFixed(2).toString(),
+            phoneOrdersTotal: totalPhoneSellsCount,
+            phoneOrdersAmount: totalPhoneSellsAmount.toFixed(2).toString(),
+            rappiOrdersTotal: totalRappiSellsCount,
+            rappiOrdersAmount: totalRappiSellsAmount.toFixed(2).toString(),
+            totalCashAmount: totalCashSellsAmount,
           },
         },
         { new: true },
