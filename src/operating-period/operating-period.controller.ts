@@ -1,17 +1,24 @@
 import {
   Body,
   Controller,
+  forwardRef,
   Get,
+  Inject,
   NotFoundException,
   Param,
   Patch,
   Put,
 } from '@nestjs/common';
 import { OperatingPeriodService } from './operating-period.service';
+import { ProcessService } from 'src/process/process.service';
 
 @Controller('operating-period')
 export class OperatingPeriodController {
-  constructor(private operatingPeriodService: OperatingPeriodService) {}
+  constructor(
+    private operatingPeriodService: OperatingPeriodService,
+    @Inject(forwardRef(() => ProcessService))
+    private readonly processService: ProcessService,
+  ) {}
 
   @Get()
   async findAll() {
@@ -43,11 +50,10 @@ export class OperatingPeriodController {
     }
   }
 
-  @Get('/total-sells')
-  async totalSells() {
+  @Get('/total-sells/:id')
+  async totalSells(@Param('id') id: string) {
     try {
-      const totalSells =
-        await this.operatingPeriodService.getTotalSellsService();
+      const totalSells = await this.processService.totalPeriodSells(id);
       if (!totalSells) {
         throw new NotFoundException('No se han iniciado operaciones');
       }
