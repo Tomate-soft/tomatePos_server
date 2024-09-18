@@ -25,6 +25,7 @@ import {
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { ProcessModule } from 'src/process/process.module';
 import { PaymentsModule } from 'src/ventas/payments/payments.module';
+import { BillsModule } from 'src/ventas/bills/bills.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { PaymentsModule } from 'src/ventas/payments/payments.module';
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => PaymentsModule),
+    forwardRef(() => BillsModule),
   ],
   controllers: [OperatingPeriodController],
   providers: [OperatingPeriodService, ProcessService, BillsService],

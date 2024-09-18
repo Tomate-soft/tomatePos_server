@@ -25,6 +25,7 @@ import {
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { BillsModule } from 'src/ventas/bills/bills.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
+    forwardRef(() => BillsModule),
   ],
   providers: [CronService, OperatingPeriodService],
 })

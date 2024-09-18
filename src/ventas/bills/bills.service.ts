@@ -370,54 +370,29 @@ export class BillsService {
         ? await this.operatingPeriodService.getCurrent(id)
         : await this.operatingPeriodService.getCurrent();
 
-      console.log('currentPeriod', currentPeriod);
       if (!currentPeriod) {
         throw new NotFoundException(
           'No se encontro ningun periodo actualmente',
         );
       }
       // traeremos todas  las cuentas que matching con el periodo actual
-      const bills = await this.billsModel
-        .find({
-          operatingPeriod: currentPeriod[0]._id,
-        })
-        .populate({
-          path: 'payment',
-          populate: {
-            path: 'transactions',
-          },
-        });
-      console.log('bills', bills);
-      const toGoOrders = await this.toGoOrderModel
-        .find({
-          operatingPeriod: currentPeriod[0]._id,
-        })
-        .populate({
-          path: 'payment',
-          populate: {
-            path: 'transactions',
-          },
-        });
-      const rappiOrders = await this.rappiOrderModel
-        .find({
-          operatingPeriod: currentPeriod[0]._id,
-        })
-        .populate({
-          path: 'payment',
-          populate: {
-            path: 'transactions',
-          },
-        });
-      const phoneOrders = await this.phoneOrderModel
-        .find({
-          operatingPeriod: currentPeriod[0]._id,
-        })
-        .populate({
-          path: 'payment',
-          populate: {
-            path: 'transactions',
-          },
-        });
+      const bills = await this.findCurrentBySellType(
+        currentPeriod[0]._id.toString(),
+        'onsite',
+      );
+      // traeremos todas las ordenes que matching con el periodo actual
+      const toGoOrders = await this.findCurrentBySellType(
+        currentPeriod[0]._id.toString(),
+        'TOGO_ORDER',
+      );
+      const rappiOrders = await this.findCurrentBySellType(
+        currentPeriod[0]._id.toString(),
+        'RAPPI_ORDER',
+      );
+      const phoneOrders = await this.findCurrentBySellType(
+        currentPeriod[0]._id.toString(),
+        'PHONE_ORDER',
+      );
 
       const allOrders = [
         ...bills,
@@ -435,34 +410,75 @@ export class BillsService {
     }
   }
 
+  async findCurrentBySellType(id: string, type: string) {
+    const session = await this.operatingPeriodModel.startSession();
+    session.startTransaction();
+    try {
+      await session.commitTransaction();
+      session.endSession();
+
+      if (type === 'onsite') {
+        const bills = await this.billsModel
+          .find({
+            operatingPeriod: id,
+          })
+          .populate({
+            path: 'payment',
+            populate: {
+              path: 'transactions',
+            },
+          });
+        return bills;
+      }
+      if (type === 'TOGO_ORDER') {
+        const toGoOrders = await this.toGoOrderModel
+          .find({
+            operatingPeriod: id,
+          })
+          .populate({
+            path: 'payment',
+            populate: {
+              path: 'transactions',
+            },
+          });
+        return toGoOrders;
+      }
+      if (type === 'PHONE_ORDER') {
+        const phoneOrders = await this.phoneOrderModel
+          .find({
+            operatingPeriod: id,
+          })
+          .populate({
+            path: 'payment',
+            populate: {
+              path: 'transactions',
+            },
+          });
+        return phoneOrders;
+      }
+      if (type === 'RAPPI_ORDER') {
+        const rappiOrders = await this.rappiOrderModel
+          .find({
+            operatingPeriod: id,
+          })
+          .populate({
+            path: 'payment',
+            populate: {
+              path: 'transactions',
+            },
+          });
+        return rappiOrders;
+      }
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
+
   private formatCode(code: string): string {
     // todo
     // formatear correctamente el codigo de la factura
     return code.padStart(6, '0');
   }
-
-  /*
-  async getNextBillCodeCounter(session?: ClientSession): Promise<number> {
-    const result = await this.billsModel.findOneAndUpdate(
-      {},
-      { $inc: { billCodeCounter: 1 } },
-      { new: true, upsert: true, select: 'billCodeCounter', session },
-    );
-
-    return result ? result.billCodeCounter : 1;
-  }
-
-  async incrementBillCodeCounter(session?: ClientSession): Promise<void> {
-    await this.billsModel.updateOne(
-      {},
-      { $inc: { billCodeCounter: 1 } },
-      { session },
-    );
-  }P
-
-  private formatBillCode(counter: number): string {
-    // Formatear el contador como "001"
-    return counter.toString().padStart(3, '0');
-  }
-  */
 }

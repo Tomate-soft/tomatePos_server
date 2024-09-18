@@ -28,6 +28,7 @@ import {
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { BillsModule } from 'src/ventas/bills/bills.module';
 
 /**
  * Module for handling closures of operations.
@@ -48,6 +49,7 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
+    forwardRef(() => BillsModule),
   ],
   controllers: [ClousuresOfOperationsController],
   providers: [
