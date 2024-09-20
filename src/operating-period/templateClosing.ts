@@ -10,15 +10,15 @@ export const templateClosing = {
   totalCreditAmount: '450.00', // ✅ -9
   totalTransferAmount: '100.00', // ✅ -10
   totalDeliveryAmount: '75.00', // ✅ -11
-  totalDiners: 120, //  -12
+  totalDiners: 120, // ✅ -12
   finishedAccounts: 90, //  // ✅ -13 debe estas la metrica en otro lado
   togoOrdersTotal: 30, // ✅ -14
   phoneOrdersTotal: 20, // ✅-15
   restaurantOrdersTotal: 50, // ✅ -16
   rappiOrdersTotal: 10, // ✅ -17
-  numberOfDiscounts: 5, // ✅ -18
-  discountTotalAmount: '50.00', // ✅ -19
-  numberOfNotesWithDiscount: 3, // ✅ -20
+  numberOfDiscounts: 5, // -18
+  discountTotalAmount: '50.00', // -19
+  numberOfNotesWithDiscount: 3, //  -20
   notesWithDiscountTotalAmount: '30.00', // -21
   numberOfproductsWithDiscount: 2, // -22
   productsWithDiscountTotalAmount: '20.00', // -23

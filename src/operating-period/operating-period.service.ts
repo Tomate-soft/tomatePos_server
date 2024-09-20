@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FINISHED_STATUS } from 'src/libs/status.libs';
+import { CANCELLED_STATUS, FINISHED_STATUS } from 'src/libs/status.libs';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { templateClosing } from './templateClosing';
 import {
@@ -11,6 +11,7 @@ import {
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { finished } from 'stream';
+import { Bills } from 'src/schemas/ventas/bills.schema';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -175,7 +176,7 @@ export class OperatingPeriodService {
         );
       const totalTransferSellsAmount = totalTransferSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago plataformasw delivery  MONTO EN DINERO,
-      // todo: Total clientes atendidos en el restaurante
+
       // todo: total de cuentas cobradas en el restaurante
       const billedAccounts = await this.billsService.findCurrentBySellType(
         periodId,
@@ -184,6 +185,14 @@ export class OperatingPeriodService {
       const accountsBilled = billedAccounts.filter(
         (account) => account.status === FINISHED_STATUS,
       );
+      // todo: Total clientes atendidos en el restaurante
+      const filterDiner = accountsBilled.filter(
+        (account) => account.status !== CANCELLED_STATUS,
+      );
+      const totalDiners = filterDiner.reduce((a, b) => {
+        return a + b.diners;
+      }, 0);
+
       // todo: total de ordenes ToGo
       // todo: total de ordenes Phone
       // total de cuentas abiertas en el restaurante
@@ -245,6 +254,7 @@ export class OperatingPeriodService {
             totalTransferAmount: totalTransferSellsAmount,
             restaurantOrdersTotal: totalRestaurantSellsCount,
             finishedAccounts: accountsBilled.length,
+            totalDiners: totalDiners,
           },
         },
         { new: true },

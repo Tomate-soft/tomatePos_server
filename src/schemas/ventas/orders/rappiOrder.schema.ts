@@ -57,6 +57,13 @@ export class RappiOrder {
     ref: 'OperatingPeriod',
   })
   operatingPeriod: OperatingPeriod;
+
+  @Prop({
+    default: 1,
+    required: true,
+    trim: true,
+  })
+  diners?: number;
 }
 
 export const RappiOrderSchema = SchemaFactory.createForClass(RappiOrder);

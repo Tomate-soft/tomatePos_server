@@ -101,6 +101,13 @@ export class Bills {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'OperatingPeriod' })
   operatingPeriod?: OperatingPeriod;
 
+  @Prop({
+    default: 1,
+    required: true,
+    trim: true,
+  })
+  diners?: number;
+
   /* 
   device: string;
   */

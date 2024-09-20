@@ -80,6 +80,12 @@ export class Notes {
     ref: 'Discount',
   })
   discount?: Discount;
+  @Prop({
+    default: 1,
+    required: true,
+    trim: true,
+  })
+  diners?: number;
 }
 
 export const NoteSchema = SchemaFactory.createForClass(Notes);
