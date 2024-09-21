@@ -58,6 +58,12 @@ export class PhoneOrder {
     ref: 'OperatingPeriod',
   })
   operatingPeriod: OperatingPeriod;
+  @Prop({
+    default: 1,
+    required: true,
+    trim: true,
+  })
+  diners?: number;
 }
 
 export const PhoneOrderSchema = SchemaFactory.createForClass(PhoneOrder);

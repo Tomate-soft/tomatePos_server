@@ -43,7 +43,7 @@ export class CronService {
       throw new Error('No se encontro la branch');
     }
 
-    const { initOperatingPeriod, closeOperatingPeriod, name } = branch;
+    const { initOperatingPeriod, closeOperatingPeriod } = branch;
 
     const [openingHour, openingMinute] = initOperatingPeriod
       .split(':')

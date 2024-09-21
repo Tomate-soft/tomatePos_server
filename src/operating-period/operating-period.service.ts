@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FINISHED_STATUS } from 'src/libs/status.libs';
+import { CANCELLED_STATUS, FINISHED_STATUS } from 'src/libs/status.libs';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { templateClosing } from './templateClosing';
 import {
@@ -9,6 +9,9 @@ import {
   State,
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
+import { BillsService } from 'src/ventas/bills/bills.service';
+import { finished } from 'stream';
+import { Bills } from 'src/schemas/ventas/bills.schema';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -18,6 +21,8 @@ export class OperatingPeriodService {
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
     @Inject(forwardRef(() => ProcessService))
     private readonly processService: ProcessService,
+    @Inject(forwardRef(() => BillsService))
+    private readonly billsService: BillsService,
   ) {}
 
   async findAll() {
@@ -118,19 +123,76 @@ export class OperatingPeriodService {
       // todo: Total de ventas del tipo de venta restaurante MONTO EN DINERO
       const totalRestaurantSellsAmount =
         totalRestaurantSellsResponse.totalSellAmount;
+
       // todo: Total de ventas del tipo de venta to Go CANTIDAD
+      const totalToGoSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'TOGO_ORDER',
+        );
+      const totalToGoSellsCount = totalToGoSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta to Go MONTO EN DINERO
+      const totalToGoSellsAmount = totalToGoSellsCountResponse.totalSellAmount;
+
       // todo: Total de ventas del tipo de venta Phone CANTIDAD
+
+      const totalPhoneSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'PHONE_ORDER',
+        );
+      const totalPhoneSellsCount = totalPhoneSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta Phone MONTO EN DINERO
+      const totalPhoneSellsAmount =
+        totalPhoneSellsCountResponse.totalSellAmount;
       // todo: Total de ventas del tipo de venta rappi CANTIDAD
+      const totalRappiSellsCountResponse =
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'RAPPI_ORDER',
+        );
+      const totalRappiSellsCount = totalRappiSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta rappi MONTO EN DINERO
+      const totalRappiSellsAmount =
+        totalRappiSellsCountResponse.totalSellAmount;
       // todo: Total de ventas del tipo de pago efectivo MONTO EN DINERO
+      const totalCashSellsResponse =
+        await this.processService.especificSellsForPayment(periodId, 'cash');
+      const totalCashSellsAmount = totalCashSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago tarjeta de debito CANTIDAD
+      const totalDebitSellsResponse =
+        await this.processService.especificSellsForPayment(periodId, 'debit');
+      const totalDebitSellsAmount = totalDebitSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago tarjeta de credito MONTO EN DINERO
+      const totalCreditSellsResponse =
+        await this.processService.especificSellsForPayment(periodId, 'credit');
+      const totalCreditSellsAmount = totalCreditSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago transferencia MONTO EN DINERO
+
+      const totalTransferSellsResponse =
+        await this.processService.especificSellsForPayment(
+          periodId,
+          'transfer',
+        );
+      const totalTransferSellsAmount = totalTransferSellsResponse.totalAmount;
       // todo: Total de ventas del tipo de pago plataformasw delivery  MONTO EN DINERO,
-      // todo: Total clientes atendidos en el restaurante
+
       // todo: total de cuentas cobradas en el restaurante
+      const billedAccounts = await this.billsService.findCurrentBySellType(
+        periodId,
+        'onsite',
+      );
+      const accountsBilled = billedAccounts.filter(
+        (account) => account.status === FINISHED_STATUS,
+      );
+      // todo: Total clientes atendidos en el restaurante
+      const filterDiner = accountsBilled.filter(
+        (account) => account.status !== CANCELLED_STATUS,
+      );
+      const totalDiners = filterDiner.reduce((a, b) => {
+        return a + b.diners;
+      }, 0);
+
       // todo: total de ordenes ToGo
       // todo: total de ordenes Phone
       // total de cuentas abiertas en el restaurante
@@ -179,7 +241,20 @@ export class OperatingPeriodService {
             totalRestaurantAmount: totalRestaurantSellsAmount
               .toFixed(2)
               .toString(),
+            toGoOrdersAmount: totalToGoSellsAmount.toFixed(2).toString(),
+            phoneOrdersAmount: totalPhoneSellsAmount.toFixed(2).toString(),
+            rappiOrdersAmount: totalRappiSellsAmount.toFixed(2).toString(),
+            totalDeliveryAmount: totalRappiSellsAmount.toFixed(2).toString(),
+            totalCashAmount: totalCashSellsAmount,
+            toGoOrdersTotal: totalToGoSellsCount,
+            phoneOrdersTotal: totalPhoneSellsCount,
+            rappiOrdersTotal: totalRappiSellsCount,
+            totalDebitAmount: totalDebitSellsAmount,
+            totalCreditAmount: totalCreditSellsAmount,
+            totalTransferAmount: totalTransferSellsAmount,
             restaurantOrdersTotal: totalRestaurantSellsCount,
+            finishedAccounts: accountsBilled.length,
+            totalDiners: totalDiners,
           },
         },
         { new: true },

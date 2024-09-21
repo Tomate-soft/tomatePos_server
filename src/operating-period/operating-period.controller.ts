@@ -110,4 +110,20 @@ export class OperatingPeriodController {
       );
     }
   }
+
+  @Get('/test/:id')
+  async test(@Param('id') id: string) {
+    try {
+      const res = await this.processService.especificSellsForPayment(
+        id,
+        'cash',
+      );
+
+      return res;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido algo inesperado. Mas informacion: ${error}`,
+      );
+    }
+  }
 }

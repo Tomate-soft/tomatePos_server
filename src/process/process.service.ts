@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CANCELLED_STATUS } from 'src/libs/status.libs';
@@ -92,6 +97,40 @@ export class ProcessService {
       await session.abortTransaction();
       session.endSession();
       throw error;
+    }
+  };
+
+  especificSellsForPayment = async (id: string, type?: string) => {
+    const session = await this.operatingModel.startSession();
+    session.startTransaction();
+    try {
+      const resOrders = await this.billsService.findCurrent(id);
+      const allOrders = resOrders.filter((order) => order.payment.length > 0);
+      const allTransactions = allOrders.flatMap((order) =>
+        order.payment.flatMap((payment) => payment.transactions),
+      );
+      const filterTransactions = allTransactions.filter((transaction) =>
+        type
+          ? transaction.paymentType === type
+          : ['cash', 'credit', 'debit', 'transfer'].includes(
+              transaction.paymentType,
+            ),
+      );
+      return {
+        numberOfTransactions: filterTransactions.length,
+        totalAmount: filterTransactions
+          .reduce(
+            (acc, transaction) => acc + parseFloat(transaction.payQuantity),
+            0,
+          )
+          .toFixed(2)
+          .toString(),
+        transactionArray: filterTransactions,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw new NotFoundException('Se encontro un error al obtener el total');
     }
   };
 

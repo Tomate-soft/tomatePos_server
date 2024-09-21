@@ -57,6 +57,13 @@ export class ToGoOrder {
     ref: 'OperatingPeriod',
   })
   operatingPeriod: OperatingPeriod;
+
+  @Prop({
+    default: 1,
+    required: true,
+    trim: true,
+  })
+  diners?: number;
 }
 
 export const ToGoOrderSchema = SchemaFactory.createForClass(ToGoOrder);

@@ -18,6 +18,7 @@ import CashWithdrawSchema, {
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { BillsModule } from 'src/ventas/bills/bills.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
+    forwardRef(() => BillsModule),
   ],
   controllers: [CashierSessionController],
   providers: [CashierSessionService, OperatingPeriodService],

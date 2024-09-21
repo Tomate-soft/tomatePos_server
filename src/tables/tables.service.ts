@@ -53,6 +53,7 @@ export class TablesService {
     const newDish = new this.tableModel(createtable);
     return await newDish.save();
   }
+
   async delete(id: string) {
     return await this.tableModel.findByIdAndDelete(id);
   }

@@ -12,6 +12,7 @@ import {
 import { TablesService } from './tables.service';
 import { CreateTableDto } from 'src/dto/tables/createTableDto';
 import { UpdateTableDto } from 'src/dto/tables/updateTableDto';
+import { PENDING_STATUS } from 'src/libs/status.libs';
 
 @Controller('tables')
 export class TablesController {
@@ -98,6 +99,22 @@ export class TablesController {
   async updateChars(@Param('id') id: string, @Body() body: UpdateTableDto) {
     try {
       const updatedTable = await this.tableService.update(id, body);
+      if (!updatedTable) {
+        new NotFoundException('No se encontro la mesa');
+      }
+      return updatedTable;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido un error inesperado');
+    }
+  }
+
+  @Patch('enable/:id')
+  async enableTable(@Param('id') id: string, @Body() body: UpdateTableDto) {
+    try {
+      const updatedTable = await this.tableService.update(id, {
+        ...body,
+        status: PENDING_STATUS,
+      });
       if (!updatedTable) {
         new NotFoundException('No se encontro la mesa');
       }
