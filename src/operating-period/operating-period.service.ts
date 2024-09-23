@@ -10,8 +10,6 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
-import { finished } from 'stream';
-import { Bills } from 'src/schemas/ventas/bills.schema';
 
 @Injectable()
 export class OperatingPeriodService {
