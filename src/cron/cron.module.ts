@@ -26,6 +26,7 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
+import { CronController } from './cron.controller';
 
 @Module({
   imports: [
@@ -72,5 +73,6 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
     forwardRef(() => BillsModule),
   ],
   providers: [CronService, OperatingPeriodService],
+  controllers: [CronController],
 })
 export class CronModule {}

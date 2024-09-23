@@ -33,7 +33,7 @@ export class CronService {
     this.initializeCronJobs();
   }
 
-  private async initializeCronJobs() {
+  async initializeCronJobs() {
     /* //////////////////////////////////////////////////////////
     /////  METODOS PARA EJECUTAR CRON JOBS AL INICIAR EL DIA ////
     ////////////////////////////////////////////////////////// */
@@ -72,13 +72,21 @@ export class CronService {
     }
     // Programa el cron job para iniciar el período operativo
     const startCronExpression = `${openingMinute} ${openingHour} * * *`;
+
     cron.schedule(startCronExpression, async () => {
       ///////////////////////////////////////////////////////////////////
       // Aquí se cierra el actual periodo operativo actual //////////////
       ///////////////////////////////////////////////////////////////////
 
       const currentPeriodId = branch.operatingPeriod;
-      await this.operatingPeriodService.closePeriod(currentPeriodId.toString());
+
+      const updatedPeriod = await this.operatingPeriodService.closePeriod(
+        currentPeriodId.toString(),
+      );
+
+      if (!updatedPeriod) {
+        throw new Error('No se pudo cerrar el periodo operativo');
+      }
 
       ////////////////////////////////////////////////////////////////////
       // Aquí se crea el nuevo periodo operativo /////////////////////////
