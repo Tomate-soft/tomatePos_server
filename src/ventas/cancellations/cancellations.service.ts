@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Console } from 'console';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
 import { UpdateCancellationDto } from 'src/dto/ventas/cancellations/updateCancellationDto';
 import { CANCELLED_STATUS, FREE_STATUS } from 'src/libs/status.libs';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Cancellations } from 'src/schemas/ventas/cancellations.schema';
@@ -20,6 +20,7 @@ export class CancellationsService {
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private notesModel: Model<Notes>,
     @InjectModel(Product.name) private productsModel: Model<Product>,
+    private operatingPeriodService: OperatingPeriodService,
   ) {}
 
   async findAll() {
@@ -33,8 +34,14 @@ export class CancellationsService {
   async create(createdCancellation: CreateCancellationDto) {
     const session = await this.cancellationModel.startSession();
     session.startTransaction();
+    const currentPeriod = await this.operatingPeriodService.getCurrent();
+    const periodId = currentPeriod[0].id;
+
     try {
-      const newCancellation = new this.cancellationModel(createdCancellation);
+      const newCancellation = new this.cancellationModel({
+        ...createdCancellation,
+        operatingPeriod: periodId,
+      });
       await newCancellation.save();
 
       if (
@@ -106,8 +113,15 @@ export class CancellationsService {
   async cancelProducts(body: { aptAccount: any; body: CreateCancellationDto }) {
     const session = await this.cancellationModel.startSession();
     session.startTransaction();
+
+    const currentPeriod = await this.operatingPeriodService.getCurrent();
+    const periodId = currentPeriod[0].id;
+    console.log(periodId);
     try {
-      const newCancelproduct = new this.cancellationModel(body.body);
+      const newCancelproduct = new this.cancellationModel({
+        ...body.body,
+        operatingPeriod: periodId,
+      });
       await newCancelproduct.save();
 
       if (newCancelproduct && !body.body.noteId) {

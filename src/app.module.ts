@@ -97,4 +97,4 @@ import { BusinessModule } from './business/business.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

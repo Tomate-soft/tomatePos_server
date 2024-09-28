@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateDiscountDto } from 'src/dto/ventas/discounts/createDiscountDto';
@@ -14,16 +14,13 @@ import {
 } from './cases';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
-import {
-  ENABLE_STATUS,
-  FOR_PAYMENT_STATUS,
-  FREE_STATUS,
-} from 'src/libs/status.libs';
+import { ENABLE_STATUS, FOR_PAYMENT_STATUS } from 'src/libs/status.libs';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
+import { BillsService } from '../bills/bills.service';
 
 @Injectable()
 export class DiscountsService {
@@ -36,7 +33,10 @@ export class DiscountsService {
     private cashierSessionModel: Model<CashierSession>,
     @InjectModel(OperatingPeriod.name)
     private operatingPeriod: Model<OperatingPeriod>,
+    @Inject(forwardRef(() => OperatingPeriodService))
     private readonly operatingPeriodService: OperatingPeriodService,
+    @Inject(forwardRef(() => BillsService))
+    private readonly billsService: BillsService,
   ) {}
 
   async findAll() {
@@ -49,14 +49,20 @@ export class DiscountsService {
   async create(payload: { accountApt: any; body: CreateDiscountDto }) {
     const session = await this.discountModel.startSession();
     session.startTransaction();
+    const operatingPeriod = await this.operatingPeriodService.getCurrent();
+
+    const createDiscountData = {
+      ...payload.body,
+      operatingPeriod: operatingPeriod[0]._id.toString(),
+    };
+
     try {
       switch (payload.body.discountType) {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
-            const newDiscountNote = await this.discountModel.create(
-              payload.body,
-            );
+            const newDiscountNote =
+              await this.discountModel.create(createDiscountData);
             if (!newDiscountNote) {
               await session.abortTransaction();
               session.endSession();
@@ -99,10 +105,10 @@ export class DiscountsService {
               currentBillNote._id,
               { checkTotal: newBillTotal, products: newProductsForBill },
             );
-            console.log(aptBill);
             return updatedNote;
           }
-          const newDiscount = await this.discountModel.create(payload.body);
+          const newDiscount =
+            await this.discountModel.create(createDiscountData);
           if (!newDiscount) {
             await session.abortTransaction();
             session.endSession();
@@ -125,7 +131,8 @@ export class DiscountsService {
           return;
 
         case NOTES_DISCOUNTS:
-          const newDiscountNote = await this.discountModel.create(payload.body);
+          const newDiscountNote =
+            await this.discountModel.create(createDiscountData);
           if (!newDiscountNote) {
             await session.abortTransaction();
             session.endSession();
@@ -141,7 +148,8 @@ export class DiscountsService {
           return newDiscountNote;
         case COURTESY_APPLY_BILL:
         case BILL_DISCOUNTS:
-          const newDiscountBill = await this.discountModel.create(payload.body);
+          const newDiscountBill =
+            await this.discountModel.create(createDiscountData);
 
           if (!newDiscountBill) {
             await session.abortTransaction();
@@ -187,7 +195,8 @@ export class DiscountsService {
           return newDiscountBill;
 
         case COURTESY_APPLY_NOTES: //
-          const newCourtesyNote = await this.discountModel.create(payload.body);
+          const newCourtesyNote =
+            await this.discountModel.create(createDiscountData);
           if (!newCourtesyNote) {
             await session.abortTransaction();
             session.endSession();

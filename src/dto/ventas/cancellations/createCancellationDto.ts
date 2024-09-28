@@ -27,4 +27,7 @@ export class CreateCancellationDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsDefined()
+  cancelledAmount: number;
 }
