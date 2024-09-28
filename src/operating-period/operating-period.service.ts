@@ -257,7 +257,6 @@ export class OperatingPeriodService {
         },
         { new: true },
       );
-      console.log(updatedPeriod);
       if (!updatedPeriod) {
         await session.abortTransaction();
         session.endSession();

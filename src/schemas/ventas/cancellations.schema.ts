@@ -39,6 +39,12 @@ export class Cancellations {
 
   @Prop({ trim: true })
   description?: string;
+
+  @Prop({ trim: true, default: 'no-identified' })
+  operatingPeriod?: string;
+
+  @Prop({ required: true, type: Number })
+  cancelledAmount: number;
 }
 
 export const CancellationSchema = SchemaFactory.createForClass(Cancellations);

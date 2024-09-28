@@ -44,6 +44,14 @@ export class Discount {
     trim: true,
   })
   discountReason: string;
+
+  @Prop({
+    default: 'no-identified',
+  })
+  operatingPeriod?: string;
+
+  @Prop({})
+  totalDiscountQuantity?: string;
 }
 
 export const DiscountSchema = SchemaFactory.createForClass(Discount);
