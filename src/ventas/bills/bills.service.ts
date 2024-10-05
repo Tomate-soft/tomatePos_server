@@ -476,6 +476,34 @@ export class BillsService {
     }
   }
 
+  async getAllHistoryOrders() {
+    const session = await this.operatingPeriodModel.startSession();
+    let results = [];
+    await session.withTransaction(async () => {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriodId = currentPeriod[0]._id.toString();
+      const [bills, toGoOrders, rappiOrders, phoneOrders] = await Promise.all([
+        this.billsModel.find().lean(),
+        this.toGoOrderModel.find().lean(),
+        this.rappiOrderModel.find().lean(),
+        this.phoneOrderModel.find().lean(),
+      ]);
+
+      const allOrders = [
+        ...bills,
+        ...toGoOrders,
+        ...rappiOrders,
+        ...phoneOrders,
+      ];
+      const filterOrders = allOrders.filter(
+        (order) => order.operatingPeriod.toString() != currentPeriodId,
+      );
+      results = filterOrders;
+      return filterOrders;
+    });
+    return results;
+  }
+
   private formatCode(code: string): string {
     // todo
     // formatear correctamente el codigo de la factura

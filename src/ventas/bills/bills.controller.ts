@@ -31,6 +31,19 @@ export class BillsController {
     }
   }
 
+  @Get('/history/all')
+  async findAllHistory() {
+    try {
+      const BillsArray = await this.billService.getAllHistoryOrders();
+      if (!BillsArray) {
+        throw new NotFoundException('No se encuentran cuentas activas');
+      }
+      return BillsArray;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
   @Get('current')
   async findCurrent() {
     try {
