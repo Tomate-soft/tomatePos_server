@@ -4,7 +4,6 @@ import {
   Body,
   HttpException,
   HttpStatus,
-  NotFoundException,
 } from '@nestjs/common';
 import {
   ThermalPrinter,
