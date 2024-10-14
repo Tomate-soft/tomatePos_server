@@ -40,7 +40,17 @@ export class DiscountsService {
   ) {}
 
   async findAll() {
-    return await this.discountModel.find();
+    return await this.discountModel
+      .find()
+      .populate({
+        path: 'accountId',
+      })
+      .populate({
+        path: 'discountByUser',
+      })
+      .populate({
+        path: 'noteAccountId',
+      });
   }
 
   async findOne(id: string) {
@@ -53,7 +63,7 @@ export class DiscountsService {
 
     const createDiscountData = {
       ...payload.body,
-      operatingPeriod: operatingPeriod[0]._id.toString(),
+      operatingPeriod: operatingPeriod[0]._id, // hiicimos este cambio hay que testear si si funciona
     };
 
     try {
@@ -131,6 +141,8 @@ export class DiscountsService {
           return;
 
         case NOTES_DISCOUNTS:
+          console.log('creaando descuento de notas');
+          console.log(createDiscountData);
           const newDiscountNote =
             await this.discountModel.create(createDiscountData);
           if (!newDiscountNote) {
@@ -139,7 +151,7 @@ export class DiscountsService {
             throw new Error('No se pudo completar');
           }
           const updateNote = await this.noteModel.findByIdAndUpdate(
-            newDiscountNote.accountId,
+            newDiscountNote.noteAccountId,
             { discount: newDiscountNote._id },
           );
 

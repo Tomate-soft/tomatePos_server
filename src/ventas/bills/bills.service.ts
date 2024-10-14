@@ -23,7 +23,7 @@ export class BillsService {
     @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
     @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
     @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
-    @InjectModel(Bills.name) private billsModel: Model<BillsDocument>,
+    @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private noteModel: Model<Notes>,
     @InjectModel(OperatingPeriod.name)
     private operatingPeriodModel: Model<OperatingPeriod>,

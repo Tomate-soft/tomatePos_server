@@ -1,9 +1,29 @@
-import { IsString, IsDefined } from 'class-validator';
+import { IsString, IsDefined, IsOptional } from 'class-validator';
 
 export class CreateDiscountDto {
   @IsString()
-  @IsDefined()
+  @IsOptional()
   accountId: string;
+
+  @IsString()
+  @IsOptional()
+  noteAccountId?: string;
+
+  @IsString()
+  @IsOptional()
+  productName?: string;
+
+  @IsString()
+  @IsOptional()
+  rappiAccountId: string;
+
+  @IsString()
+  @IsOptional()
+  phoneAccountId: string;
+
+  @IsString()
+  @IsOptional()
+  toGoAccountId: string;
 
   @IsString()
   @IsDefined()
