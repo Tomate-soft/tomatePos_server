@@ -38,7 +38,7 @@ export class DiscountsController {
    * @param id - The ID of the discount to retrieve.
    * @returns A Promise that resolves to the selected discount.
    * @throws NotFoundException if the discount with the specified ID is not found.
-   * @throws NotFoundException if an unexpected error occurs.
+   * @throws NotFoundException if an unexpected error occurs.// component
    */
   async findOne(@Param('id') id: string) {
     try {
@@ -61,6 +61,8 @@ export class DiscountsController {
    * @throws {NotFoundException} If the discount could not be applied.
    */
   async create(@Body() payload: { accountApt: any; body: CreateDiscountDto }) {
+    console.log(payload);
+
     try {
       const newDiscount = await this.discountService.create(payload);
       return newDiscount;

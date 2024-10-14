@@ -17,6 +17,7 @@ async function bootstrap() {
       'https://tomate-ksuxm5zwf-tomatepvs-projects.vercel.app',
       'http://localhost:5174',
       'http://localhost:5173',
+      'http://localhost:1420',
     ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
