@@ -41,6 +41,7 @@ import { RappiOrderModule } from './ventas/orders/rappi-order/rappi-order.module
 import { PhoneOrderModule } from './ventas/orders/phone-order/phone-order.module';
 import { ProcessModule } from './process/process.module';
 import { BusinessModule } from './business/business.module';
+import { ReopenModule } from './reopen/reopen.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { BusinessModule } from './business/business.module';
     PhoneOrderModule,
     ProcessModule,
     BusinessModule,
+    ReopenModule,
   ],
   controllers: [],
   providers: [
