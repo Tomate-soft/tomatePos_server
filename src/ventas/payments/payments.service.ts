@@ -47,7 +47,20 @@ export class PaymentsService {
   ) {}
 
   async findAll() {
-    return await this.paymentModel.find();
+    return await this.paymentModel
+      .find()
+      .populate({
+        path: 'accountId',
+      })
+      .lean()
+      .populate({
+        path: 'noteAccountId',
+      })
+      .lean()
+      .populate({
+        path: 'cashier',
+      })
+      .lean();
   }
 
   async findOne(id: string) {
@@ -159,7 +172,33 @@ export class PaymentsService {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
-      const newPayment = new this.paymentModel(body.body);
+      const lastPaymentCode = await this.paymentModel
+        .findOne({})
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const nextPaymentCode = lastPaymentCode
+        ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
+        : 1;
+
+      const newCode = nextPaymentCode.toString();
+      const formatCode = this.formatCode(newCode);
+
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      const OperatingPeriod =
+        await this.operatingPeriodModel.findById(periodId);
+
+      const newPayment = new this.paymentModel({
+        ...body.body,
+        paymentCode: formatCode,
+        operatingPeriod: OperatingPeriod._id,
+      });
       await newPayment.save();
       if (!newPayment) {
         throw new NotFoundException(`No se pudo crear el pago`);
@@ -272,9 +311,7 @@ export class PaymentsService {
 
       await session.commitTransaction();
       session.endSession();
-      console.log('se compelto bien');
-      console.log(updatedCashierSession);
-      console.log(cashierSessionUpdated);
+
       return { message: 'Funciona perfecto' };
     } catch (error) {
       await session.abortTransaction();

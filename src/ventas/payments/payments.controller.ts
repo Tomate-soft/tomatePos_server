@@ -34,6 +34,7 @@ export class PaymentsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
   @Get('current')
   async findCurrent() {
     try {
@@ -60,7 +61,6 @@ export class PaymentsController {
 
   @Post()
   async create(@Body() body: CreatePaymentDto) {
-    console.log('Por aca el body que llega al create de payments.controller');
     try {
       const newPayment = await this.paymentService.create(body);
 

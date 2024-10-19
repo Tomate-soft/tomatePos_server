@@ -29,7 +29,6 @@ export class ProcessService {
     session.startTransaction();
     try {
       const allOrders = await this.billsService.findCurrent();
-      console.log('allOrders', allOrders);
       const filterOrders = allOrders.filter(
         (order) => order.status != CANCELLED_STATUS,
       );
