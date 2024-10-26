@@ -7,6 +7,10 @@ export class CreateCancellationDto {
 
   @IsOptional()
   @IsString()
+  cancelType?: string;
+
+  @IsOptional()
+  @IsString()
   noteId?: string;
 
   @IsOptional()
@@ -28,6 +32,7 @@ export class CreateCancellationDto {
   @IsString()
   description?: string;
 
-  @IsDefined()
-  cancelledAmount: number;
+  @IsOptional()
+  @IsString()
+  cancelledAmount: string;
 }

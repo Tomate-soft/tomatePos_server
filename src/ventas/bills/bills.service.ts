@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateBillDto } from 'src/dto/ventas/bills/createBill.Dto';
 import { UpdateBillDto } from 'src/dto/ventas/bills/updateBill.Dto';
-import { Bills, BillsDocument } from 'src/schemas/ventas/bills.schema';
+import { Bills } from 'src/schemas/ventas/bills.schema';
 import {
   BILL_TO_BILL,
   BILL_TO_NOTE,
@@ -44,6 +44,7 @@ export class BillsService {
       throw new Error(error);
     }
   }
+
   /*
   async findCurrent() {
     try {
@@ -483,7 +484,14 @@ export class BillsService {
       const currentPeriod = await this.operatingPeriodService.getCurrent();
       const currentPeriodId = currentPeriod[0]._id.toString();
       const [bills, toGoOrders, rappiOrders, phoneOrders] = await Promise.all([
-        this.billsModel.find().lean(),
+        this.billsModel.find().populate({
+          path: 'notes',
+          populate: [
+            {
+              path: 'discount',
+            },
+          ],
+        }),
         this.toGoOrderModel.find().lean(),
         this.rappiOrderModel.find().lean(),
         this.phoneOrderModel.find().lean(),

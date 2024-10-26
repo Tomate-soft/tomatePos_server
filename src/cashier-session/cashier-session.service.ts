@@ -27,7 +27,10 @@ export class CashierSessionService {
   async findAll() {
     return await this.cashierSessionModel
       .find()
-      .populate({ path: 'bills', populate: [{ path: 'notes' }] });
+      .populate({ path: 'bills', populate: [{ path: 'notes' }] })
+      .populate({
+        path: 'user',
+      });
   }
 
   async findOne(id: string) {
@@ -39,7 +42,6 @@ export class CashierSessionService {
   }
 
   async create(body: createCashierSessionDto) {
-    console.log(body);
     const data = { ...body, startDate: new Date().toISOString() };
 
     // Crear nueva sesión de cajero
@@ -75,7 +77,6 @@ export class CashierSessionService {
         );
       }
     }
-
     // Se retorna la nueva sesión creada
     return newSession;
   }
@@ -116,7 +117,6 @@ export class CashierSessionService {
   async cashWithdrawal(body: any) {
     const session = await this.cashWithdrawModel.startSession();
     session.startTransaction();
-    console.log(body);
     // nec4sitamos saber si el monto que se esta retirando es menor al monto que se tiene en caja
     const currentOperatingPeriod =
       await this.operatingPeriodService.getCurrent();

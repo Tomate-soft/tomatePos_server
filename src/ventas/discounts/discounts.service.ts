@@ -55,7 +55,12 @@ export class DiscountsService {
   }
 
   async findOne(id: string) {
-    return await this.discountModel.findById(id);
+    return await this.discountModel
+      .findById(id)
+      .populate({
+        path: 'discountByUser',
+      })
+      .lean();
   }
   async create(payload: { accountApt: any; body: CreateDiscountDto }) {
     const session = await this.discountModel.startSession();
@@ -79,7 +84,6 @@ export class DiscountsService {
               session.endSession();
               throw new Error('No se pudo completar');
             }
-
             const restoreDtaNote = {
               products: payload.accountApt.products,
               checkTotal: payload.accountApt.checkTotal,
