@@ -2,7 +2,7 @@ import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Bills } from './bills.schema';
 import { Notes } from './notes.schema';
-import { Product } from './product.schema';
+import { User } from '../users.schema';
 
 @Schema({ timestamps: true })
 export class Cancellations {
@@ -16,14 +16,22 @@ export class Cancellations {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Notes' })
   noteId?: Notes;
 
-  @Prop({ type: MongooseSchema.Types.Mixed, required: false })
+  @Prop({ type: MongooseSchema.Types.ObjectId, required: false })
   product?: any;
 
   @Prop({
     required: true,
     trim: true,
   })
-  cancellationBy: string;
+  cancelType?: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+  })
+  cancellationBy: User;
 
   @Prop({
     required: true,
@@ -43,8 +51,8 @@ export class Cancellations {
   @Prop({ trim: true, default: 'no-identified' })
   operatingPeriod?: string;
 
-  @Prop({ required: true, type: Number })
-  cancelledAmount: number;
+  @Prop({ required: true })
+  cancelledAmount?: string;
 }
 
 export const CancellationSchema = SchemaFactory.createForClass(Cancellations);

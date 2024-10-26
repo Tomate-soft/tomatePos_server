@@ -24,7 +24,14 @@ export class CancellationsService {
   ) {}
 
   async findAll() {
-    return await this.cancellationModel.find();
+    return await this.cancellationModel
+      .find()
+      .populate({
+        path: 'accountId',
+      })
+      .populate({
+        path: 'cancellationBy',
+      });
   }
 
   async findOne(id: string) {
@@ -33,35 +40,43 @@ export class CancellationsService {
 
   async create(createdCancellation: CreateCancellationDto) {
     const session = await this.cancellationModel.startSession();
-    session.startTransaction();
-    const currentPeriod = await this.operatingPeriodService.getCurrent();
-    const periodId = currentPeriod[0].id;
+    await session.withTransaction(async () => {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const periodId = currentPeriod[0].id;
+      const isBillCancel =
+        createdCancellation.cancelType === 'BILL_CANCELLATION';
 
-    try {
+      const isNotesCancel =
+        createdCancellation.cancelType === 'NOTES_CANCELLATION';
+
       const newCancellation = new this.cancellationModel({
         ...createdCancellation,
         operatingPeriod: periodId,
       });
       await newCancellation.save();
 
-      if (
-        createdCancellation.accountId &&
-        !createdCancellation.noteId &&
-        !createdCancellation.product
-      ) {
+      if (isBillCancel) {
+        console.log('create de cancelation-2');
+
         const currentBill = await this.billsModel.findByIdAndUpdate(
-          createdCancellation.accountId,
+          createdCancellation.accountId.toString(),
           { status: CANCELLED_STATUS },
           { new: true },
         );
-        const updateTabl = await this.tableModel.findByIdAndUpdate(
+
+        const updateTable = await this.tableModel.findByIdAndUpdate(
           currentBill.table,
           { status: FREE_STATUS, bill: [] },
           { new: true },
         );
+
+        await session.commitTransaction();
+        await session.endSession();
+        return newCancellation;
       }
       // Notes cancel
-      if (createdCancellation.noteId && !createdCancellation.product) {
+      console.log(isNotesCancel);
+      if (isNotesCancel) {
         const updateNote = await this.notesModel.findByIdAndUpdate(
           createdCancellation.noteId,
           { status: CANCELLED_STATUS },
@@ -99,15 +114,11 @@ export class CancellationsService {
             { new: true },
           );
         }
+        await session.commitTransaction();
+        await session.endSession();
+        return newCancellation;
       }
-      await session.commitTransaction();
-      session.endSession();
-      return newCancellation;
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw new NotFoundException(`No se pudo completar. ${error}`);
-    }
+    });
   }
 
   async cancelProducts(body: { aptAccount: any; body: CreateCancellationDto }) {
@@ -116,14 +127,12 @@ export class CancellationsService {
 
     const currentPeriod = await this.operatingPeriodService.getCurrent();
     const periodId = currentPeriod[0].id;
-    console.log(periodId);
     try {
       const newCancelproduct = new this.cancellationModel({
         ...body.body,
         operatingPeriod: periodId,
       });
       await newCancelproduct.save();
-
       if (newCancelproduct && !body.body.noteId) {
         // aca la cuenta sin notas
         const checkTotalNew = body.aptAccount.products

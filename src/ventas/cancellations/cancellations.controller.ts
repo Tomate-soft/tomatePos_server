@@ -58,6 +58,7 @@ export class CancellationsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
   @Post('products')
   async cancelProduct(@Body() body: any) {
     console.log('body del controller');
