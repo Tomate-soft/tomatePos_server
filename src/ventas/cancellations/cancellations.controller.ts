@@ -61,8 +61,6 @@ export class CancellationsController {
 
   @Post('products')
   async cancelProduct(@Body() body: any) {
-    console.log('body del controller');
-    console.log(body.body);
     try {
       const cancelProduct = await this.cancellationService.cancelProducts(body);
       return cancelProduct;

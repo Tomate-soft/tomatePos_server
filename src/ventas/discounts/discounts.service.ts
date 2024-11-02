@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateDiscountDto } from 'src/dto/ventas/discounts/createDiscountDto';
@@ -77,6 +82,7 @@ export class DiscountsService {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
+            console.log('Entro como si tuviera nota el perro');
             const newDiscountNote =
               await this.discountModel.create(createDiscountData);
             if (!newDiscountNote) {
@@ -288,6 +294,7 @@ export class DiscountsService {
       session.endSession();
     }
   }
+
   async delete(id: string) {
     return await this.discountModel.findByIdAndDelete(id);
   }
@@ -331,7 +338,6 @@ export class DiscountsService {
 
   /**
    * Deletes a discount product in a note.
-   *
    * @param id - The ID of the note.
    * @param body - The updated note data.
    * @returns The updated note data with the products and check total.
@@ -398,6 +404,33 @@ export class DiscountsService {
       return updateBill;
     } catch (error) {
       throw new Error(`No se pudo completar. mas informacion: ${error}`);
+    }
+  }
+
+  async findCurrent() {
+    const session = await this.discountModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriodId = currentPeriod[0]._id.toString();
+
+      console.log('llegue aca');
+      console.log(currentPeriodId);
+
+      const currentDiscounts = await this.discountModel.find({
+        operatingPeriod: currentPeriodId,
+      });
+
+      if (!currentDiscounts) {
+        throw new NotFoundException('No se encontraron descuentos');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return currentDiscounts;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
   }
 }

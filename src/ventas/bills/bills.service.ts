@@ -428,6 +428,9 @@ export class BillsService {
             populate: {
               path: 'transactions',
             },
+          })
+          .populate({
+            path: 'notes',
           });
         return bills;
       }

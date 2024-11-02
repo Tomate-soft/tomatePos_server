@@ -1,20 +1,19 @@
-import { SchemaFactory, Prop, Schema, MongooseModule } from '@nestjs/mongoose';
-import { Schema as MongooseSchema } from 'mongoose';
-import { User } from '../users.schema';
+import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
+// import { Schema as MongooseSchema } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class CashWithdraw {
   @Prop({ required: true })
-  amount: string;
-
-  @Prop({ default: 'withdraw' })
-  concept?: string;
+  quantity: string;
 
   @Prop({ required: true })
-  user: string;
+  operation: string;
 
-  @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
-  authUser: User;
+  @Prop({ required: true })
+  type: string;
+
+  @Prop({ required: true })
+  sessionId: string;
 }
 
 const CashWithdrawSchema = SchemaFactory.createForClass(CashWithdraw);

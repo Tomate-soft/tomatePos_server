@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
@@ -31,7 +31,11 @@ export class CancellationsService {
       })
       .populate({
         path: 'cancellationBy',
-      });
+      })
+      .populate({
+        path: 'noteId',
+      })
+      .lean();
   }
 
   async findOne(id: string) {
@@ -56,8 +60,6 @@ export class CancellationsService {
       await newCancellation.save();
 
       if (isBillCancel) {
-        console.log('create de cancelation-2');
-
         const currentBill = await this.billsModel.findByIdAndUpdate(
           createdCancellation.accountId.toString(),
           { status: CANCELLED_STATUS },
@@ -74,8 +76,7 @@ export class CancellationsService {
         await session.endSession();
         return newCancellation;
       }
-      // Notes cancel
-      console.log(isNotesCancel);
+
       if (isNotesCancel) {
         const updateNote = await this.notesModel.findByIdAndUpdate(
           createdCancellation.noteId,
@@ -123,16 +124,17 @@ export class CancellationsService {
 
   async cancelProducts(body: { aptAccount: any; body: CreateCancellationDto }) {
     const session = await this.cancellationModel.startSession();
-    session.startTransaction();
+    const cancellation = await session.withTransaction(async (session) => {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const periodId = currentPeriod[0].id;
 
-    const currentPeriod = await this.operatingPeriodService.getCurrent();
-    const periodId = currentPeriod[0].id;
-    try {
       const newCancelproduct = new this.cancellationModel({
         ...body.body,
         operatingPeriod: periodId,
+        cancelType: 'PRODUCTS_CANCELLATION',
       });
       await newCancelproduct.save();
+
       if (newCancelproduct && !body.body.noteId) {
         // aca la cuenta sin notas
         const checkTotalNew = body.aptAccount.products
@@ -183,11 +185,11 @@ export class CancellationsService {
       await session.commitTransaction();
       session.endSession();
       return newCancelproduct;
-    } catch (error) {
-      await session.abortTransaction();
-      session.endSession();
-      throw new Error('no se completo');
-    }
+    });
+    console.log('cancelacion de productos papirrin');
+    console.log(cancellation);
+
+    return cancellation;
   }
 
   async delete(id: string) {

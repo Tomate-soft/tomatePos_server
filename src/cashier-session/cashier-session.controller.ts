@@ -12,6 +12,7 @@ import {
 import { CashierSessionService } from './cashier-session.service';
 import { updateCashierSessionDto } from 'src/dto/cashierSession/updateCashierSession';
 import { createCashierSessionDto } from 'src/dto/cashierSession/createCashierSession';
+import { createCashWithdrawDto } from 'src/dto/cashierSession/cashWithdraw/createCashWithdraw';
 
 @Controller('cashier-session')
 export class CashierSessionController {
@@ -116,8 +117,9 @@ export class CashierSessionController {
   }
 
   @Post('/cash-withdrawal')
-  async cashWithdrawal(@Body() body: any) {
+  async cashWithdrawal(@Body() body: createCashWithdrawDto) {
     console.log('LLegue al metodo adecuado con la data:');
+    console.log(body);
     try {
       const withdrawal = await this.cashierSessionService.cashWithdrawal(body);
       return withdrawal;

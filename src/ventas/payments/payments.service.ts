@@ -22,6 +22,7 @@ import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { Payment } from 'src/schemas/ventas/payment.schema';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 
 @Injectable()
 export class PaymentsService {
@@ -44,6 +45,7 @@ export class PaymentsService {
     private reportsService: ReportsService,
     @InjectModel(PhoneOrder.name)
     private readonly phoneOrderModel: Model<PhoneOrder>,
+    private readonly operatingPeriodService: OperatingPeriodService,
   ) {}
 
   async findAll() {
@@ -85,7 +87,16 @@ export class PaymentsService {
         })
         .populate({
           path: 'accountId',
-        });
+        })
+        .lean()
+        .populate({
+          path: 'noteAccountId',
+        })
+        .lean()
+        .populate({
+          path: 'cashier',
+        })
+        .lean();
       if (!payments) {
         await session.abortTransaction();
         session.endSession();
@@ -461,6 +472,41 @@ export class PaymentsService {
     }
   }
 
+  async getCurrentPayments() {
+    const session = await this.paymentModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriodId = currentPeriod[0]._id.toString();
+
+      const currentPayments = await this.paymentModel
+        .find({
+          operatingPeriod: currentPeriodId,
+        })
+        .populate({
+          path: 'accountId',
+        })
+        .lean()
+        .populate({
+          path: 'noteAccountId',
+        })
+        .lean()
+        .populate({
+          path: 'cashier',
+        })
+        .lean();
+      if (!currentPayments) {
+        throw new NotFoundException('No se encontro el periodo operativo');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return currentPayments;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
   private getNextPaymentCode(lastPaymentCode: number): number {
     // Incrementar el billCode actual en 1
     return lastPaymentCode + 1;

@@ -52,6 +52,20 @@ export class DiscountsController {
     }
   }
 
+  @Get('current')
+  async findAllCurrent() {
+    console.log('asllo');
+    try {
+      const discountsArray = await this.discountService.findCurrent();
+      if (!discountsArray) {
+        throw new NotFoundException('No se encontro ningun decsuento');
+      }
+      return discountsArray;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
   @Post()
   /**
    * Creates a new discount.
