@@ -2,14 +2,14 @@ import { IsOptional } from 'class-validator';
 
 export class updateCashWithdrawDto {
   @IsOptional()
-  readonly amount: string;
+  quantity: string;
 
   @IsOptional()
-  readonly concept: string;
+  operation: string;
 
   @IsOptional()
-  readonly user: string;
+  type: string;
 
   @IsOptional()
-  readonly authUser: string;
+  sessionId: string;
 }

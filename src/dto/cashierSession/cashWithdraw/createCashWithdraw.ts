@@ -1,16 +1,19 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
 
 export class createCashWithdrawDto {
+  @IsDefined()
   @IsString()
-  readonly amount: string;
+  quantity: string;
 
-  @IsOptional()
+  @IsDefined()
   @IsString()
-  readonly concept: string;
+  operation: string;
 
+  @IsDefined()
   @IsString()
-  readonly user: string;
+  type: string;
 
+  @IsDefined()
   @IsString()
-  readonly authUser: string;
+  sessionId: string;
 }

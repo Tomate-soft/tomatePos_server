@@ -195,4 +195,16 @@ export class PaymentsController {
       );
     }
   }
+  @Get('current')
+  async getPaymentsCurrent() {
+    try {
+      const currentPayments = await this.paymentService.getCurrentPayments();
+      if (!currentPayments) {
+        throw new NotFoundException('No se encuentran pagos actuales');
+      }
+      return currentPayments;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 }
