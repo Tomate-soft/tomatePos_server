@@ -26,6 +26,8 @@ import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { ProcessModule } from 'src/process/process.module';
 import { PaymentsModule } from 'src/ventas/payments/payments.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
+import { User, UserSchema } from 'src/schemas/users.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -57,6 +59,14 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
       {
         name: Notes.name,
         schema: NoteSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
       },
     ]),
     forwardRef(() => ProcessModule),

@@ -42,6 +42,7 @@ import { PhoneOrderModule } from './ventas/orders/phone-order/phone-order.module
 import { ProcessModule } from './process/process.module';
 import { BusinessModule } from './business/business.module';
 import { ReopenModule } from './reopen/reopen.module';
+import { AdditionsGroupModule } from './additions-group/additions-group.module';
 
 @Module({
   imports: [
@@ -90,6 +91,7 @@ import { ReopenModule } from './reopen/reopen.module';
     ProcessModule,
     BusinessModule,
     ReopenModule,
+    AdditionsGroupModule,
   ],
   controllers: [],
   providers: [

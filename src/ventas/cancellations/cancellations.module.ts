@@ -31,6 +31,7 @@ import {
   PhoneOrder,
   PhoneOrderSchema,
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { User, UserSchema } from 'src/schemas/users.schema';
 
 @Module({
   imports: [
@@ -74,6 +75,10 @@ import {
       {
         name: PhoneOrder.name,
         schema: PhoneOrderSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
       },
     ]),
   ],

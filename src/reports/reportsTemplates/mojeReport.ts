@@ -1,5 +1,3 @@
-import { Body } from '@nestjs/common';
-
 export const mojeReportTemplate = (data: any) => {
   return `
         <!DOCTYPE html>

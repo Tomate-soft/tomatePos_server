@@ -25,6 +25,8 @@ import {
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { BillsModule } from 'src/ventas/bills/bills.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { User, UserSchema } from 'src/schemas/users.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -54,6 +56,14 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
       {
         name: Notes.name,
         schema: NoteSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
       },
     ]),
     forwardRef(() => BillsModule),

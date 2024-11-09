@@ -6,6 +6,7 @@ import { CashierSession } from '../cashierSession/cashierSession';
 import { Table } from '../tables/tableSchema';
 import { Discount } from './discounts.schema';
 import { OperatingPeriod } from '../operatingPeriod/operatingPeriod.schema';
+import { User } from '../users.schema';
 
 @Schema({ timestamps: true })
 export class Bills {
@@ -20,7 +21,7 @@ export class Bills {
     trim: true,
     default: 'ON_SITE_ORDER',
   })
-  sellType?: string;
+  sellType: string;
 
   @Prop({
     required: true,
@@ -31,8 +32,10 @@ export class Bills {
   @Prop({
     required: true,
     trim: true,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
   })
-  userId: string;
+  userId: User;
 
   @Prop({
     required: true,
@@ -42,14 +45,14 @@ export class Bills {
 
   @Prop({
     required: true,
+    default: 'enable',
   })
-  status: 'enable' | 'disabled' | 'cancelled' | 'finished';
+  status: 'enable' | 'disable' | 'cancelled' | 'finished';
 
   @Prop({
     default: [],
-    trim: true,
   })
-  products: object[];
+  products?: object[];
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Payment' }],
@@ -72,14 +75,15 @@ export class Bills {
 
   @Prop({
     trim: true,
+    default: null,
   })
-  billName: string;
+  billName?: string | null;
 
   @Prop({
     trim: true,
-    default: '',
+    default: null,
   })
-  comments: string;
+  comments?: string | null;
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Notes' }],
@@ -92,11 +96,15 @@ export class Bills {
   })
   transferHistory?: string[]; // historial de transferenncias // aca seguirmos
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'CashierSession' })
-  cashierSession?: CashierSession;
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'CashierSession',
+    default: null,
+  })
+  cashierSession?: CashierSession | null;
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount' })
-  discount?: Discount;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount', default: null })
+  discount?: Discount | null;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'OperatingPeriod' })
   operatingPeriod?: OperatingPeriod;

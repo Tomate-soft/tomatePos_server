@@ -13,6 +13,7 @@ import { Notes } from 'src/schemas/ventas/notes.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 
 @Injectable()
 export class NotesService {
@@ -133,13 +134,12 @@ export class NotesService {
           const refreshedBill = await this.BillsModel.findById(
             accountId,
           ).populate({ path: 'notes' });
-          const newTotal = refreshedBill.notes.reduce(
-            (total, element) => total + parseFloat(element.checkTotal),
-            0,
+
+          const sumProducts = [...refreshedBill.notes].flatMap(
+            (nota) => nota.products,
           );
-          const sumProducts = [].concat(
-            ...refreshedBill.notes.map((element) => element.products),
-          );
+
+          const newTotal = calculateBillTotal(sumProducts);
 
           const refreshData = { checkTotal: newTotal, products: sumProducts };
 

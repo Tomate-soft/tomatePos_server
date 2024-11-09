@@ -28,6 +28,8 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import { User, UserSchema } from 'src/schemas/users.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -63,6 +65,14 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
       {
         name: Branch.name,
         schema: BranchSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
       },
     ]),
     forwardRef(() => ProcessModule),

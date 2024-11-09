@@ -11,9 +11,8 @@ import {
   Param,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { createDishesDto } from 'src/dto/catalogo/dishes/createdDishes.dto';
-import { createProductDto } from 'src/dto/catalogo/products/createProduct.dto';
-import { updateProductDto } from 'src/dto/catalogo/products/updatedProduct.dto';
+import { CreateProductDto } from 'src/dto/catalogo/products/createProduct.dto';
+import { UpdateProductDto } from 'src/dto/catalogo/products/updatedProduct.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -44,13 +43,15 @@ export class ProductsController {
   }
 
   @Post()
-  async create(@Body() body: createProductDto | createProductDto[]) {
+  async create(@Body() body: CreateProductDto | CreateProductDto[]) {
+    console.log('llegue');
+
     const proService = this.productService;
     try {
       if (Array.isArray(body)) {
         await this.productService.replace();
         const createdProduct = await Promise.all(
-          body.map(async (element: createProductDto) => {
+          body.map(async (element: CreateProductDto) => {
             return await proService.create(element);
           }),
         );
@@ -80,7 +81,7 @@ export class ProductsController {
     }
   }
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: updateProductDto) {
+  async update(@Param('id') id: string, @Body() body: UpdateProductDto) {
     try {
       const updatedProduct = await this.productService.update(id, body);
       if (!updatedProduct) throw new NotFoundException('No existe el producto');

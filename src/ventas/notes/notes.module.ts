@@ -31,6 +31,7 @@ import {
 } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { ProcessModule } from 'src/process/process.module';
+import { User, UserSchema } from 'src/schemas/users.schema';
 
 @Module({
   imports: [
@@ -70,6 +71,10 @@ import { ProcessModule } from 'src/process/process.module';
       {
         name: PhoneOrder.name,
         schema: PhoneOrderSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
       },
     ]),
     forwardRef(() => ProcessModule),
