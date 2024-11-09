@@ -16,6 +16,9 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
 import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
+import { User } from 'src/schemas/users.schema';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
+import { Table } from 'src/schemas/tables/tableSchema';
 
 @Injectable()
 export class BillsService {
@@ -25,6 +28,9 @@ export class BillsService {
     @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private noteModel: Model<Notes>,
+    @InjectModel(User.name)
+    private userModel: Model<User>,
+    @InjectModel(Table.name) private tableModel: Model<Table>,
     @InjectModel(OperatingPeriod.name)
     private operatingPeriodModel: Model<OperatingPeriod>,
     private readonly operatingPeriodService: OperatingPeriodService,
@@ -80,6 +86,7 @@ export class BillsService {
   }
 
   async create(createBill: CreateBillDto) {
+    console.log('create bil legoool');
     try {
       const lastBill = await this.billsModel
         .findOne({})
@@ -90,11 +97,24 @@ export class BillsService {
         ? this.getNextBillCode(parseFloat(lastBill.code))
         : 1;
       const formatCode = this.formatCode(nextBillCode.toString());
-
+      const period = await this.operatingPeriodService.getCurrent();
+      const { name, lastName } = await this.userModel.findById(createBill.user);
+      const { tableNum } = await this.tableModel.findById(createBill.table);
       const billToCreate = new this.billsModel({
         ...createBill,
         code: formatCode,
+        user: `${name} ${lastName}`,
+        userId: createBill.user,
+        checkTotal: calculateBillTotal(createBill.products),
+        products: createBill.products,
+        tableNum: tableNum,
+        table: createBill.table,
+        operatingPeriod: period[0]._id,
+        // vamo a buscar la mesa
       });
+
+      console.log(billToCreate);
+
       await billToCreate.save();
       return billToCreate;
     } catch (error) {

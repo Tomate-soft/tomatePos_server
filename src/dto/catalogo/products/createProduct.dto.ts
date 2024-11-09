@@ -5,66 +5,49 @@ import {
   IsNotEmpty,
   IsOptional,
   Length,
+  IsBoolean,
+  ValidateNested,
+  IsEnum,
+  ArrayNotEmpty,
 } from 'class-validator';
-export class createProductDto {
-  @IsDefined()
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 16)
-  code: string;
+import { Type } from 'class-transformer';
 
+enum Status {
+  DISABLED = 'disabled',
+  ENABLED = 'enabled',
+}
+
+enum Prices {
+  ONSITE = 'ONSITE',
+  TOGO = 'TOGO',
+  RAPPI = 'RAPPI',
+  PHONE = 'PHONE',
+}
+
+class PriceDto {
+  @IsEnum(Prices)
+  @IsNotEmpty()
+  name: Prices;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
+}
+
+export class CreateProductDto {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  @Length(1, 35)
-  category: string;
+  subcategory: string;
 
   @IsDefined()
   @IsString()
   @IsNotEmpty()
   productName: string;
 
-  @IsString()
-  @IsOptional()
-  priceInSite?: string;
-
-  @IsString()
-  @IsOptional()
-  priceToGo?: string;
-
-  @IsString()
-  @IsOptional()
-  priceCallOrder?: string;
-
-  @IsString()
-  @IsOptional()
-  priceDelivery?: string;
-
-  @IsString()
-  @Length(1, 8)
-  @IsOptional()
-  status?: 'disabled' | 'enabled';
-
-  @IsOptional()
-  @Length(1, 2)
-  quantity?: number;
-
-  @IsString()
-  @IsOptional()
-  priceInSiteBill?: string;
-
-  @IsString()
-  @IsOptional()
-  priceToGoBill?: string;
-
-  @IsString()
-  @IsOptional()
-  priceCallOrderBill?: string;
-
-  @IsString()
-  @IsOptional()
-  priceDeliveryBill?: string;
-
-  @IsOptional()
-  active: boolean;
+  @IsDefined()
+  @ValidateNested({ each: true })
+  @Type(() => PriceDto)
+  @ArrayNotEmpty()
+  prices: PriceDto[];
 }

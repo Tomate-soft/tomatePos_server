@@ -27,6 +27,7 @@ import { OperatingPeriodService } from 'src/operating-period/operating-period.se
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
 import { BillsService } from '../bills/bills.service';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 
 @Injectable()
 export class DiscountsService {
@@ -82,7 +83,6 @@ export class DiscountsService {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
-            console.log('Entro como si tuviera nota el perro');
             const newDiscountNote =
               await this.discountModel.create(createDiscountData);
             if (!newDiscountNote) {
@@ -112,16 +112,13 @@ export class DiscountsService {
               session.endSession();
               throw new Error('No se pudo encontrar la cuenta para actualizar');
             }
-            const newBillTotal = currentBillNote.notes
-              .reduce((a, b) => {
-                return a + parseFloat(b.checkTotal);
-              }, 0)
-              .toFixed(2)
-              .toString();
 
             const newProductsForBill = currentBillNote.notes.flatMap(
               (element) => element.products,
             );
+
+            const newBillTotal = calculateBillTotal(newProductsForBill);
+
             const aptBill = await this.billsModel.findByIdAndUpdate(
               currentBillNote._id,
               { checkTotal: newBillTotal, products: newProductsForBill },
@@ -152,8 +149,6 @@ export class DiscountsService {
           return;
 
         case NOTES_DISCOUNTS:
-          console.log('creaando descuento de notas');
-          console.log(createDiscountData);
           const newDiscountNote =
             await this.discountModel.create(createDiscountData);
           if (!newDiscountNote) {
@@ -355,13 +350,10 @@ export class DiscountsService {
         .findById(updatedNote.accountId)
         .populate({ path: 'notes' });
 
-      const newTotal = currentBill.notes.reduce(
-        (a, b) => a + parseFloat(b.checkTotal),
-        0,
-      );
       const noteToBillSendProducts = currentBill.notes.flatMap(
         (element) => element.products,
       );
+      const newTotal = calculateBillTotal(noteToBillSendProducts);
       const updateDatasSendNoteToBill = {
         products: noteToBillSendProducts,
         checkTotal: newTotal,
@@ -413,9 +405,6 @@ export class DiscountsService {
     try {
       const currentPeriod = await this.operatingPeriodService.getCurrent();
       const currentPeriodId = currentPeriod[0]._id.toString();
-
-      console.log('llegue aca');
-      console.log(currentPeriodId);
 
       const currentDiscounts = await this.discountModel.find({
         operatingPeriod: currentPeriodId,

@@ -16,6 +16,7 @@ export enum State {
   CLOSED = 'CLOSED',
   APPROVED = 'APPROVED',
 }
+
 /*
 interface OperationalClousure {
   state: State;

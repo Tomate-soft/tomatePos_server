@@ -1,6 +1,24 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 //Schema for products
-@Schema({ timestamps: true })
+
+enum Status {
+  disabled = 'disabled',
+  enabled = 'enabled',
+}
+
+enum Prices {
+  ONSITE = 'ONSITE',
+  TOGO = 'TOGO',
+  RAPPI = 'RAPPI',
+  PHONE = 'PHONE',
+}
+
+interface PricesList {
+  name: Prices;
+  price: number;
+}
+
+@Schema({ timestamps: true, versionKey: false })
 export class Products {
   @Prop({
     unique: true,
@@ -8,75 +26,34 @@ export class Products {
     trim: true,
   })
   code: string;
+
   @Prop({
     required: true,
     trim: true,
   })
   category: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
+  subcategory: string;
+
   @Prop({
     required: true,
     trim: true,
   })
   productName: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceInSite: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceToGo: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceCallOrder: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceDelivery: string;
 
   @Prop({
-    default: 'enabled',
+    default: Status.enabled,
   })
-  status: 'disabled' | 'enabled';
+  status?: Status;
 
   @Prop({
     default: 1,
   })
-  quantity: number;
-
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceInSiteBill?: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceToGoBill?: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceCallOrderBill?: string;
-  @Prop({
-    required: true,
-    trim: true,
-    default: '00.00',
-  })
-  priceDeliveryBill?: string;
+  quantity?: number;
 
   @Prop({
     required: true,
@@ -84,6 +61,12 @@ export class Products {
     default: false,
   })
   active?: boolean;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
+  prices: PricesList[];
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Products);
