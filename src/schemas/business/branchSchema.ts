@@ -36,7 +36,6 @@ export class Branch {
   @Prop({ default: false })
   status: boolean;
 
-  //le vamos a meter la clave devices, para referenciar a los dispositivos que tiene el branch
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Device' }],
     default: [],
@@ -54,7 +53,7 @@ export class Branch {
     ref: 'OperatingPeriod',
   })
   operatingPeriod: OperatingPeriod;
-  // vamos a referenciar a que negocio pertenece y este sera un campo requerido
+
   @Prop({
     type: MongooseSchema.Types.ObjectId,
     ref: 'Business',

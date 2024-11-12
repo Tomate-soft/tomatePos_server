@@ -13,7 +13,7 @@ import {
 import { DeviceService } from './device.service';
 import { CreateDeviceDto } from 'src/dto/devices/createDeviceDto';
 import { UpdateDeviceDto } from 'src/dto/devices/updateDeviceDto';
-import { idnMachine } from 'src/idn.config'; // Esta ruta es despues de pegar el archivo manualmente, verificar la ruta donde se crea por medio del controllador
+import { idnMachine } from 'src/idn.config';
 
 @Controller('device')
 export class DeviceController {
@@ -42,7 +42,6 @@ export class DeviceController {
       if (!idnMachine) {
         throw new NotFoundException('No se ha creado ningun identificador');
       }
-      console.log(idnMachine);
       return idnMachine;
     } catch (error) {
       throw new NotFoundException(
@@ -85,10 +84,10 @@ export class DeviceController {
     }
   }
 
-  @Post()
-  async create(@Body() body: CreateDeviceDto) {
+  @Post(':id')
+  async create(@Body() body: CreateDeviceDto, @Param('id') id: string) {
     try {
-      const newDevice = await this.deviceService.create(body);
+      const newDevice = await this.deviceService.create(body, id);
       return newDevice;
     } catch (error) {
       if (error.code === 11000) {

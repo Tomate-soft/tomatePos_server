@@ -5,7 +5,7 @@ export class CreateDeviceDto {
   @IsString()
   @IsDefined()
   @IsNotEmpty()
-  deviceIdn: string;
+  deviceName: string;
 
   @IsOptional()
   settings: Setting[];
