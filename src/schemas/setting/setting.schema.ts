@@ -1,5 +1,5 @@
 import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 import { Printer } from '../configuracion/printer.schema';
 
 @Schema({ timestamps: true })

@@ -14,6 +14,7 @@ export class BusinessService {
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
     @InjectModel(LicenseKey.name) private licenseKeyModel: Model<LicenseKey>,
   ) {}
+
   /*
   private async sendMail() {
     const businessEx = {
@@ -63,6 +64,7 @@ export class BusinessService {
       console.error('NOPservbice');
     }
   }
+
   async createBranch(branch: any) {
     try {
       const session = await this.branchModel.startSession();
@@ -90,6 +92,51 @@ export class BusinessService {
       session.endSession();
 
       return newBranch;
+    } catch (error) {
+      console.error('NOPservbice');
+    }
+  }
+
+  async getBusinesses(key: string) {
+    try {
+      const businesses = await this.businessModel
+        .findById(key)
+        .populate({ path: 'branches', populate: { path: 'devices' } })
+        .lean();
+      if (!businesses) {
+        throw new NotFoundException('Businesses not found');
+      }
+      return businesses;
+    } catch (error) {
+      throw new NotFoundException('NOP');
+    }
+  }
+
+  async createLicenseKey(bussinesId: { bussinesId: string }) {
+    try {
+      const session = await this.licenseKeyModel.startSession();
+      session.startTransaction();
+      const newLicenseKey = new this.licenseKeyModel();
+      if (!newLicenseKey) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('LicenseKey not created');
+      }
+      await newLicenseKey.save();
+
+      const currentBusiness = await this.businessModel.findByIdAndUpdate(
+        bussinesId.bussinesId,
+        { licenseKey: newLicenseKey._id },
+      );
+
+      if (!currentBusiness) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('Branch not found');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return newLicenseKey;
     } catch (error) {
       console.error('NOPservbice');
     }

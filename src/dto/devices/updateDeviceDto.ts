@@ -4,8 +4,11 @@ import { Setting } from 'src/schemas/setting/setting.schema';
 export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
-  deviceIdn: string;
+  deviceName: string;
 
   @IsOptional()
   settings: Setting[];
+
+  @IsOptional()
+  status: boolean;
 }

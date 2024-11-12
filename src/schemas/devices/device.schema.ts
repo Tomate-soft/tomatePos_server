@@ -1,5 +1,5 @@
-import { Schema, SchemaFactory, Prop, MongooseModule } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 
 import { Setting } from '../setting/setting.schema';
 
@@ -9,12 +9,17 @@ export class Device {
     required: true,
     trim: true,
   })
-  deviceIdn: string;
+  deviceName: string;
+
   @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Setting' }],
-    default: [],
+    type: { type: MongooseSchema.Types.ObjectId, ref: 'Setting' },
   })
-  settings?: Setting[];
+  settings?: Setting;
+
+  @Prop({
+    default: true,
+  })
+  status?: boolean;
 }
 
 export const DeviceSchema = SchemaFactory.createForClass(Device);
