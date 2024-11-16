@@ -4,7 +4,7 @@ import { Modifier } from './modifiers.Schema';
 import { Dishes } from './dishes.schema';
 
 @Schema({ timestamps: true, versionKey: false })
-class Additions {
+export class Addition {
   @Prop({
     required: true,
     trim: true,
@@ -24,4 +24,4 @@ class Additions {
   dishes: Dishes[];
 }
 
-export const AdditionsSchema = SchemaFactory.createForClass(Additions);
+export const AdditionsSchema = SchemaFactory.createForClass(Addition);
