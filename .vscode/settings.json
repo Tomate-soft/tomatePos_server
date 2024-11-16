@@ -1,3 +1,7 @@
 {
-  "conventionalCommits.scopes": ["discounts checkpoint"]
+  "conventionalCommits.scopes": [
+    "discounts checkpoint"
+  ],
+  "editor.fontFamily": "Cascadia Code",
+  "editor.fontVariations": false
 }

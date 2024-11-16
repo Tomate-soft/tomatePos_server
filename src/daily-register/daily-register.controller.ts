@@ -2,6 +2,7 @@ import {
   Body,
   ConflictException,
   Controller,
+  Get,
   NotFoundException,
   Post,
 } from '@nestjs/common';
@@ -23,6 +24,16 @@ export class DailyRegisterController {
           `No se pudo completar el registro ${error}`,
         );
       }
+      throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
+    }
+  }
+
+  @Get()
+  async getAll() {
+    try {
+      const allRegister = await this.dailyRegisterService.getAll();
+      return allRegister;
+    } catch (error) {
       throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
     }
   }

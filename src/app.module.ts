@@ -55,10 +55,10 @@ import { AdditionsGroupModule } from './additions-group/additions-group.module';
     DishesModule,
     ProductsModule,
     ModificationsModule,
-    MenusYrecetasModule,
+    MenusYrecetasModule, // No se utilizó aun.
     BillsModule,
     NotesModule,
-    ProductModule, // este modulo probablemente se elimine (revisar)
+    ProductModule,
     PaymentsModule,
     DiscountsModule,
     CancellationsModule,

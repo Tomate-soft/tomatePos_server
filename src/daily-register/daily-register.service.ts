@@ -109,4 +109,15 @@ export class DailyRegisterService {
       }
     }
   }
+
+  async getAll() {
+    try {
+      const allRegister = await this.dailyRegisterModel.find().populate({
+        path: 'userId',
+      });
+      return allRegister;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 }
