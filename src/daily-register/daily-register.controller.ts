@@ -4,10 +4,13 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { DailyRegisterService } from './daily-register.service';
 import { CreateDailyRegisterDto } from 'src/dto/dailyRegister/createDailyregister.dto';
+import { UpdateDailyRegisterDto } from 'src/dto/dailyRegister/updateDailyRegister.dto';
 
 @Controller('daily-register')
 export class DailyRegisterController {
@@ -33,6 +36,22 @@ export class DailyRegisterController {
     try {
       const allRegister = await this.dailyRegisterService.getAll();
       return allRegister;
+    } catch (error) {
+      throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
+    }
+  }
+
+  @Put(':id')
+  async updateRegister(
+    @Param('id') id: string,
+    @Body() body: UpdateDailyRegisterDto,
+  ) {
+    try {
+      const updateRegister = await this.dailyRegisterService.updateRegister(
+        id,
+        body,
+      );
+      return updateRegister;
     } catch (error) {
       throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
     }

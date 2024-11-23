@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateDailyRegisterDto } from 'src/dto/dailyRegister/createDailyregister.dto';
+import { UpdateDailyRegisterDto } from 'src/dto/dailyRegister/updateDailyRegister.dto';
 import { DailyRegister } from 'src/schemas/dailyRegister/createDailyRegister';
 import { User } from 'src/schemas/users.schema';
 
@@ -108,6 +109,20 @@ export class DailyRegisterService {
         throw new NotFoundException('Ha ocurrido algo inesperado');
       }
     }
+  }
+
+  async updateRegister(id: string, update: UpdateDailyRegisterDto) {
+    const session = await this.dailyRegisterModel.startSession();
+    const updateRegister = await session.withTransaction(async () => {
+      const updateRegister = await this.dailyRegisterModel.findByIdAndUpdate(
+        id,
+        update,
+        { new: true },
+      );
+      return updateRegister;
+    });
+    await session.commitTransaction();
+    return updateRegister;
   }
 
   async getAll() {

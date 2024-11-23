@@ -17,10 +17,16 @@ enum Status {
 }
 
 enum Prices {
-  ONSITE = 'ONSITE',
+  ONSITE = 'ON_SITE',
   TOGO = 'TOGO',
   RAPPI = 'RAPPI',
   PHONE = 'PHONE',
+  PRICE_LIST_FIVE = 'PRICE_LIST_FIVE',
+  PRICE_LIST_SIX = 'PRICE_LIST_SIX',
+  PRICE_LIST_SEVEN = 'PRICE_LIST_SEVEN',
+  PRICE_LIST_EIGHT = 'PRICE_LIST_EIGHT',
+  PRICE_LIST_NINE = 'PRICE_LIST_NINE',
+  PRICE_LIST_TEN = 'PRICE_LIST_TEN',
 }
 
 class PriceDto {
@@ -69,4 +75,7 @@ export class UpdateProductDto {
   @Type(() => PriceDto)
   @IsArray()
   prices?: PriceDto[];
+
+  @IsOptional()
+  group?: string;
 }

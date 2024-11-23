@@ -1,4 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Addition } from './additions.schema';
+
 //Schema for products
 
 enum Status {
@@ -7,10 +10,16 @@ enum Status {
 }
 
 enum Prices {
-  ONSITE = 'ONSITE',
+  ONSITE = 'ON_SITE',
   TOGO = 'TOGO',
   RAPPI = 'RAPPI',
   PHONE = 'PHONE',
+  PRICE_LIST_FIVE = 'PRICE_LIST_FIVE',
+  PRICE_LIST_SIX = 'PRICE_LIST_SIX',
+  PRICE_LIST_SEVEN = 'PRICE_LIST_SEVEN',
+  PRICE_LIST_EIGHT = 'PRICE_LIST_EIGHT',
+  PRICE_LIST_NINE = 'PRICE_LIST_NINE',
+  PRICE_LIST_TEN = 'PRICE_LIST_TEN',
 }
 
 interface PricesList {
@@ -67,6 +76,12 @@ export class Products {
     trim: true,
   })
   prices: PricesList[];
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Addition',
+  })
+  group?: Addition;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Products);

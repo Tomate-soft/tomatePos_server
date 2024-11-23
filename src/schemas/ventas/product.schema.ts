@@ -1,4 +1,6 @@
 import { Schema, Prop } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
+import { Addition } from '../catalogo/additions.schema';
 
 @Schema({ timestamps: true })
 export class Product {
@@ -31,4 +33,10 @@ export class Product {
     trim: true,
   })
   discount?: string;
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Addition',
+  })
+  group?: Addition;
 }

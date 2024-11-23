@@ -1,19 +1,23 @@
-import { IsBoolean, IsOptional, IsNumber, IsString } from 'class-validator';
+import { IsOptional, IsString, IsMongoId } from 'class-validator';
 
-export class CreateDailyRegisterDto {
+export class UpdateDailyRegisterDto {
   @IsOptional()
-  @IsNumber()
+  @IsMongoId()
   userId?: string;
 
   @IsOptional()
-  @IsBoolean()
-  active?: boolean;
+  @IsString()
+  firstTime?: string | null;
 
   @IsOptional()
   @IsString()
-  timeStart?: string;
+  secondTime?: string | null;
 
   @IsOptional()
   @IsString()
-  timeEnd?: string;
+  thirdTime?: string | null;
+
+  @IsOptional()
+  @IsString()
+  fourthTime?: string | null;
 }
