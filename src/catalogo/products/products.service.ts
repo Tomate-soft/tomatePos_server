@@ -14,7 +14,10 @@ export class ProductsService {
   ) {}
 
   async findAll() {
-    return await this.productsModel.find();
+    return this.productsModel.find().populate({
+      path: 'group',
+      populate: [{ path: 'modifiers' }, { path: 'dishes' }],
+    });
   }
 
   async create(createdProduct: CreateProductDto) {
@@ -40,6 +43,7 @@ export class ProductsService {
     return await this.productsModel.findByIdAndDelete(id);
   }
   async update(id: string, updatedProduct: UpdateProductDto) {
+    console.log(updatedProduct);
     return await this.productsModel.findByIdAndUpdate(id, updatedProduct, {
       new: true,
     });

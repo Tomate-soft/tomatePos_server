@@ -3,25 +3,24 @@ import {
   IsDefined,
   IsNumber,
   IsNotEmpty,
-  IsOptional,
-  Length,
-  IsBoolean,
   ValidateNested,
   IsEnum,
   ArrayNotEmpty,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-enum Status {
-  DISABLED = 'disabled',
-  ENABLED = 'enabled',
-}
-
 enum Prices {
-  ONSITE = 'ONSITE',
+  ONSITE = 'ON_SITE',
   TOGO = 'TOGO',
   RAPPI = 'RAPPI',
   PHONE = 'PHONE',
+  PRICE_LIST_FIVE = 'PRICE_LIST_FIVE',
+  PRICE_LIST_SIX = 'PRICE_LIST_SIX',
+  PRICE_LIST_SEVEN = 'PRICE_LIST_SEVEN',
+  PRICE_LIST_EIGHT = 'PRICE_LIST_EIGHT',
+  PRICE_LIST_NINE = 'PRICE_LIST_NINE',
+  PRICE_LIST_TEN = 'PRICE_LIST_TEN',
 }
 
 class PriceDto {
@@ -50,4 +49,7 @@ export class CreateProductDto {
   @Type(() => PriceDto)
   @ArrayNotEmpty()
   prices: PriceDto[];
+
+  @IsOptional()
+  group?: string;
 }

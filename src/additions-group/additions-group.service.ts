@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateAdditionDto } from 'src/dto/catalogo/additions/createGroup.dto';
+import { UpdateAdditionDto } from 'src/dto/catalogo/additions/updateGroup.dto';
 import { Addition } from 'src/schemas/catalogo/additions.schema';
 import { Dishes } from 'src/schemas/catalogo/dishes.schema';
 import { Modifier } from 'src/schemas/catalogo/modifiers.Schema';
@@ -35,7 +36,7 @@ export class AdditionsGroupService {
     return newAddition;
   }
 
-  async update(id: string, body: Addition) {
+  async update(id: string, body: UpdateAdditionDto) {
     return await this.additionModel.findByIdAndUpdate(id, body, { new: true });
   }
 

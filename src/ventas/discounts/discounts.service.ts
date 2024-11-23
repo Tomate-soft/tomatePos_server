@@ -380,7 +380,6 @@ export class DiscountsService {
       const updateBill = await this.billsModel.findByIdAndUpdate(id, body, {
         new: true,
       });
-      console.log('Esto regresa despues de');
       /*
       const newTotal = updateBill.products.reduce(
         (a: any, b: any) => a + parseFloat(b.checkTotal),
