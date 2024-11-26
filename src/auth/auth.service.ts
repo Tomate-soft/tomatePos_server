@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { last } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -82,10 +83,10 @@ export class AuthService {
         'El email y/o contraseña son incorrectos',
       );
     }
-    const payload = { email: user.email };
+    const payload = { name: user.name, lastName: user.lastName };
     const token = await this.jwtService.signAsync(payload);
 
-    return { token, email };
+    return { token, payload };
   }
 
   async loginPos({ employeeNumber, pinPos }: any) {
