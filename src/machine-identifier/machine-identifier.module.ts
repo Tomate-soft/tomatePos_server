@@ -4,6 +4,6 @@ import { MachineIdentifierService } from './machine-identifier.service';
 
 @Module({
   controllers: [MachineIdentifierController],
-  providers: [MachineIdentifierService]
+  providers: [MachineIdentifierService],
 })
 export class MachineIdentifierModule {}

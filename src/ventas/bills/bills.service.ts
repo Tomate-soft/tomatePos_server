@@ -86,7 +86,6 @@ export class BillsService {
   }
 
   async create(createBill: CreateBillDto) {
-    console.log('create bil legoool');
     try {
       const lastBill = await this.billsModel
         .findOne({})

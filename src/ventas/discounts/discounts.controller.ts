@@ -75,8 +75,6 @@ export class DiscountsController {
    * @throws {NotFoundException} If the discount could not be applied.
    */
   async create(@Body() payload: { accountApt: any; body: CreateDiscountDto }) {
-    console.log(payload);
-
     try {
       const newDiscount = await this.discountService.create(payload);
       return newDiscount;

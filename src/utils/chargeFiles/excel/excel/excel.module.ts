@@ -8,6 +8,6 @@ import { CategoriesModule } from 'src/catalogo/categories/categories.module';
 @Module({
   imports: [MulterModule.register(multerOptions)],
   controllers: [ExcelController],
-  providers: [ExcelService]
+  providers: [ExcelService],
 })
 export class ExcelModule {}
