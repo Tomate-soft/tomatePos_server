@@ -186,9 +186,6 @@ export class CancellationsService {
       session.endSession();
       return newCancelproduct;
     });
-    console.log('cancelacion de productos papirrin');
-    console.log(cancellation);
-
     return cancellation;
   }
 

@@ -212,7 +212,7 @@ export class DiscountsService {
           session.endSession();
           return newDiscountBill;
 
-        case COURTESY_APPLY_NOTES: //
+        case COURTESY_APPLY_NOTES:
           const newCourtesyNote =
             await this.discountModel.create(createDiscountData);
           if (!newCourtesyNote) {
@@ -220,24 +220,32 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
+          console.log('paso uno');
+          console.log(newCourtesyNote);
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
-            newCourtesyNote.accountId,
+            newCourtesyNote.noteAccountId,
             { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
             { new: true },
           );
+          console.log('ea');
+          console.log(updateCourtesyNote);
+
           if (!updateCourtesyNote) {
+            console.log('En aca o que? no se pudoactualizar la nota');
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
+          console.log('0112');
+          console.log(updateCourtesyNote);
 
           const courtesyBill = await this.billsModel
             .findById(updateCourtesyNote.accountId)
-            .populate({ path: 'notes' }); // encontramos la cuenta
+            .populate({ path: 'notes' });
 
           const enableNotes = courtesyBill.notes.filter(
-            (note) => note.status === ENABLE_STATUS, // checar este metodo
+            (note) => note.status === ENABLE_STATUS,
           );
           if (courtesyBill.cashierSession) {
             /////////////////////////////////////////////////////////////////

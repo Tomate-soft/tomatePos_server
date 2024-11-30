@@ -24,7 +24,7 @@ export class ShiftsService {
     return await newShift.save();
   }
 
-  async delete(id: String) {
+  async delete(id: string) {
     return await this.shiftModel.findByIdAndDelete(id);
   }
 

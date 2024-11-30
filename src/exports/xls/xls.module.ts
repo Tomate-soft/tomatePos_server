@@ -4,6 +4,6 @@ import { XlsService } from './xls.service';
 
 @Module({
   controllers: [XlsController],
-  providers: [XlsService]
+  providers: [XlsService],
 })
 export class XlsModule {}

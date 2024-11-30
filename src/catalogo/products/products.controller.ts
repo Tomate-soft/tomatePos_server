@@ -44,7 +44,7 @@ export class ProductsController {
 
   @Post()
   async create(@Body() body: CreateProductDto | CreateProductDto[]) {
-    console.log('llegue');
+    console.log(body);
 
     const proService = this.productService;
     try {
@@ -59,6 +59,39 @@ export class ProductsController {
       } else {
         const createdProduct = await this.productService.create(body); // Usar la variable categoriesService
         return createdProduct;
+      }
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('El producto ya existe');
+      } else {
+        throw new NotFoundException('Ha ocurrido algo inesperado');
+      }
+    }
+  }
+
+  @Post('table-add')
+  async createWithTable(@Body() body: CreateProductDto | CreateProductDto[]) {
+    console.log(body);
+
+    try {
+      // Verifica si es un array
+      if (Array.isArray(body)) {
+        const createdProducts = [];
+        for (const element of body) {
+          const createdProduct = await this.productService.create(element);
+          createdProducts.push(createdProduct);
+        }
+        return {
+          message: 'Productos creados exitosamente',
+          products: createdProducts,
+        };
+      } else {
+        // Si no es un array, crea un único producto
+        const createdProduct = await this.productService.create(body);
+        return {
+          message: 'Producto creado exitosamente',
+          product: createdProduct,
+        };
       }
     } catch (error) {
       if (error.code === 11000) {

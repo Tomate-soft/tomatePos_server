@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, model } from 'mongoose';
+import { Model } from 'mongoose';
 import { createNoteDto } from 'src/dto/ventas/notes/createNoteDto';
 import { updateNoteDto } from 'src/dto/ventas/notes/updateNoteDto';
 import { ENABLE_STATUS } from 'src/libs/status.libs';
@@ -52,7 +52,6 @@ export class NotesService {
       ...createNote,
       noteNumber: nextNoteCode,
     });
-    console.log(noteToCreate);
 
     await noteToCreate.save();
     return noteToCreate;
