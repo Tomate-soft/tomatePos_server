@@ -100,70 +100,93 @@ export class ClousuresOfOperationsService {
   async closeCashierSession(body: any) {
     // Requested Data
     const currentSession = await this.cashierSessionModel
-      .findOne({
-        _id: body.session._id,
-      })
+      .findById(body.session._id)
       .populate({
         path: 'bills',
+        populate: { path: 'payment' },
+      })
+      .populate({
+        path: 'togoorders',
         populate: { path: 'payment' },
       });
 
     // calculate cash diference
-    const concentratedPayments = currentSession.bills.flatMap(
+    const restaurantPayments = currentSession.bills.flatMap(
       (bill) => bill.payment,
     );
 
-    // VAMOS A REVISAR LAS TRANSACTIONS  EN EL FRONTEND PARA VER COMO FUNCIONA
+    const togoPayments = currentSession.togoorders.flatMap(
+      (bill) => bill.payment,
+    );
 
+    const rappiPayments = currentSession.rappiOrders.flatMap(
+      (bill) => bill.payment,
+    );
+
+    const phonePayments = currentSession.phoneOrders.flatMap(
+      (bill) => bill.payment,
+    );
+
+    const concentratedPayments = [
+      ...restaurantPayments,
+      ...togoPayments,
+      ...rappiPayments,
+      ...phonePayments,
+    ];
+
+    // VAMOS A REVISAR LAS TRANSACTIONS  EN EL FRONTEND PARA VER COMO FUNCIONA
     // vamos a apliocar filter a concentratedPayments para que solo nos devuelva los valores que sean de tipo efectivo
-    // necesitamos las transaciones concentrarlas en un solo array para filtrarlas, elas transacciones dentro de los paymenmts, estan diferenciadas por el tipo de pago
+    // necesitamos las transaciones concentrarlas en un solo array para filtr carlas, elas transacciones dentro de los paymenmts, estan diferenciadas por el tipo de pago
     // luego sumaremos cada una para lograr las cantidad a pedir
+    // ya teniando el array vamos a filtrar cada uno por "cash", "debit", "credit", "transfer"
+    // y sumaremos cada uno de los valores para obtener el total de cada uno y lo guardaremos en una variable para luego pasarlo al reporte
+    // por ejemplo si tenemos un array de pagos de la siguiente manera
+
+    const requestCash = concentratedPayments.flatMap(
+      (payment) => payment.transactions,
+    );
 
     /* 
-   ya teniando el array vamos a filtrar cada uno por "cash", "debit", "credit", "transfer" 
-    y sumaremos cada uno de los valores para obtener el total de cada uno y lo guardaremos en una variable para luego pasarlo al reporte
-    por ejemplo si tenemos un array de pagos de la siguiente manera
 
-    const requestCash = arrayDeTransacciones.filter((payment) => payment.type === 'cash');
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
     const requestCredit = arrayDeTransacciones.filter((payment) => payment.type === 'credit');
     const requestTransfer = arrayDeTransacciones.filter((payment) => payment.type === 'transfer');
 
+    tmb debemos sumar los totales que nos interesan para el reporte
+    // saldo total en tarjeta
+    // saldo todal cobrado que es total de efectivo + total de tarjeta + cualquier otroa ingreso disponible
+    // saldo total a requerir que es total de efectivo menos el total de efectivo que se tiene en caja menos salidas de efectivo que se hayan hecho.
 
-  tmb debemos sumar los totales que nos interesan para el reporte
-  // saldo total en tarjeta
-   // saldo todal cobrado que es total de efectivo + total de tarjeta + cualquier otroa ingreso disponible
-  // saldo total a requerir que es total de efectivo menos el total de efectivo que se tiene en caja menos salidas de efectivo que se hayan hecho.
+    // por ultimo agreguemos datos relevantes de venta
+    // cuantas cuentas se atendieron
+      // cuantas cuentas canceladas
+    const canceledAccounts = currentSession.bills.filter((bill) => bill.status === 'calcel') o algo asi
 
-  // por ultimo agreguemos datos relevantes de venta
-  // cuantas cuentas se atendieron
-    // cuantas cuentas canceladas
-  const canceledAccounts = currentSession.bills.filter((bill) => bill.status === 'calcel') o algo asi
+    // Descuentos echos a cuenta
+    // Descuentos echos a notas
+    // Descuentos echos a productos
+    // cortesias echas a cuenta
+    // cortesias echas a notas
+    // cortesias echas a productos
+    // total de los descuentos en dinero
+    // total de las cortesias en dinero
+    // por ultimo el resultado de la operacion de caja, es decir si hace falta o sobra dinero en caja.
 
-  // Descuentos echos a cuenta
-  // Descuentos echos a notas
-  // Descuentos echos a productos
-  // cortesias echas a cuenta
-  // cortesias echas a notas
-  // cortesias echas a productos
-
-  // total de los descuentos en dinero
-  // total de las cortesias en dinero
-
-
-  // por ultimo el resultado de la operacion de caja, es decir si hace falta o sobra dinero en caja.
-
-  // hay que recuperar tmb datos del encabezado
-  // como la fecha
-  // el nombre dle cajero
-  // Folio de corte
+    // hay que recuperar tmb datos del encabezado
+    // como la fecha
+    // el nombre dle cajero
+    // Folio de corte
 
 */
 
-    const dataForPrint = { ...body, totalCash: concentratedPayments };
+    const dataForPrint = {
+      ...body,
+      totalCash: concentratedPayments,
+      cashAmount: requestCash,
+    };
 
-    const report = await this.reportsService.closeCashierSession(dataForPrint);
+    // const report = await this.reportsService.closeCashierSession(dataForPrint);
 
-    return body;
+    return requestCash;
   }
 }

@@ -1,6 +1,7 @@
 {
   "conventionalCommits.scopes": [
-    "discounts checkpoint"
+    "discounts checkpoint",
+    "update changes week 06/12/2024"
   ],
   "editor.fontFamily": "Cascadia Code",
   "editor.fontVariations": false
