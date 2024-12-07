@@ -159,6 +159,19 @@ export class PaymentsService {
       if (!updatedBill) {
         throw new NotFoundException('No se pudo actualizar la factura');
       }
+
+      // vamos a actualizar la mesa
+      const table = await this.tableModel.findById(billCurrent.table);
+
+      const updatedTable = await this.tableModel.findByIdAndUpdate(table._id, {
+        status: FREE_STATUS,
+        bill: [],
+      });
+      if (!updatedTable) {
+        await session.abortTransaction();
+        await session.endSession();
+        throw new NotFoundException('No se pudo actualizar la mesa');
+      }
       await session.commitTransaction();
       session.endSession();
       return;
@@ -269,6 +282,8 @@ export class PaymentsService {
   }
 
   async paymentToGo(data: { waiterId: string; body: any }) {
+    console.log('vamos hacer un chiringuito por aca');
+    console.log(data);
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {

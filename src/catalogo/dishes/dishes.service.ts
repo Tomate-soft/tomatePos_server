@@ -8,7 +8,22 @@ import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class DishesService {
+  private currentCode = 'A00';
+
   constructor(@InjectModel(Dishes.name) private dishesModel: Model<Dishes>) {}
+
+  private generateNextCode(): string {
+    const prefix = this.currentCode[0];
+    const numericPart = parseInt(this.currentCode.slice(1));
+
+    if (numericPart < 99) {
+      this.currentCode = `${prefix}${String(numericPart + 1).padStart(2, '0')}`;
+    } else {
+      const nextPrefix = String.fromCharCode(prefix.charCodeAt(0) + 1);
+      this.currentCode = `${nextPrefix}00`;
+    }
+    return this.currentCode;
+  }
 
   async findAll(skip: number) {
     const skipValue = skip ? skip : 0;
@@ -21,9 +36,14 @@ export class DishesService {
   }
 
   async create(createDishes: createDishesDto) {
-    const newDish = new this.dishesModel(createDishes);
+    console.log(createDishes);
+    const newDish = new this.dishesModel({
+      ...createDishes,
+      code: this.generateNextCode(), // Automatically assign the code
+    });
     return await newDish.save();
   }
+
   async delete(id: string) {
     return await this.dishesModel.findByIdAndDelete(id);
   }

@@ -85,7 +85,12 @@ export class ModificationsController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, updatedModifier: updateModifierDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updatedModifier: updateModifierDto,
+  ) {
+    console.log(updatedModifier);
+    console.log(id);
     try {
       const modifierUpdated = await this.modifierService.update(
         id,

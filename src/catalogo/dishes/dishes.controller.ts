@@ -63,7 +63,7 @@ export class DishesController {
       }
     } catch (error) {
       if (error.code === 11000) {
-        throw new ConflictException('El producto ya existe');
+        throw new ConflictException('El complemento ya existe');
       } else {
         throw new NotFoundException('Ha ocurrido algo inesperado');
       }
