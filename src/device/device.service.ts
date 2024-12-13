@@ -65,9 +65,11 @@ export class DeviceService {
       if (!device) {
         throw new Error(`Device with ID ${id} not found`);
       }
-      /*
 
-      if (device.settings?.printers?.length) {
+      if (
+        device.settings.printers.length &&
+        device.settings.printers.length > 0
+      ) {
         // Update existing settings
         const updatedSettings = await this.settingModel.findByIdAndUpdate(
           device.settings,
@@ -79,7 +81,6 @@ export class DeviceService {
           data: updatedSettings,
         };
       }
-        */
 
       // Create new settings if none exist
       const newSettings = await this.settingModel.create({
