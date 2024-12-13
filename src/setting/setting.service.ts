@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Printer } from 'escpos';
 import { Model } from 'mongoose';
 import { CreatePrinterDto } from 'src/dto/configuracion/printers/createPrinterDto';
 import { UpdatePrinterDto } from 'src/dto/configuracion/printers/updatePrinterDto';
 import { CreateSettingDto } from 'src/dto/setting/createSettingDto';
 import { UpdateSettingDto } from 'src/dto/setting/updateSettingDto';
+import { Printer } from 'src/schemas/configuracion/printer.schema';
 import { Setting } from 'src/schemas/setting/setting.schema';
 
 @Injectable()
