@@ -49,7 +49,7 @@ export class DailyRegisterService {
             throw new NotFoundException('No se pudo actualizar el usuario');
           }
 
-          return newRegister;
+          return { username: `${actuallyUser.name} ${actuallyUser.lastName}` };
         }
 
         if (!actuallyUser.dailyRegister.secondTime) {
@@ -65,7 +65,7 @@ export class DailyRegisterService {
               { new: true },
             );
 
-          return updatedRegister;
+          return { username: `${actuallyUser.name} ${actuallyUser.lastName}` };
         }
         if (!actuallyUser.dailyRegister.thirdTime) {
           const dataDate = new Date().toTimeString();
@@ -82,7 +82,7 @@ export class DailyRegisterService {
           if (!updatedRegister) {
             throw new NotFoundException('No se pudo actualizar el registro');
           }
-          return updatedRegister;
+          return { username: `${actuallyUser.name} ${actuallyUser.lastName}` };
         }
         if (!actuallyUser.dailyRegister.fourthTime) {
           const dataDate = new Date().toTimeString();
@@ -99,7 +99,7 @@ export class DailyRegisterService {
           if (!updatedRegister) {
             throw new NotFoundException('No se pudo actualizar el registro');
           }
-          return updatedRegister;
+          return { username: `${actuallyUser.name} ${actuallyUser.lastName}` };
         }
         if (actuallyUser.dailyRegister.fourthTime) {
           const res = 'Registro de de dia completo';
