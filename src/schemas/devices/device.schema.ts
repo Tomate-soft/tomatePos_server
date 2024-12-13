@@ -12,7 +12,8 @@ export class Device {
   deviceName: string;
 
   @Prop({
-    type: { type: MongooseSchema.Types.ObjectId, ref: 'Setting' },
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Setting',
   })
   settings?: Setting;
 

@@ -34,7 +34,6 @@ export class PaymentsService {
     @InjectModel(Branch.name) private readonly branchModel: Model<Branch>,
     @InjectModel(OperatingPeriod.name)
     private readonly operatingPeriodModel: Model<OperatingPeriod>,
-    @InjectModel(OperatingPeriod.name)
     @InjectModel(RappiOrder.name)
     private readonly rappiOrderModel: Model<RappiOrder>,
     @InjectModel(ToGoOrder.name)
@@ -408,18 +407,21 @@ export class PaymentsService {
     }
   }
   async paymentRappiService(data: { waiterId: string; body: any }) {
+    console.log(data);
+
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
       // se crea el pago
       const newPayment = new this.paymentModel(data.body);
       await newPayment.save();
-      console.log(newPayment);
 
       // encontramos la orden actual - la que enviamos
       const currentBill = await this.rappiOrderModel.findById(
         data.body.accountId,
       );
+      console.log('DOS');
+      console.log(currentBill);
 
       const updatedRappiOrder = {
         payment: [...currentBill.payment, newPayment._id],

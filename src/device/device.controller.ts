@@ -21,6 +21,7 @@ export class DeviceController {
 
   @Get()
   async findAll() {
+    console.log('FindAll');
     try {
       const devicesArray = await this.deviceService.findAll();
       if (!devicesArray) {

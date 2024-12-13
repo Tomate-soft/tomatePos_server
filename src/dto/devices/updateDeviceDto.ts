@@ -4,11 +4,14 @@ import { Setting } from 'src/schemas/setting/setting.schema';
 export class UpdateDeviceDto {
   @IsOptional()
   @IsString()
-  deviceName: string;
+  deviceName?: string;
 
   @IsOptional()
-  settings: Setting[];
+  settings?: Setting[];
 
   @IsOptional()
-  status: boolean;
+  status?: boolean;
+
+  @IsOptional()
+  printers: string[];
 }
