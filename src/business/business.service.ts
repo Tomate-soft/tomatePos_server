@@ -101,7 +101,13 @@ export class BusinessService {
     try {
       const businesses = await this.businessModel
         .findById(key)
-        .populate({ path: 'branches', populate: { path: 'devices' } })
+        .populate({
+          path: 'branches',
+          populate: {
+            path: 'devices',
+            populate: { path: 'settings', populate: { path: 'printers' } },
+          },
+        })
         .lean();
       if (!businesses) {
         throw new NotFoundException('Businesses not found');
