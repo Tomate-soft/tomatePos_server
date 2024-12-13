@@ -5,12 +5,14 @@ import { CreateDeviceDto } from 'src/dto/devices/createDeviceDto';
 import { UpdateDeviceDto } from 'src/dto/devices/updateDeviceDto';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { Device } from 'src/schemas/devices/device.schema';
+import { Setting } from 'src/schemas/setting/setting.schema';
 
 @Injectable()
 export class DeviceService {
   constructor(
     @InjectModel(Device.name) private deviceModel: Model<Device>,
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
+    @InjectModel(Setting.name) private settingModel: Model<Setting>,
   ) {}
   async findAll() {
     return await this.deviceModel.find().populate({
@@ -57,7 +59,42 @@ export class DeviceService {
   }
 
   async update(id: string, body: UpdateDeviceDto) {
-    return await this.deviceModel.findByIdAndUpdate(id, body, { new: true });
+    try {
+      // Fetch device and populate settings
+      const device = await this.deviceModel.findById(id).populate('settings');
+      if (!device) {
+        throw new Error(`Device with ID ${id} not found`);
+      }
+      /*
+
+      if (device.settings?.printers?.length) {
+        // Update existing settings
+        const updatedSettings = await this.settingModel.findByIdAndUpdate(
+          device.settings,
+          { printers: body.printers },
+          { new: true }, // Return the updated document
+        );
+        return {
+          message: 'Settings updated successfully',
+          data: updatedSettings,
+        };
+      }
+        */
+
+      // Create new settings if none exist
+      const newSettings = await this.settingModel.create({
+        printers: body.printers,
+      });
+      await this.deviceModel.findByIdAndUpdate(id, {
+        $set: { settings: newSettings._id },
+      });
+
+      return { message: 'Device updated successfully', data: newSettings };
+    } catch (error) {
+      // Handle and log errors
+      console.error(`Error updating device: ${error.message}`);
+      throw new Error('Unable to update device settings');
+    }
   }
 
   async delete(id: string) {

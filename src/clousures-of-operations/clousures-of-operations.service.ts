@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { parse } from 'path';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { ReportsService } from 'src/reports/reports.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
@@ -98,7 +99,6 @@ export class ClousuresOfOperationsService {
   }
 
   async closeCashierSession(body: any) {
-    // Requested Data
     const currentSession = await this.cashierSessionModel
       .findById(body.session._id)
       .populate({
@@ -107,6 +107,14 @@ export class ClousuresOfOperationsService {
       })
       .populate({
         path: 'togoorders',
+        populate: { path: 'payment' },
+      })
+      .populate({
+        path: 'rappiOrders',
+        populate: { path: 'payment' },
+      })
+      .populate({
+        path: 'phoneOrders',
         populate: { path: 'payment' },
       });
 
@@ -146,6 +154,10 @@ export class ClousuresOfOperationsService {
       (payment) => payment.transactions,
     );
 
+    const totalCash = requestCash
+      .filter((payment) => payment.paymentType === 'cash')
+      .reduce((acc, curr) => acc + parseFloat(curr.payQuantity), 0);
+
     /* 
 
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
@@ -181,12 +193,13 @@ export class ClousuresOfOperationsService {
 
     const dataForPrint = {
       ...body,
-      totalCash: concentratedPayments,
+      totalCash: totalCash,
       cashAmount: requestCash,
     };
+    console.log(dataForPrint);
 
     // const report = await this.reportsService.closeCashierSession(dataForPrint);
 
-    return requestCash;
+    return dataForPrint;
   }
 }

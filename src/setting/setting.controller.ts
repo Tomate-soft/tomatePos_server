@@ -13,6 +13,8 @@ import {
 import { SettingService } from './setting.service';
 import { UpdateSettingDto } from 'src/dto/setting/updateSettingDto';
 import { CreateSettingDto } from 'src/dto/setting/createSettingDto';
+import { CreatePrinterDto } from 'src/dto/configuracion/printers/createPrinterDto';
+import { UpdatePrinterDto } from 'src/dto/configuracion/printers/updatePrinterDto';
 
 @Controller('setting')
 export class SettingController {
@@ -21,6 +23,40 @@ export class SettingController {
   async findAll() {
     try {
       const settingsArray = await this.settingService.findAll();
+      if (!settingsArray) {
+        throw new NotFoundException(
+          `No se encontraron dispositivos disponibles`,
+        );
+      }
+      return settingsArray;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado el buscar dispositivos disponibles ${error}`,
+      );
+    }
+  }
+
+  @Get('printers')
+  async findPrinters() {
+    try {
+      const settingsArray = await this.settingService.findAllPrinters();
+      if (!settingsArray) {
+        throw new NotFoundException(
+          `No se encontraron dispositivos disponibles`,
+        );
+      }
+      return settingsArray;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido un error inesperado el buscar dispositivos disponibles ${error}`,
+      );
+    }
+  }
+
+  @Post('printers')
+  async createPrinters(@Body() body: CreatePrinterDto) {
+    try {
+      const settingsArray = await this.settingService.createPrinters(body);
       if (!settingsArray) {
         throw new NotFoundException(
           `No se encontraron dispositivos disponibles`,
@@ -67,6 +103,24 @@ export class SettingController {
   async update(@Param('id') id: string, @Body() body: UpdateSettingDto) {
     try {
       const settingUpdated = await this.settingService.update(id, body);
+      if (!settingUpdated) {
+        throw new NotFoundException(
+          `El dispositivo ${id} no se encuentra disponible para actualizar o no existe`,
+        );
+      }
+      return settingUpdated;
+    } catch (error) {
+      throw new NotFoundException(`Ha ocurrido algo inesperado ${error}`);
+    }
+  }
+
+  @Put('printers/:id')
+  async updatePrinters(
+    @Param('id') id: string,
+    @Body() body: UpdatePrinterDto,
+  ) {
+    try {
+      const settingUpdated = await this.settingService.updatePrinter(id, body);
       if (!settingUpdated) {
         throw new NotFoundException(
           `El dispositivo ${id} no se encuentra disponible para actualizar o no existe`,
