@@ -102,7 +102,9 @@ export class DailyRegisterService {
           return { username: `${actuallyUser.name} ${actuallyUser.lastName}` };
         }
         if (actuallyUser.dailyRegister.fourthTime) {
-          const res = 'Registro de de dia completo';
+          const res = {
+            username: `${actuallyUser.name} ${actuallyUser.lastName}`,
+          };
           return res;
         }
       } catch (error) {
