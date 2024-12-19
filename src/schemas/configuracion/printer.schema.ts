@@ -13,6 +13,16 @@ export class Printer {
     trim: true,
   })
   tcp: string;
+
+  @Prop({
+    trim: true,
+  })
+  associatedProducts?: string[];
+
+  @Prop({
+    trim: true,
+  })
+  printActions?: string[];
 }
 
 export const PrinterSchema = SchemaFactory.createForClass(Printer);
