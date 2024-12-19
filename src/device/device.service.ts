@@ -65,7 +65,7 @@ export class DeviceService {
     try {
       // Fetch device and populate settings
       const device = await this.deviceModel.findById(id).populate('settings');
-      
+
       console.log('Device encontrado:', device ? 'Sí' : 'No');
       if (!device) {
         throw new Error(`Device with ID ${id} not found`);
@@ -74,18 +74,24 @@ export class DeviceService {
       console.log('Device completo:', JSON.stringify(device, null, 2));
       console.log('Device settings:', device.settings);
 
-      if (device.settings && device.settings.printers && device.settings.printers.length > 0) {
-        console.log("Entrando al bloque de actualización de settings existentes");
-        console.log("Impresoras actuales:", device.settings.printers);
+      if (
+        device.settings &&
+        device.settings.printers &&
+        device.settings.printers.length > 0
+      ) {
+        console.log(
+          'Entrando al bloque de actualización de settings existentes',
+        );
+        console.log('Impresoras actuales:', device.settings.printers);
 
         // Update existing settings
         const updatedSettings = await this.settingModel.findByIdAndUpdate(
-          device.settings , // Usa device.settings._id en lugar de device.settings
+          device.settings, // Usa device.settings._id en lugar de device.settings
           { printers: body.printers },
           { new: true }, // Return the updated document
         );
 
-        console.log("Settings actualizados:", updatedSettings);
+        console.log('Settings actualizados:', updatedSettings);
 
         return {
           message: 'Settings updated successfully',
@@ -93,14 +99,14 @@ export class DeviceService {
         };
       }
 
-      console.log("Creando nuevos settings");
+      console.log('Creando nuevos settings');
 
       // Create new settings if none exist
       const newSettings = await this.settingModel.create({
         printers: body.printers,
       });
 
-      console.log("Nuevos settings creados:", newSettings);
+      console.log('Nuevos settings creados:', newSettings);
 
       await this.deviceModel.findByIdAndUpdate(id, {
         $set: { settings: newSettings._id },
@@ -113,7 +119,7 @@ export class DeviceService {
       console.error(`Mensaje de error:`, error.message);
       throw new Error('Unable to update device settings');
     }
-}
+  }
 
   async delete(id: string) {
     return await this.deviceModel.findByIdAndDelete(id);
