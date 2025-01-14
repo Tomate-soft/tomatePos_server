@@ -71,8 +71,7 @@ export class CronService {
       return;
     }
     // Programa el cron job para iniciar el período operativo
-    // const startCronExpression = `${openingMinute} ${openingHour} * * *`;
-    const startCronExpression = `*/6 * * * *`;
+    const startCronExpression = `${openingMinute} ${openingHour} * * *`;
 
     cron.schedule(startCronExpression, async () => {
       ///////////////////////////////////////////////////////////////////
@@ -81,13 +80,14 @@ export class CronService {
 
       const currentPeriodId = branch.operatingPeriod;
 
-      const updatedPeriod = await this.operatingPeriodService.closePeriod(
-        currentPeriodId.toString(),
-      );
+      if (currentPeriodId) {
+        const updatedPeriod = await this.operatingPeriodService.closePeriod(
+          currentPeriodId.toString(),
+        );
 
-      if (!updatedPeriod) {
-        // throw new Error('No se pudo cerrar el periodo operativo');
-        console.log('No se pudo cerrar el periodo operativo');
+        if (!updatedPeriod) {s
+         console.error('No se pudo cerrar el periodo operativo');
+        }
       }
 
       ////////////////////////////////////////////////////////////////////
