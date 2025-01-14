@@ -8,7 +8,6 @@ import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { last } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -94,13 +93,18 @@ export class AuthService {
 
     await user.populate({
       path: 'tables',
-      populate: {
-        path: 'bill',
-        populate: [
-          { path: 'discount' },
-          { path: 'notes', populate: { path: 'discount' } },
-        ],
-      },
+      populate: [
+        {
+          path: 'bill',
+          populate: [
+            { path: 'discount' },
+            { path: 'notes', populate: { path: 'discount' } },
+          ],
+        },
+        {
+          path: 'user',
+        },
+      ],
     });
 
     if (!user) {

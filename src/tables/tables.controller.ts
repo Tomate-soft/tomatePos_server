@@ -29,6 +29,7 @@ export class TablesController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     try {

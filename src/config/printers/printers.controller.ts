@@ -75,7 +75,7 @@ export class PrintersController {
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() Body: UpdatePrinterDto) {
-    console.log("llegue aca");
+    console.log('llegue aca');
     console.log(Body);
     try {
       const updatedPrinter = await this.printersService.update(id, Body);

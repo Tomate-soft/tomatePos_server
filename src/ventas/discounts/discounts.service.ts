@@ -75,7 +75,7 @@ export class DiscountsService {
 
     const createDiscountData = {
       ...payload.body,
-      operatingPeriod: operatingPeriod[0]._id, // hiicimos este cambio hay que testear si si funciona
+      operatingPeriod: operatingPeriod[0]._id,
     };
 
     try {
@@ -220,25 +220,18 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
-          console.log('paso uno');
-          console.log(newCourtesyNote);
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
             newCourtesyNote.noteAccountId,
             { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
             { new: true },
           );
-          console.log('ea');
-          console.log(updateCourtesyNote);
 
           if (!updateCourtesyNote) {
-            console.log('En aca o que? no se pudoactualizar la nota');
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
-          console.log('0112');
-          console.log(updateCourtesyNote);
 
           const courtesyBill = await this.billsModel
             .findById(updateCourtesyNote.accountId)
@@ -384,7 +377,6 @@ export class DiscountsService {
     const session = await this.billsModel.startSession();
     session.startTransaction();
     try {
-      console.log('pase por el cuerpo');
       const updateBill = await this.billsModel.findByIdAndUpdate(id, body, {
         new: true,
       });
