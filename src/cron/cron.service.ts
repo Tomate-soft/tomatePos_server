@@ -85,7 +85,7 @@ export class CronService {
           currentPeriodId.toString(),
         );
 
-        if (!updatedPeriod) {s
+        if (!updatedPeriod) {
          console.error('No se pudo cerrar el periodo operativo');
         }
       }
