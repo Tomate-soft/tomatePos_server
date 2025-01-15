@@ -12,7 +12,11 @@ export class ProfilesService {
   ) {}
 
   async findAll() {
-    return await this.profileModel.find().populate({ path: 'role' }).exec();
+    return await this.profileModel
+      .find()
+      .populate({ path: 'role' })
+      .populate({ path: 'departament' })
+      .exec();
   }
 
   async findOne(id: string) {

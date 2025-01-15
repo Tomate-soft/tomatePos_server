@@ -83,6 +83,8 @@ export class DiscountsService {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
+          console.log(createDiscountData);
+
             const newDiscountNote =
               await this.discountModel.create(createDiscountData);
             if (!newDiscountNote) {
@@ -125,6 +127,7 @@ export class DiscountsService {
             );
             return updatedNote;
           }
+          console.log('aqui si');
           const newDiscount =
             await this.discountModel.create(createDiscountData);
           if (!newDiscount) {
@@ -132,6 +135,7 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
+          console.log('pero aqui no');
           const restoreDta = {
             products: payload.accountApt.products,
             checkTotal: payload.accountApt.checkTotal,
