@@ -1,16 +1,17 @@
 import { IsOptional, IsString, Length } from 'class-validator';
 
 export class updateProfileDto {
-  @IsString()
   @IsOptional()
-  departament?: string;
+  departament?: string[];
 
   @IsOptional()
   code?: number;
 
   @IsString()
-  @IsString()
   @IsOptional()
-  @Length(1, 25)
+  @Length(1, 45)
   profileName?: string;
+
+  @IsOptional()
+  role?: string;
 }

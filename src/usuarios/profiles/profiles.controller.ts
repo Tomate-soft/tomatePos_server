@@ -78,6 +78,7 @@ export class ProfilesController {
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() body: updateProfileDto) {
+    console.log('body', body);
     try {
       const updatedProfile = await this.profileService.update(id, body);
       if (!updatedProfile) {
