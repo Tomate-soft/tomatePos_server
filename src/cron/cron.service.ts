@@ -37,6 +37,7 @@ export class CronService {
     /* //////////////////////////////////////////////////////////
     /////  METODOS PARA EJECUTAR CRON JOBS AL INICIAR EL DIA ////
     ////////////////////////////////////////////////////////// */
+    console.log('estamos en la nueva version bebe');
     const branchId = '66bd36e5a107f6584ef54dca';
     const branch = await this.branchModel.findById(branchId);
     if (!branch) {

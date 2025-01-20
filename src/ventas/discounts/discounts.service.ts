@@ -83,7 +83,7 @@ export class DiscountsService {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
-          console.log(createDiscountData);
+            console.log(createDiscountData);
 
             const newDiscountNote =
               await this.discountModel.create(createDiscountData);
