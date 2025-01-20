@@ -44,11 +44,11 @@ import { BusinessModule } from './business/business.module';
 import { ReopenModule } from './reopen/reopen.module';
 import { AdditionsGroupModule } from './additions-group/additions-group.module';
 
+const uri =
+  'mongodb+srv://tomatesoftadmin:Masqueunataqueria.2025@tomatesoft.mongocluster.cosmos.azure.com/dbtomatesoft?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000';
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://tomateDataBase:tomatemasqueunataqueria@cluster0.ficwm8y.mongodb.net/?retryWrites=true&w=majority',
-    ),
+    MongooseModule.forRoot(uri),
     UsersModule,
     AuthModule,
     CategoriesModule,
