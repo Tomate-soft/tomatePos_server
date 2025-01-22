@@ -15,6 +15,11 @@ export class Modifier {
   modifierName: string;
 
   @Prop({
+    default: [],
+  })
+  verbs: string[];
+
+  @Prop({
     default: 'enabled',
   })
   status: 'disabled' | 'enabled';
