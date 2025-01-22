@@ -25,4 +25,7 @@ export class updateModifierDto {
   @Length(1, 8)
   @IsOptional()
   status?: 'disabled' | 'enabled';
+
+  @IsOptional()
+  verbs?: string[];
 }
