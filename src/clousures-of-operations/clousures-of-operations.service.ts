@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { request } from 'http';
 import { Model } from 'mongoose';
 import { parse } from 'path';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
@@ -10,6 +11,7 @@ import { Bills } from 'src/schemas/ventas/bills.schema';
 import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
+import { calculateTotalByType } from './lib/calculateTotalByType';
 
 @Injectable()
 export class ClousuresOfOperationsService {
@@ -154,12 +156,16 @@ export class ClousuresOfOperationsService {
       (payment) => payment.transactions,
     );
 
-    const totalCash = requestCash
-      .filter((payment) => payment.paymentType === 'cash')
-      .reduce((acc, curr) => acc + parseFloat(curr.payQuantity), 0);
+    const totalCash = calculateTotalByType(requestCash, 'cash');
+
+    const totalDebit = calculateTotalByType(requestCash, 'debit');
+    const totalCredit = calculateTotalByType(requestCash, 'credit');
+    const totalTransfer = calculateTotalByType(requestCash, 'transfer');
+    const total = totalCash + totalDebit + totalCredit + totalTransfer;
+
+    console.log(`totalCash: ${totalCash}`);
 
     /* 
-
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
     const requestCredit = arrayDeTransacciones.filter((payment) => payment.type === 'credit');
     const requestTransfer = arrayDeTransacciones.filter((payment) => payment.type === 'transfer');
@@ -196,7 +202,7 @@ export class ClousuresOfOperationsService {
       totalCash: totalCash,
       cashAmount: requestCash,
     };
-    console.log(dataForPrint);
+    // console.log(dataForPrint);
 
     // const report = await this.reportsService.closeCashierSession(dataForPrint);
 
