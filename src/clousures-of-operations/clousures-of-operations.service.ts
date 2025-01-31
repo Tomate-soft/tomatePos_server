@@ -157,13 +157,31 @@ export class ClousuresOfOperationsService {
     );
 
     const totalCash = calculateTotalByType(requestCash, 'cash');
-
     const totalDebit = calculateTotalByType(requestCash, 'debit');
     const totalCredit = calculateTotalByType(requestCash, 'credit');
     const totalTransfer = calculateTotalByType(requestCash, 'transfer');
     const total = totalCash + totalDebit + totalCredit + totalTransfer;
 
-    console.log(`totalCash: ${totalCash}`);
+    // Summary totals
+    const summaryCash = parseFloat(totalCash) - parseFloat(body.cash ?? 0);
+    const summaryDebit = parseFloat(totalDebit) - parseFloat(body.debit ?? 0);
+    const summaryCredit =
+      parseFloat(totalCredit) - parseFloat(body.credit ?? 0);
+    const summaryTransfer =
+      parseFloat(totalTransfer) - parseFloat(body.transfer ?? 0);
+    // const summaryRappi = parseFloat(totalRappi ?? 0) - parseFloat(body.rappi ?? 0); // esto habra que filtrar por tipo de venta|
+    // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
+    // const summaryDidiFood = parseFloat(totalDidiFood ?? 0) - parseFloat(body.didiFood ?? 0); // esto habra que filtrar por tipo de venta|
+    const summaryTotal =
+      parseFloat(total) -
+      (parseFloat(body?.cash ?? 0) +
+        parseFloat(body?.debit ?? 0) +
+        parseFloat(body?.credit ?? 0) +
+        parseFloat(body?.transfer ?? 0) +
+        parseFloat(body?.rappi ?? 0) +
+        parseFloat(body?.uberEats ?? 0) +
+        parseFloat(body?.didiFood ?? 0));
+
 
     /* 
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
@@ -199,8 +217,23 @@ export class ClousuresOfOperationsService {
 
     const dataForPrint = {
       ...body,
-      totalCash: totalCash,
-      cashAmount: requestCash,
+      totalCash: total,
+      cashAmount: totalCash,
+      debitAmount: totalDebit,
+      creditAmount: totalCredit,
+      transferAmount: totalTransfer,
+      rappiAmount: 0,
+      uberEatsAmount: 0,
+      didiFoodAmount: 0,
+      totalAmount: total,
+      summaryCash: summaryCash,
+      summaryDebit: summaryDebit,
+      summaryCredit: summaryCredit,
+      summaryTransfer: summaryTransfer,
+      summaryRappi: '$0.00',
+      summaryUberEats: '0.00',
+      summaryDidiFood: '0.00',
+      summaryTotal: summaryTotal,
     };
     // console.log(dataForPrint);
 
