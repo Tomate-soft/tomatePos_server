@@ -163,6 +163,7 @@ export class ClousuresOfOperationsService {
     const total = totalCash + totalDebit + totalCredit + totalTransfer;
 
     // Summary totals
+    // Summary cash    total de las ventas del efetivo - 
     const summaryCash = parseFloat(totalCash) - parseFloat(body.cash ?? 0);
     const summaryDebit = parseFloat(totalDebit) - parseFloat(body.debit ?? 0);
     const summaryCredit =
@@ -228,14 +229,14 @@ export class ClousuresOfOperationsService {
       uberEatsAmount: 0,
       didiFoodAmount: 0,
       totalAmount: total,
-      summaryCash: summaryCash,
-      summaryDebit: summaryDebit,
-      summaryCredit: summaryCredit,
-      summaryTransfer: summaryTransfer,
+      summaryCash: summaryCash * -1,
+      summaryDebit: summaryDebit * -1,
+      summaryCredit: summaryCredit * -1,
+      summaryTransfer: summaryTransfer * -1,
       summaryRappi: '$0.00',
       summaryUberEats: '0.00',
       summaryDidiFood: '0.00',
-      summaryTotal: summaryTotal,
+      summaryTotal: summaryTotal * -1,
     };
     // console.log(dataForPrint);
 
