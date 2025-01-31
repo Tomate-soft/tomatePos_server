@@ -173,6 +173,7 @@ export class ClousuresOfOperationsService {
     // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryDidiFood = parseFloat(totalDidiFood ?? 0) - parseFloat(body.didiFood ?? 0); // esto habra que filtrar por tipo de venta|
     // new deployed version 
+    // summary deployed
     const summaryTotal =
       parseFloat(total) -
       (parseFloat(body?.cash ?? 0) +
