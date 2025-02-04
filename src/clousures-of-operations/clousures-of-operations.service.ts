@@ -217,6 +217,8 @@ export class ClousuresOfOperationsService {
     // Folio de corte
 
 */
+    const totalTargetsAmount = totalDebit + totalCredit;
+    const totalTranferencesAmount = totalTransfer;
 
     const dataForPrint = {
       ...body,
@@ -225,6 +227,8 @@ export class ClousuresOfOperationsService {
       debitAmount: totalDebit,
       creditAmount: totalCredit,
       transferAmount: totalTransfer,
+      totalTargetsAmount: totalTargetsAmount, // calcularemos total de tarjetas
+      totalTranferencesAmount: totalTranferencesAmount, // calcularemos total de transferencias
       rappiAmount: 0,
       uberEatsAmount: 0,
       didiFoodAmount: 0,
