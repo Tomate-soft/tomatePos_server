@@ -217,7 +217,7 @@ export class ClousuresOfOperationsService {
     // Folio de corte
 
 */
-    const totalTargetsAmount = parseFloat(body.debit) + parseFloat(body.credit) ;
+    const totalTargetsAmount = parseFloat(body.debit) + parseFloat(body.credit);
     const totalTranferencesAmount = parseFloat(body.transference);
 
     const dataForPrint = {
