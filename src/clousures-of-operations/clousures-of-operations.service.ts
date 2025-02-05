@@ -227,8 +227,8 @@ export class ClousuresOfOperationsService {
       debitAmount: totalDebit,
       creditAmount: totalCredit,
       transferAmount: totalTransfer,
-      totalTargetsAmount: totalTargetsAmount, // calcularemos total de tarjetas
-      totalTranferencesAmount: totalTranferencesAmount, // calcularemos total de transferencias
+      totalTargetsAmount: totalTargetsAmount, 
+      totalTranferencesAmount: totalTranferencesAmount, 
       rappiAmount: 0,
       uberEatsAmount: 0,
       didiFoodAmount: 0,
