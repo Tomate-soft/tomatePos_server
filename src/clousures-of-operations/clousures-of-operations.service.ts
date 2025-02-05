@@ -218,7 +218,7 @@ export class ClousuresOfOperationsService {
 
 */
     const totalTargetsAmount = parseFloat(body.debit) + parseFloat(body.credit) ;
-    const totalTranferencesAmount = parseFloat(body.transfer);
+    const totalTranferencesAmount = parseFloat(body.transference);
 
     const dataForPrint = {
       ...body,
