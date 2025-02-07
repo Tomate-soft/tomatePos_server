@@ -73,14 +73,11 @@ export class BillsController {
   async create(@Body() body: CreateBillDto) {
     try {
       const newBill = await this.billService.create(body);
-      console.log('new bill');
-      console.log(newBill);
       return newBill;
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException('Esta cuenta ya existe');
       }
-      console.log('valio verga');
       throw new NotFoundException('Ha ocurrido algop inesperado');
     }
   }

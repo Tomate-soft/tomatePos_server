@@ -15,9 +15,17 @@ export class TablesService {
         .find()
         .populate({
           path: 'bill',
-          populate: {
-            path: 'notes',
-          },
+          populate: [
+            {
+              path: 'notes',
+              populate: {
+                path: 'discount',
+              },
+            },
+            {
+              path: 'discount',
+            },
+          ],
         })
         .populate([
           {
