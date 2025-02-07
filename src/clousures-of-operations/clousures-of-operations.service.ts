@@ -163,7 +163,7 @@ export class ClousuresOfOperationsService {
     const total = totalCash + totalDebit + totalCredit + totalTransfer;
 
     // Summary totals
-    // Summary cash    total de las ventas del efetivo - 
+    // Summary cash    total de las ventas del efetivo -
     const summaryCash = parseFloat(totalCash) - parseFloat(body.cash ?? 0);
     const summaryDebit = parseFloat(totalDebit) - parseFloat(body.debit ?? 0);
     const summaryCredit =
@@ -173,7 +173,7 @@ export class ClousuresOfOperationsService {
     // const summaryRappi = parseFloat(totalRappi ?? 0) - parseFloat(body.rappi ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryDidiFood = parseFloat(totalDidiFood ?? 0) - parseFloat(body.didiFood ?? 0); // esto habra que filtrar por tipo de venta|
-    // new deployed version 
+    // new deployed version
     // summary deployed
     const summaryTotal =
       parseFloat(total) -
@@ -184,7 +184,6 @@ export class ClousuresOfOperationsService {
         parseFloat(body?.rappi ?? 0) +
         parseFloat(body?.uberEats ?? 0) +
         parseFloat(body?.didiFood ?? 0));
-
 
     /* 
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
@@ -217,6 +216,9 @@ export class ClousuresOfOperationsService {
     // Folio de corte
 
 */
+    console.log(parseFloat(body.transference));
+    console.log(body);
+
     const totalTargetsAmount = parseFloat(body.debit) + parseFloat(body.credit);
     const totalTranferencesAmount = parseFloat(body.transference);
 
@@ -227,8 +229,8 @@ export class ClousuresOfOperationsService {
       debitAmount: totalDebit,
       creditAmount: totalCredit,
       transferAmount: totalTransfer,
-      totalTargetsAmount: totalTargetsAmount, 
-      totalTranferencesAmount: totalTranferencesAmount, 
+      totalTargetsAmount: totalTargetsAmount,
+      totalTranferencesAmount: totalTranferencesAmount,
       rappiAmount: 0,
       uberEatsAmount: 0,
       didiFoodAmount: 0,
