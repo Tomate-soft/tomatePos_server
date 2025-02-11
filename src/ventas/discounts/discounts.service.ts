@@ -83,8 +83,6 @@ export class DiscountsService {
         case COURTESY_APPLY_PRODUCTS:
         case PRODUCTS_DISCOUNTS:
           if (payload.accountApt.noteNumber) {
-            console.log(createDiscountData);
-
             const newDiscountNote =
               await this.discountModel.create(createDiscountData);
             if (!newDiscountNote) {
@@ -128,9 +126,11 @@ export class DiscountsService {
             return updatedNote;
           }
           console.log('aqui si');
+          const { noteAccountId, ...notelessProps } = createDiscountData;
           const newDiscount =
-            await this.discountModel.create(createDiscountData);
+            await this.discountModel.create(notelessProps);
           if (!newDiscount) {
+            console.log("Termina cayendo aca");
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
@@ -151,7 +151,6 @@ export class DiscountsService {
             throw new Error('No se pudo completar');
           }
           return;
-
         case NOTES_DISCOUNTS:
           const newDiscountNote =
             await this.discountModel.create(createDiscountData);
@@ -164,7 +163,6 @@ export class DiscountsService {
             newDiscountNote.noteAccountId,
             { discount: newDiscountNote._id },
           );
-
           await session.commitTransaction();
           session.endSession();
           return newDiscountNote;
