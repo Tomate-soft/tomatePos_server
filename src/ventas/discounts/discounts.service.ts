@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import { CreateDiscountDto } from 'src/dto/ventas/discounts/createDiscountDto';
 import { UpdateDiscountDto } from 'src/dto/ventas/discounts/updateDiscountsDto';
 import { Discount } from 'src/schemas/ventas/discounts.schema';
+
 // updates
 import {
   BILL_DISCOUNTS,
@@ -18,6 +19,7 @@ import {
   NOTES_DISCOUNTS,
   PRODUCTS_DISCOUNTS,
 } from './cases';
+
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
 import { ENABLE_STATUS, FOR_PAYMENT_STATUS } from 'src/libs/status.libs';
@@ -125,12 +127,10 @@ export class DiscountsService {
             );
             return updatedNote;
           }
-          console.log('aqui si');
           const { noteAccountId, ...notelessProps } = createDiscountData;
           const newDiscount =
             await this.discountModel.create(notelessProps);
           if (!newDiscount) {
-            console.log("Termina cayendo aca");
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
@@ -217,23 +217,12 @@ export class DiscountsService {
         case COURTESY_APPLY_NOTES:
           const newCourtesyNote =
             await this.discountModel.create(createDiscountData);
-          if (!newCourtesyNote) {
-            await session.abortTransaction();
-            session.endSession();
-            throw new Error('No se pudo completar');
-          }
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
             newCourtesyNote.noteAccountId,
             { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
             { new: true },
           );
-
-          if (!updateCourtesyNote) {
-            await session.abortTransaction();
-            session.endSession();
-            throw new Error('No se pudo completar');
-          }
 
           const courtesyBill = await this.billsModel
             .findById(updateCourtesyNote.accountId)
@@ -302,7 +291,6 @@ export class DiscountsService {
       new: true,
     });
   }
-
   async deleteDiscounte(id: string, body: any) {
     const NOTE_CASE = 'NOTE_CASE';
     const BILL_CASE = 'BILL_CASE';
