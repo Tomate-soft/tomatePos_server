@@ -135,7 +135,6 @@ export class DiscountsService {
             session.endSession();
             throw new Error('No se pudo completar');
           }
-          console.log('pero aqui no');
           const restoreDta = {
             products: payload.accountApt.products,
             checkTotal: payload.accountApt.checkTotal,
@@ -217,66 +216,107 @@ export class DiscountsService {
         case COURTESY_APPLY_NOTES:
           const newCourtesyNote =
             await this.discountModel.create(createDiscountData);
+            console.log("1")
 
           const updateCourtesyNote = await this.noteModel.findByIdAndUpdate(
             newCourtesyNote.noteAccountId,
             { discount: newCourtesyNote._id, status: FOR_PAYMENT_STATUS },
             { new: true },
           );
+          console.log("2")
 
           const courtesyBill = await this.billsModel
             .findById(updateCourtesyNote.accountId)
             .populate({ path: 'notes' });
 
+            console.log("3")
+
+
           const enableNotes = courtesyBill.notes.filter(
             (note) => note.status === ENABLE_STATUS,
           );
+
+          console.log("4")
+
           if (courtesyBill.cashierSession) {
+            console.log("5")
+
             /////////////////////////////////////////////////////////////////
             if (enableNotes.length <= 0) {
+            console.log("6")
+
               const tableUpdated = await this.tableModel.findByIdAndUpdate(
                 courtesyBill.table,
                 { status: FOR_PAYMENT_STATUS },
               );
             }
+
+            console.log("7")
+
             await session.commitTransaction();
             session.endSession();
+
+            console.log("8")
+
             return updateCourtesyNote;
           }
+          console.log("90")
           if (enableNotes.length <= 0) {
             const tableUpdated = await this.tableModel.findByIdAndUpdate(
               courtesyBill.table,
               { status: FOR_PAYMENT_STATUS },
             );
           }
+
+          console.log("100")
+
           const currentPeriod: any =
             await this.operatingPeriodService.getCurrent();
+
+
+          console.log("200")
+
           const randomIndex = Math.floor(
             Math.random() * currentPeriod[0].sellProcess.length,
           );
+
+          console.log("300")
+
           const cashierSessionId =
             currentPeriod[0].sellProcess[randomIndex]._id;
+
+          console.log("400")
+
           const selectSession =
             await this.cashierSessionModel.findById(cashierSessionId);
+
+          console.log("500")
+
           const updatedSession =
             await this.cashierSessionModel.findByIdAndUpdate(cashierSessionId, {
               bills: [...selectSession.bills, courtesyBill._id],
             });
-
+          console.log("600")
+            
           const updateBill = await this.billsModel.findByIdAndUpdate(
             courtesyBill._id,
             { cashierSession: cashierSessionId },
             { new: true },
           );
 
+          console.log("700")
+
+
           await session.commitTransaction();
           session.endSession();
-          return newDiscountNote;
+          return updateCourtesyNote;
 
         default:
           return;
       }
     } catch (error) {
+      console.log("si llegue al error")
+      console.error(error)
       await session.abortTransaction();
       session.endSession();
     }
