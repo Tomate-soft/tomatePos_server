@@ -303,10 +303,7 @@ export class DiscountsService {
             { cashierSession: cashierSessionId },
             { new: true },
           );
-
           console.log("700")
-
-
           await session.commitTransaction();
           session.endSession();
           return updateCourtesyNote;
