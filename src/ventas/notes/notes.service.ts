@@ -82,7 +82,7 @@ export class NotesService {
               (element) => element.status === ENABLE_STATUS,
             );
 
-            if (pendingNotes.length <= 1) {
+            if (pendingNotes.length === 0) {
               // aqui cambiamos el status de la mesa
               const table = await this.tableModel.findByIdAndUpdate(
                 searchAccount.table,
