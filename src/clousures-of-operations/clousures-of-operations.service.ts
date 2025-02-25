@@ -169,12 +169,19 @@ export class ClousuresOfOperationsService {
     const summaryCredit =
       parseFloat(totalCredit) - parseFloat(body.credit ?? 0);
     const summaryTransfer =
-      parseFloat(totalTransfer) - parseFloat(body.transfer ?? 0);
+      parseFloat(totalTransfer) - parseFloat(body.transference ?? 0);
+     
+    const summaryTargets =
+      totalDebit + totalCredit - (body.debit ?? 0 + body.credit ?? 0);
+
+    const summaryTotal = (totalCash + totalDebit + totalCredit + totalTransfer) - parseFloat(body.totalAmount ?? (parseFloat(body.cash ?? 0) + parseFloat(body.debit ?? 0) + parseFloat(body.credit ?? 0) + parseFloat(body.transference ?? 0)));
+
     // const summaryRappi = parseFloat(totalRappi ?? 0) - parseFloat(body.rappi ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryDidiFood = parseFloat(totalDidiFood ?? 0) - parseFloat(body.didiFood ?? 0); // esto habra que filtrar por tipo de venta|
     // new deployed version
     // summary deployed
+    /*
     const summaryTotal =
       parseFloat(total) -
       (parseFloat(body?.cash ?? 0) +
@@ -184,6 +191,7 @@ export class ClousuresOfOperationsService {
         parseFloat(body?.rappi ?? 0) +
         parseFloat(body?.uberEats ?? 0) +
         parseFloat(body?.didiFood ?? 0));
+        */
 
     /* 
     const requestDebit = arrayDeTransacciones.filter((payment) => payment.type === 'debit');
@@ -216,7 +224,7 @@ export class ClousuresOfOperationsService {
     // Folio de corte
 
 */
-
+    // Esto es de lo que mandamos desde el front
     const totalTargetsAmount = parseFloat(body.debit) + parseFloat(body.credit);
     const totalTranferencesAmount = parseFloat(body.transference);
 
@@ -226,6 +234,8 @@ export class ClousuresOfOperationsService {
       cashAmount: totalCash,
       debitAmount: totalDebit,
       creditAmount: totalCredit,
+      targetsAmount: totalDebit + totalCredit,
+      transferencesAmount: totalTransfer, // Aca sujmaremos rappi , uber y todo lo que venga de transferencias aunque sean de otro tipo de venta.
       transferAmount: totalTransfer,
       totalTargetsAmount: totalTargetsAmount,
       totalTranferencesAmount: totalTranferencesAmount,
@@ -233,14 +243,16 @@ export class ClousuresOfOperationsService {
       uberEatsAmount: 0,
       didiFoodAmount: 0,
       totalAmount: total,
-      summaryCash: summaryCash * -1,
-      summaryDebit: summaryDebit * -1,
-      summaryCredit: summaryCredit * -1,
-      summaryTransfer: summaryTransfer * -1,
+      summaryTargets: summaryTargets,
+      summaryTransferences: summaryTransfer,
+      summaryCash: summaryCash,
+      summaryDebit: summaryDebit,
+      summaryCredit: summaryCredit,
+      summaryTransfer: summaryTransfer,
       summaryRappi: '$0.00',
       summaryUberEats: '0.00',
       summaryDidiFood: '0.00',
-      summaryTotal: summaryTotal * -1,
+      summaryTotal: summaryTotal,
     };
     // console.log(dataForPrint);
 
