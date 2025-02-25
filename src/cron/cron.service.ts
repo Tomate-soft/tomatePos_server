@@ -37,7 +37,6 @@ export class CronService {
     /* //////////////////////////////////////////////////////////
     /////  METODOS PARA EJECUTAR CRON JOBS AL INICIAR EL DIA ////
     ////////////////////////////////////////////////////////// */
-    console.log('estamos en la nueva version bebe');
     const branchId = '66bd36e5a107f6584ef54dca';
     const branch = await this.branchModel.findById(branchId);
     if (!branch) {
@@ -78,7 +77,6 @@ export class CronService {
       ///////////////////////////////////////////////////////////////////
       // Aquí se cierra el actual periodo operativo actual //////////////
       ///////////////////////////////////////////////////////////////////
-
       const currentPeriodId = branch.operatingPeriod;
 
       if (currentPeriodId) {
@@ -163,6 +161,7 @@ export class CronService {
       }
     });
 
+    /*
     // Programa el cron job para finalizar el período operativo
     const endCronExpression = `${closingMinute} ${closingHour} * * *`;
     cron.schedule(endCronExpression, async () => {
@@ -183,5 +182,7 @@ export class CronService {
         session.endSession();
       }
     });
+
+    */
   }
 }
