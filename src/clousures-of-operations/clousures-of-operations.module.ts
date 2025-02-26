@@ -29,6 +29,8 @@ import {
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
+import { UsersService } from 'src/users/users.service';
+import { User, UserSchema } from 'src/schemas/users.schema';
 
 /**
  * Module for handling closures of operations.
@@ -46,6 +48,7 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
       { name: ToGoOrder.name, schema: ToGoOrderSchema },
       { name: RappiOrder.name, schema: RappiOrderSchema },
       { name: PhoneOrder.name, schema: PhoneOrderSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
@@ -56,6 +59,7 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
     ClousuresOfOperationsService,
     ReportsService,
     OperatingPeriodService,
+    UsersService
   ],
 })
 export class ClousuresOfOperationsModule {}
