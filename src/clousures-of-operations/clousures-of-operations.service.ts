@@ -12,6 +12,7 @@ import { PhoneOrder } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { calculateTotalByType } from './lib/calculateTotalByType';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ClousuresOfOperationsService {
@@ -26,6 +27,7 @@ export class ClousuresOfOperationsService {
     @InjectModel(ToGoOrder.name) private toGoOrderModel: Model<ToGoOrder>,
     @InjectModel(RappiOrder.name) private rappiOrderModel: Model<RappiOrder>,
     @InjectModel(PhoneOrder.name) private phoneOrderModel: Model<PhoneOrder>,
+    private usersService: UsersService,
   ) {}
 
   async closePeriod(body: any) {
@@ -60,7 +62,6 @@ export class ClousuresOfOperationsService {
             path: 'transactions',
           },
         });
-      console.log('toGoOrders', toGoOrders);
       const rappiOrders = await this.rappiOrderModel
         .find({
           operatingPeriod: currentPeriod[0]._id,
@@ -71,7 +72,6 @@ export class ClousuresOfOperationsService {
             path: 'transactions',
           },
         });
-      console.log('rappiOrders', rappiOrders);
       const phoneOrders = await this.phoneOrderModel
         .find({
           operatingPeriod: currentPeriod[0]._id,
@@ -82,7 +82,6 @@ export class ClousuresOfOperationsService {
             path: 'transactions',
           },
         });
-      console.log('phoneOrders', phoneOrders);
 
       const allOrders = [
         ...bills,
@@ -100,7 +99,11 @@ export class ClousuresOfOperationsService {
     // return await this.operatingPeriodModel.find();
   }
 
-  async closeCashierSession(body: any) {
+  async closeCashierSession(body: any, auth: any) {
+    const { employeeNumber } = auth;
+
+    const authUser =
+      await this.usersService.findByEmployeeNumber(employeeNumber);
     const currentSession = await this.cashierSessionModel
       .findById(body.session._id)
       .populate({
@@ -264,6 +267,9 @@ export class ClousuresOfOperationsService {
       summaryUberEats: '0.00',
       summaryDidiFood: '0.00',
       summaryTotal: summaryTotal,
+      authFor: authUser.name
+        ? `${authUser.name} ${authUser.lastName}`
+        : 'No encontrado',
     };
     // console.log(dataForPrint);
 
