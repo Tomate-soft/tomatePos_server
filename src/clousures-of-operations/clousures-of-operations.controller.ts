@@ -8,10 +8,10 @@ export class ClousuresOfOperationsController {
   ) {}
 
   @Post('cashier-session')
-  async closeCashierSession(@Body() body: any) {
+  async closeCashierSession(@Body() body: {auth: any, body: any}) {
     try {
       const result =
-        await this.clousuresOfOperationsService.closeCashierSession(body);
+        await this.clousuresOfOperationsService.closeCashierSession(body.body);
       if (!result) {
         throw new NotFoundException('No se ha podido cerrar la caja');
       }

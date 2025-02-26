@@ -170,11 +170,22 @@ export class ClousuresOfOperationsService {
       parseFloat(totalCredit) - parseFloat(body.credit ?? 0);
     const summaryTransfer =
       parseFloat(totalTransfer) - parseFloat(body.transference ?? 0);
-     
+
     const summaryTargets =
       totalDebit + totalCredit - (body.debit ?? 0 + body.credit ?? 0);
 
-    const summaryTotal = (totalCash + totalDebit + totalCredit + totalTransfer) - parseFloat(body.totalAmount ?? (parseFloat(body.cash ?? 0) + parseFloat(body.debit ?? 0) + parseFloat(body.credit ?? 0) + parseFloat(body.transference ?? 0)));
+    const summaryTotal =
+      totalCash +
+      totalDebit +
+      totalCredit +
+      totalTransfer -
+      parseFloat(
+        body.totalAmount ??
+          parseFloat(body.cash ?? 0) +
+            parseFloat(body.debit ?? 0) +
+            parseFloat(body.credit ?? 0) +
+            parseFloat(body.transference ?? 0),
+      );
 
     // const summaryRappi = parseFloat(totalRappi ?? 0) - parseFloat(body.rappi ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
