@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { createCashWithdrawDto } from 'src/dto/cashierSession/cashWithdraw/createCashWithdraw';
@@ -117,13 +117,23 @@ export class CashierSessionService {
   // ver si hay dinero para realizar el retiro
   // ya que creamos el retiro lo metemos a la session del cajero
   async cashWithdrawal(body: createCashWithdrawDto) {
-    console.log(' Moises el crack senior');
     console.log(body);
     // vamos a mover le mopdelo t los DTO
     const session = await this.cashierSessionModel.startSession();
     const newWithdraw = await session.withTransaction(async () => {
+      const currentSession = await this.cashierSessionModel.findById(
+        body.sessionId,
+      );
       const newWithdraw = new this.cashWithdrawModel(body);
       await newWithdraw.save();
+
+      await this.cashierSessionModel.findByIdAndUpdate(
+        body.sessionId,
+        { cashWithdraw: [...currentSession.cashWithdraw, newWithdraw] },
+        {
+          new: true,
+        },
+      );
       await session.commitTransaction();
       session.endSession();
       return newWithdraw;

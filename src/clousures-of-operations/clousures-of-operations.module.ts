@@ -59,7 +59,7 @@ import { User, UserSchema } from 'src/schemas/users.schema';
     ClousuresOfOperationsService,
     ReportsService,
     OperatingPeriodService,
-    UsersService
+    UsersService,
   ],
 })
 export class ClousuresOfOperationsModule {}
