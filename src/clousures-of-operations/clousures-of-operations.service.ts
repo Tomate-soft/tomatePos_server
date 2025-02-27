@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { request } from 'http';
 import { Model } from 'mongoose';
-import { parse } from 'path';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { ReportsService } from 'src/reports/reports.service';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
@@ -13,6 +11,7 @@ import { RappiOrder } from 'src/schemas/ventas/orders/rappiOrder.schema';
 import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { calculateTotalByType } from './lib/calculateTotalByType';
 import { UsersService } from 'src/users/users.service';
+import { parse } from 'path';
 
 @Injectable()
 export class ClousuresOfOperationsService {
@@ -121,6 +120,9 @@ export class ClousuresOfOperationsService {
       .populate({
         path: 'phoneOrders',
         populate: { path: 'payment' },
+      })
+      .populate({
+        path: 'cashWithdraw',
       });
 
     // calculate cash diference
@@ -155,6 +157,11 @@ export class ClousuresOfOperationsService {
     // y sumaremos cada uno de los valores para obtener el total de cada uno y lo guardaremos en una variable para luego pasarlo al reporte
     // por ejemplo si tenemos un array de pagos de la siguiente manera
 
+    const totalWithdraws = currentSession.cashWithdraw.reduce(
+      (acc, current) => parseFloat(current.quantity) + acc,
+      0,
+    );
+
     const requestCash = concentratedPayments.flatMap(
       (payment) => payment.transactions,
     );
@@ -164,6 +171,7 @@ export class ClousuresOfOperationsService {
     const totalCredit = calculateTotalByType(requestCash, 'credit');
     const totalTransfer = calculateTotalByType(requestCash, 'transfer');
     const total = totalCash + totalDebit + totalCredit + totalTransfer;
+   
 
     // Summary totals
     // Summary cash    total de las ventas del efetivo -
@@ -188,7 +196,8 @@ export class ClousuresOfOperationsService {
             parseFloat(body.debit ?? 0) +
             parseFloat(body.credit ?? 0) +
             parseFloat(body.transference ?? 0),
-      );
+      ) -
+      totalWithdraws;
 
     // const summaryRappi = parseFloat(totalRappi ?? 0) - parseFloat(body.rappi ?? 0); // esto habra que filtrar por tipo de venta|
     // const summaryUberEats = parseFloat(totalUberEats ?? 0) - parseFloat(body.uberEats ?? 0); // esto habra que filtrar por tipo de venta|
@@ -244,6 +253,8 @@ export class ClousuresOfOperationsService {
 
     const dataForPrint = {
       ...body,
+      cashWithdraws: currentSession.cashWithdraw,
+      totalWithdraws: totalWithdraws,
       totalCash: total,
       cashAmount: totalCash,
       debitAmount: totalDebit,
