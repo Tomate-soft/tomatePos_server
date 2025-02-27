@@ -1,4 +1,5 @@
 export const calculateTotalByType = (transactionArray, type) => {
+
   return transactionArray
     .filter((payment) => payment.paymentType === type)
     .reduce(
