@@ -1,5 +1,10 @@
 export const calculateTotalByType = (transactionArray, type) => {
-
+  transactionArray.forEach((payment) => {
+    if(payment.paymentType === 'transfer') {
+      console.log(payment);
+    }
+    
+  });
   return transactionArray
     .filter((payment) => payment.paymentType === type)
     .reduce(
