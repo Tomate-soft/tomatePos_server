@@ -136,14 +136,21 @@ export class PaymentsService {
       const periodId = branch.operatingPeriod;
       const OperatingPeriod =
         await this.operatingPeriodModel.findById(periodId);
+        console.log(createdPayment);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
         paymentCode: formatCode,
         operatingPeriod: OperatingPeriod._id,
       });
-
-      await newPaymentCode.save();
+      if (
+        !createdPayment.transactions.some(
+          (element) => element.paymentType === 'courtesy',
+        )
+      ) {
+        await newPaymentCode.save();
+      }
+      //
       const billCurrent = await this.billModel
         .findById(createdPayment.accountId)
         .populate({ path: 'payment' });

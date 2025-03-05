@@ -49,6 +49,7 @@ export class OperatingPeriodService {
           populate: [
             { path: 'bills', populate: { path: 'notes' } },
             { path: 'bills', populate: { path: 'payment' } },
+            { path: 'bills', populate: { path: 'discount' } },
           ],
         });
       await session.commitTransaction();
