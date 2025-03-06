@@ -175,39 +175,30 @@ export class BillsService {
 
     // receiving data
     const receivingProducts = body.receivingBill.products; // ✅
-    const receivingTotal = receivingProducts
-      .reduce(
-        (a, b) =>
-          a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-        0,
-      )
-      .toFixed(2)
-      .toString();
+   
 
     const receivingUpdate = {
       products: receivingProducts,
-      checkTotal: receivingTotal,
     };
 
     // send data
     const sendBillProducts = body.sendBill.products;
-    const sendBillcheckTotal = sendBillProducts
-      .reduce(
-        (a, b) =>
-          a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-        0,
-      )
-      .toFixed(2)
-      .toString();
-
+   
     const updateSendBill = {
       products: sendBillProducts,
-      checkTotal: sendBillcheckTotal,
     };
 
     try {
       switch (body.case) {
         case BILL_TO_BILL:
+          console.log("Si llegue por aca")
+          console.log("aqui empezara el chirnguito")
+          console.log(body);
+          console.log("aca los productos de la receiving bill")
+          console.log(body.receivingBill.products);
+          console.log("aca los productos de la sendbill")
+          console.log(sendBillProducts);
+          
           // hacemos los cambios en la cuenta principal
           const currentReceivingBill = await this.billsModel.findByIdAndUpdate(
             body.receivingBill._id,
