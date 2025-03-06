@@ -2,7 +2,8 @@
   "conventionalCommits.scopes": [
     "discounts checkpoint",
     "update changes week 06/12/2024",
-    "server repair"
+    "server repair",
+    "update server"
   ],
   "editor.fontFamily": "Cascadia Code",
   "editor.fontVariations": false
