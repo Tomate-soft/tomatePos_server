@@ -93,16 +93,35 @@ export class CashierSessionService {
     session.startTransaction();
     try {
       const currentSession = await this.cashierSessionModel.findById(id);
+
+      console.log(currentSession.bills);
       if (!currentSession) {
         throw new NotFoundException('No se pudo actualizar');
       }
       const res = await this.cashierSessionModel.findByIdAndUpdate(
         id,
-        { bills: [...currentSession.bills].concat(body.bills) },
         {
-          new: true,
+          bills: [
+            ...new Set([
+              ...currentSession.bills.map((bill: any) => bill.toString()),
+              ...body.bills,
+            ]),
+          ],
         },
+        { new: true },
       );
+
+      /*
+        if (!currentSession.bills.includes(body.bills)) {
+        const res = await this.cashierSessionModel.findByIdAndUpdate(
+          id,
+          { bills: [...currentSession.bills].concat(body.bills) },
+          {
+            new: true,
+          },
+        );
+      }
+      */
       await session.commitTransaction();
       session.endSession();
       return res;

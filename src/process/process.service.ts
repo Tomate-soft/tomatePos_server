@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CANCELLED_STATUS } from 'src/libs/status.libs';
+import { CANCELLED_STATUS, FINISHED_STATUS } from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
@@ -30,12 +30,18 @@ export class ProcessService {
     try {
       const allOrders = await this.billsService.findCurrent();
       const filterOrders = allOrders.filter(
-        (order) => order.status != CANCELLED_STATUS,
+        (order) => order.status === FINISHED_STATUS,
       );
-      const sellTotal =
-        filterOrders?.reduce((acc, order) => {
-          return acc + parseFloat(order.checkTotal);
-        }, 0) ?? 0.0;
+      // Aca hay que meditar la idea de recuperar el total de venta por referencia de los pagos y no de las transacciones de las cuenta.
+      const totalPayments = filterOrders
+        .flatMap((order) => order?.payment)
+        .flatMap((payment) => payment.transactions);
+      
+
+      const sellTotal = totalPayments.reduce(
+        (acc, payment) => acc + parseFloat(payment.payQuantity),
+        0,
+      );
 
       await session.commitTransaction();
       session.endSession();

@@ -136,7 +136,7 @@ export class PaymentsService {
       const periodId = branch.operatingPeriod;
       const OperatingPeriod =
         await this.operatingPeriodModel.findById(periodId);
-        console.log(createdPayment);
+      console.log(createdPayment);
 
       const newPaymentCode = new this.paymentModel({
         ...createdPayment,
