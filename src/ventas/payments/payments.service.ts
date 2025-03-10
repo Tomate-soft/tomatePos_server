@@ -143,7 +143,6 @@ export class PaymentsService {
         operatingPeriod: OperatingPeriod._id,
       });
 
-      console.log(newPaymentCode);
       if (
         !createdPayment?.transactions?.some(
           (element) => element.paymentType === 'courtesy',
@@ -275,7 +274,6 @@ export class PaymentsService {
           currentBill.payment.length > 0
             ? [...currentBill.payment, newPayment._id]
             : [newPayment._id],
-        status: FINISHED_STATUS,
       };
       await this.billModel.findByIdAndUpdate(currentBill._id, updatedBillData);
       await session.commitTransaction();
@@ -428,8 +426,6 @@ export class PaymentsService {
       const currentBill = await this.rappiOrderModel.findById(
         data.body.accountId,
       );
-      console.log('DOS');
-      console.log(currentBill);
 
       const updatedRappiOrder = {
         payment: [...currentBill.payment, newPayment._id],
@@ -440,7 +436,7 @@ export class PaymentsService {
         currentBill._id,
         updatedRappiOrder,
       );
-      //
+
       const waiter = await this.userModel.findById(data.waiterId);
       const totalTransactions = newPayment.transactions;
 

@@ -36,8 +36,10 @@ export class ProcessService {
       const totalPayments = filterOrders
         .flatMap((order) => order?.payment)
         .flatMap((payment) => payment.transactions);
-      
 
+      totalPayments.forEach((element) => {
+        console.log(element);
+      });
       const sellTotal = totalPayments.reduce(
         (acc, payment) => acc + parseFloat(payment.payQuantity),
         0,

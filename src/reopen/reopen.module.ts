@@ -9,12 +9,14 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
+import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Reopen.name, schema: ReopenSchema },
       { name: Bills.name, schema: BillSchema },
+      { name: Notes.name, schema: NoteSchema },
       { name: Table.name, schema: TableSchema },
       { name: CashierSession.name, schema: CashierSessionSchema },
     ]),

@@ -19,6 +19,7 @@ import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { User } from 'src/schemas/users.schema';
 import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 import { Table } from 'src/schemas/tables/tableSchema';
+import { path } from 'pdfkit';
 
 @Injectable()
 export class BillsService {
@@ -441,6 +442,9 @@ export class BillsService {
           })
           .populate({
             path: 'notes',
+            populate: {
+              path: 'discount',
+            },
           })
           .populate({
             path: 'discount',
