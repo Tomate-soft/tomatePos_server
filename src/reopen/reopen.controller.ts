@@ -38,4 +38,17 @@ export class ReopenController {
       throw new NotFoundException('No data found');
     }
   }
+
+  @Post('note')
+  async createReopenNote(@Body() payload: CreateReopenDto) {
+    try {
+      const data = await this.reopenService.createReopenNote(payload);
+      return data;
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('Already exists');
+      }
+      throw new NotFoundException('No data found');
+    }
+  }
 }
