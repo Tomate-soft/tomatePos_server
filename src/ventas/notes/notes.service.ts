@@ -110,7 +110,7 @@ export class NotesService {
           // Actualizar bill
           const updateBill = await this.BillsModel.findByIdAndUpdate(
             accountId,
-            { ...updatedNote, cashierSession: cashierSessionId },
+            {  cashierSession: cashierSessionId },
             { new: true },
           );
           const res = { updNote: upNote, updBill: updateBill };
