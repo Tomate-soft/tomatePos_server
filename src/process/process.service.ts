@@ -30,16 +30,14 @@ export class ProcessService {
     try {
       const allOrders = await this.billsService.findCurrent();
       const filterOrders = allOrders.filter(
-        (order) => order.status === FINISHED_STATUS,
+        (order) =>
+          order.status != CANCELLED_STATUS && order.status === FINISHED_STATUS,
       );
       // Aca hay que meditar la idea de recuperar el total de venta por referencia de los pagos y no de las transacciones de las cuenta.
       const totalPayments = filterOrders
         .flatMap((order) => order?.payment)
         .flatMap((payment) => payment.transactions);
 
-      totalPayments.forEach((element) => {
-        console.log(element);
-      });
       const sellTotal = totalPayments.reduce(
         (acc, payment) => acc + parseFloat(payment.payQuantity),
         0,
@@ -61,12 +59,19 @@ export class ProcessService {
     try {
       const allOrders = await this.billsService.findCurrent(id);
       const filterOrders = allOrders.filter(
-        (order) => order.status != CANCELLED_STATUS,
+        (order) =>
+          order.status != CANCELLED_STATUS && order.status === FINISHED_STATUS,
       );
-      const sellTotal =
-        filterOrders?.reduce((acc, order) => {
-          return acc + parseFloat(order.checkTotal);
-        }, 0) ?? 0.0;
+
+      // Aca hay que meditar la idea de recuperar el total de venta por referencia de los pagos y no de las transacciones de las cuenta.
+      const totalPayments = filterOrders
+        .flatMap((order) => order?.payment)
+        .flatMap((payment) => payment.transactions);
+
+      const sellTotal = totalPayments.reduce(
+        (acc, payment) => acc + parseFloat(payment.payQuantity),
+        0,
+      );
       await session.commitTransaction();
       session.endSession();
       const counterSells = allOrders.length ?? 0;

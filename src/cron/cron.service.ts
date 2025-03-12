@@ -182,7 +182,40 @@ export class CronService {
         session.endSession();
       }
     });
-
     */
+  }
+
+  async closeManualPeriod(body: any) {
+    const session = await this.operatingPeriodModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent(
+        body.period,
+      );
+      const currentPeriodId = currentPeriod[0]._id.toString();
+      // const updatedPeriod = await this.operatingPeriodService.closePeriod(
+      //   currentPeriodId.toString(),
+      // );
+      // if (!updatedPeriod) {
+      //   throw new Error('No se pudo cerrar el periodo operativo');
+      // }
+
+      const updatedPeriod = await this.operatingPeriodService.closePeriod(
+        currentPeriodId.toString(),
+      );
+      console.log(updatedPeriod);
+
+      if (!updatedPeriod) {
+        console.error('No se pudo cerrar el periodo operativo');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return updatedPeriod;
+    } catch (error) {
+      console.log(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }
