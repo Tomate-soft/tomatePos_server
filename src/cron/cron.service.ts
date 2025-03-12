@@ -203,7 +203,6 @@ export class CronService {
       const updatedPeriod = await this.operatingPeriodService.closePeriod(
         currentPeriodId.toString(),
       );
-      console.log(updatedPeriod);
 
       if (!updatedPeriod) {
         console.error('No se pudo cerrar el periodo operativo');
