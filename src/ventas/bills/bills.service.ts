@@ -46,6 +46,7 @@ export class BillsService {
         })
         .populate({
           path: 'notes',
+          populate: { path: 'discount' },
         })
         .populate({ path: 'discount' });
     } catch (error) {
@@ -81,6 +82,7 @@ export class BillsService {
         })
         .populate({
           path: 'notes',
+          populate: { path: 'discount' },
         });
     } catch (error) {
       throw new Error(error);

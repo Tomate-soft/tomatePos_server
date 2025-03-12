@@ -3,13 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
 import { UpdateCancellationDto } from 'src/dto/ventas/cancellations/updateCancellationDto';
-import { CANCELLED_STATUS, FREE_STATUS } from 'src/libs/status.libs';
+import {
+  CANCELLED_STATUS,
+  ENABLE_STATUS,
+  FINISHED_STATUS,
+  FREE_STATUS,
+} from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
 import { Cancellations } from 'src/schemas/ventas/cancellations.schema';
 import { Notes } from 'src/schemas/ventas/notes.schema';
 import { Product } from 'src/schemas/ventas/product.schema';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 
 @Injectable()
 export class CancellationsService {
@@ -86,12 +92,18 @@ export class CancellationsService {
         const currentBill = await this.billsModel
           .findById(createdCancellation.accountId)
           .populate({ path: 'notes' });
+
         const enableNotes = currentBill.notes.filter(
-          (element) => element.status !== CANCELLED_STATUS,
+          (element) => element.status === ENABLE_STATUS,
+        );
+
+        const finishedNotes = currentBill.notes.filter(
+          (element) => element.status === FINISHED_STATUS,
         );
 
         const newTotal = (
-          parseFloat(currentBill.checkTotal) - parseFloat(updateNote.checkTotal)
+          parseFloat(calculateBillTotal(currentBill?.products)) -
+          parseFloat(calculateBillTotal(updateNote?.products))
         ).toString();
 
         const updateBill = await this.billsModel
@@ -102,16 +114,23 @@ export class CancellationsService {
           )
           .populate({ path: 'notes' });
 
-        if (updateBill.notes.length <= 0) {
+        const newStatus =
+          enableNotes?.length <= 0 && finishedNotes.length <= 0
+            ? CANCELLED_STATUS
+            : enableNotes?.length >= 1
+              ? ENABLE_STATUS
+              : FINISHED_STATUS;
+
+        const updateBillStatus = await this.billsModel.findByIdAndUpdate(
+          updateBill._id,
+          { status: newStatus },
+          { new: true },
+        );
+
+        if (enableNotes.length <= 1) {
           const updateTabl = await this.tableModel.findByIdAndUpdate(
             currentBill.table,
             { status: FREE_STATUS, bill: [] },
-            { new: true },
-          );
-
-          const updateBillStatus = await this.billsModel.findByIdAndUpdate(
-            updateBill._id,
-            { status: CANCELLED_STATUS },
             { new: true },
           );
         }

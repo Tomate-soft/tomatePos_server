@@ -32,7 +32,7 @@ export class NotesService {
   ) {}
 
   async findAll() {
-    return await this.noteModel.find();
+    return await this.noteModel.find().populate({ path: 'discount' });
   }
 
   async findOne(id: string) {

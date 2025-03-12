@@ -47,7 +47,10 @@ export class OperatingPeriodService {
         .populate({
           path: 'sellProcess',
           populate: [
-            { path: 'bills', populate: { path: 'notes' } },
+            {
+              path: 'bills',
+              populate: { path: 'notes', populate: { path: 'discount' } },
+            },
             { path: 'bills', populate: { path: 'payment' } },
             { path: 'bills', populate: { path: 'discount' } },
           ],
@@ -278,7 +281,7 @@ export class OperatingPeriodService {
         .findByIdAndUpdate(
           id,
           {
-            operationalClousure: {  state: State.CLOSED },
+            operationalClousure: { state: State.CLOSED },
             approvedBy: body.userId,
           },
           { new: true },
@@ -305,24 +308,28 @@ export class OperatingPeriodService {
     const session = await this.operatingPeriodModel.startSession();
     session.startTransaction();
     try {
-      // TRAEREMOS EL MONTO TOTAL DE VENTAS
+      // Actualizar solo el estado dentro de operationalClousure
       const updatedPeriod = await this.operatingPeriodModel
         .findByIdAndUpdate(
           id,
           {
-            operationalClousure: {  state: State.APPROVED },
-            approvedBy: body.userId,
+            $set: {
+              'operationalClousure.state': State.APPROVED,
+              approvedBy: body.userId,
+            },
           },
           { new: true },
         )
         .populate({
           path: 'approvedBy',
         });
+
       if (!updatedPeriod) {
         await session.abortTransaction();
         session.endSession();
         throw new Error('No se pudo actualizar el periodo operativo');
       }
+
       await session.commitTransaction();
       session.endSession();
       return updatedPeriod;
