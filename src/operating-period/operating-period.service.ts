@@ -278,7 +278,7 @@ export class OperatingPeriodService {
         .findByIdAndUpdate(
           id,
           {
-            operationalClousure: { ...templateClosing, state: State.CLOSED },
+            operationalClousure: {  state: State.CLOSED },
             approvedBy: body.userId,
           },
           { new: true },
@@ -310,7 +310,7 @@ export class OperatingPeriodService {
         .findByIdAndUpdate(
           id,
           {
-            operationalClousure: { ...templateClosing, state: State.APPROVED },
+            operationalClousure: {  state: State.APPROVED },
             approvedBy: body.userId,
           },
           { new: true },

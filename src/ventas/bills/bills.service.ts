@@ -191,14 +191,6 @@ export class BillsService {
     try {
       switch (body.case) {
         case BILL_TO_BILL:
-          console.log('Si llegue por aca');
-          console.log('aqui empezara el chirnguito');
-          console.log(body);
-          console.log('aca los productos de la receiving bill');
-          console.log(body.receivingBill.products);
-          console.log('aca los productos de la sendbill');
-          console.log(sendBillProducts);
-
           // hacemos los cambios en la cuenta principal
           const currentReceivingBill = await this.billsModel.findByIdAndUpdate(
             body.receivingBill._id,
