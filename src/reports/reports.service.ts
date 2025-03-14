@@ -24,7 +24,7 @@ export class ReportsService {
   constructor(
     @InjectModel(CashierSession.name)
     private cashierSessionModel: Model<CashierSession>,
-   // private billService: BillsService,
+    //  private billService: BillsService,
     //private processService: ProcessService,
   ) {}
 

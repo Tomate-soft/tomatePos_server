@@ -2,6 +2,7 @@ import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Payment } from '../payment.schema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { Discount } from '../discounts.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class RappiOrder {
@@ -64,6 +65,9 @@ export class RappiOrder {
     trim: true,
   })
   diners?: number;
+
+  // @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Discount', default: null })
+  // discount?: Discount | null;
 }
 
 export const RappiOrderSchema = SchemaFactory.createForClass(RappiOrder);
