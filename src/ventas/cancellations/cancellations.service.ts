@@ -116,7 +116,6 @@ export class CancellationsService {
             { new: true },
           )
           .populate({ path: 'notes' });
-       
 
         const newStatus =
           enableNotes?.length <= 0 && finishedNotes.length <= 0
@@ -131,10 +130,42 @@ export class CancellationsService {
           { new: true },
         );
 
+        const onlyForPayment = enableNotes.filter(
+          (element) => element.status === FOR_PAYMENT_STATUS,
+        );
+
+        // Aqui la situacion es que pueden ser los siguientes casos
+        // Mando una nota a cancelar, pueden haber mas notas habilitadas  ---> Aca mesa deberia seguir estando habilitada
+        // Mando una nota a cancelar, sin mas notas habilitadas pero otras que esten por pagar ----> Aca la mesa deberia estar por pagar
+        // Mando una nota a cancelar, puede que no haya mas notas habilitadas ni pór págar, y que las demas esten ya pagadas ----> La mesa deberia estar libre
+        // Mando una nota a cancelar, puede que no haya mas notas habilitadas ni pór págar, y que las demas esten ya canceladas  -----> La mesa deberia estar libre
+        // Mando una nota a cancelar, puede que no haya mas notas habilitadas ni pór págar, que haya algunas pagadas y otras canceladas ----> La mesa deberia estar libre
+        const newTableStatus =
+          enableNotes?.length > 1 &&
+          !enableNotes.some((element) => element.status === FOR_PAYMENT_STATUS)
+            ? ENABLE_STATUS
+            : enableNotes?.length === 1 && onlyForPayment.length > 0
+              ? FOR_PAYMENT_STATUS
+              : FREE_STATUS;
+        console.log(
+          enableNotes?.length > 1 &&
+            !enableNotes.some(
+              (element) => element.status === FOR_PAYMENT_STATUS,
+            ),
+        );
+        console.log(enableNotes?.length === 2 && onlyForPayment.length > 0);
+        console.log(newTableStatus);
+        console.log(onlyForPayment);
+        console.log(onlyForPayment.length);
+        enableNotes.forEach((element) => {
+          console.log(element);
+        });
+
+        // Cuando vamos a actualizar la mesa?
         if (enableNotes.length <= 1) {
           const updateTabl = await this.tableModel.findByIdAndUpdate(
             currentBill.table,
-            { status: FREE_STATUS, bill: [] },
+            { status: newTableStatus, bill: [] },
             { new: true },
           );
         }
