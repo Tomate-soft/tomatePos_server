@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
@@ -14,12 +14,18 @@ import { printPayTipsReport } from './reportsTemplates/tipsReport';
 import { printShiftTemplate } from './reportsTemplates/printShift';
 import { format, getISOWeek, startOfWeek } from 'date-fns';
 import { mojeReportTemplate } from './reportsTemplates/mojeReport';
+import { BillsService } from 'src/ventas/bills/bills.service';
+import { FINISHED_STATUS } from 'src/libs/status.libs';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
+//import { ProcessService } from 'src/process/process.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectModel(CashierSession.name)
     private cashierSessionModel: Model<CashierSession>,
+   // private billService: BillsService,
+    //private processService: ProcessService,
   ) {}
 
   private async ensureReportsFolderExists(folderPath: string) {
@@ -186,4 +192,24 @@ export class ReportsService {
       console.log(error);
     }
   }
+
+  // async printClosedBillsReport(body: any, type: string) {
+  //   try {
+  //     // hay que llevar todas las cuentas cerradas
+  //     const BillsArray = await this.billService.findCurrent();
+  //     const finishedBills = BillsArray.filter(
+  //       (bill) => bill.status === FINISHED_STATUS,
+  //     );
+  //     const totalSellAmount = finishedBills.reduce(
+  //       (acc, bill) => acc + !bill.discount?.discountType ? calculateBillTotal(bill.products) : 0,
+  //       0,
+  //     );
+  //     return {
+  //       finishedBills,
+
+  //     };
+  //   } catch (error) {
+  //     throw new NotFoundException(error);
+  //   }
+  // }
 }

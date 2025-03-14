@@ -174,7 +174,8 @@ export class ClousuresOfOperationsService {
 
     // Summary totals
     // Summary cash    total de las ventas del efetivo -
-    const summaryCash = parseFloat(totalCash) - parseFloat(body.cash ?? 0);
+    const summaryCash =
+      parseFloat(totalCash) - parseFloat(body.cash ?? 0) - totalWithdraws;
     const summaryDebit = parseFloat(totalDebit) - parseFloat(body.debit ?? 0);
     const summaryCredit =
       parseFloat(totalCredit) - parseFloat(body.credit ?? 0);

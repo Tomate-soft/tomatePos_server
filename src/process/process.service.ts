@@ -177,7 +177,6 @@ export class ProcessService {
       const incomeTotal = currentPeriod[0].cashIn
         ? parseFloat(currentPeriod[0].cashIn.amount) + totalCurrentSells
         : totalCurrentSells;
-      console.log(parseFloat(currentPeriod[0].cashIn.amount));
 
       if (currentPeriod[0].cashIn.init) {
         console.log(parseFloat(currentPeriod[0].cashIn.amount));
