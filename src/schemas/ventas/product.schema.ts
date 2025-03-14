@@ -2,6 +2,11 @@ import { Schema, Prop } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Addition } from '../catalogo/additions.schema';
 
+interface Price {
+  name: string;
+  price: number;
+}
+
 @Schema({ timestamps: true })
 export class Product {
   @Prop({
@@ -26,7 +31,7 @@ export class Product {
     required: true,
     trim: true,
   })
-  prices: string;
+  prices: Price[];
 
   @Prop({
     required: true,

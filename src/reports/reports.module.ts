@@ -6,6 +6,7 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
+import { BillsService } from 'src/ventas/bills/bills.service';
 
 @Module({
   imports: [

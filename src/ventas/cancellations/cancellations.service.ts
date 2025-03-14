@@ -7,6 +7,7 @@ import {
   CANCELLED_STATUS,
   ENABLE_STATUS,
   FINISHED_STATUS,
+  FOR_PAYMENT_STATUS,
   FREE_STATUS,
 } from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
@@ -94,7 +95,9 @@ export class CancellationsService {
           .populate({ path: 'notes' });
 
         const enableNotes = currentBill.notes.filter(
-          (element) => element.status === ENABLE_STATUS,
+          (element) =>
+            element.status === ENABLE_STATUS ||
+            element.status === FOR_PAYMENT_STATUS,
         );
 
         const finishedNotes = currentBill.notes.filter(
