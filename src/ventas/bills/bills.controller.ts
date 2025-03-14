@@ -98,7 +98,6 @@ export class BillsController {
 
   @Put(':id')
   async update(@Body() body: UpdateBillDto, @Param('id') id: string) {
-    console.log(body);
     const currentBill = await this.billService.findOne(id);
     const newHistory = body.transferHistory;
     const updateValue =
