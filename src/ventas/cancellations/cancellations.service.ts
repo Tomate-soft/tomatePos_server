@@ -116,6 +116,7 @@ export class CancellationsService {
             { new: true },
           )
           .populate({ path: 'notes' });
+       
 
         const newStatus =
           enableNotes?.length <= 0 && finishedNotes.length <= 0
