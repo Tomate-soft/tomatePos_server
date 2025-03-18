@@ -117,8 +117,12 @@ export class OperatingPeriodService {
       const totalSells = totalSellsResponse.totalSellAmount;
 
       // todo: Total de ventas del tipo de venta restaurante CANTIDAD
+      // usar el findCurrentBysSelltype del  billService
       const totalRestaurantSellsResponse =
-        await this.processService.especifTotalPeriodSells(periodId, 'onSite');
+        await this.processService.especifTotalPeriodSells(
+          periodId,
+          'ON_SITE_ORDER',
+        );
       const totalRestaurantSellsCount =
         totalRestaurantSellsResponse.totalSellCount;
 

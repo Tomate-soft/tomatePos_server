@@ -10,6 +10,7 @@ import { CANCELLED_STATUS, FINISHED_STATUS } from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
+import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 import { BillsService } from 'src/ventas/bills/bills.service';
 
 @Injectable()
@@ -98,7 +99,7 @@ export class ProcessService {
       );
       const sellTotal =
         filterOrders?.reduce((acc, order) => {
-          return acc + parseFloat(order.checkTotal);
+          return acc + parseFloat(calculateBillTotal(order?.products));
         }, 0) ?? 0.0;
       await session.commitTransaction();
       session.endSession();
