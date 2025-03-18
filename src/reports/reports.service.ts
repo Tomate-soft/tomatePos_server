@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CashierSession } from 'src/schemas/cashierSession/cashierSession';
 import puppeteer from 'puppeteer';
+import { spawn } from 'child_process';
+import { join } from 'path';
 import * as fs from 'fs/promises';
 import { cashierSessionReport } from './reportsTemplates/cashierSessionReport';
 import {
@@ -16,7 +18,6 @@ import { format, getISOWeek, startOfWeek } from 'date-fns';
 import { mojeReportTemplate } from './reportsTemplates/mojeReport';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { FINISHED_STATUS } from 'src/libs/status.libs';
-import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 //import { ProcessService } from 'src/process/process.service';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class ReportsService {
   constructor(
     @InjectModel(CashierSession.name)
     private cashierSessionModel: Model<CashierSession>,
-    //  private billService: BillsService,
+    private billService: BillsService,
     //private processService: ProcessService,
   ) {}
 
@@ -193,23 +194,104 @@ export class ReportsService {
     }
   }
 
-  // async printClosedBillsReport(body: any, type: string) {
-  //   try {
-  //     // hay que llevar todas las cuentas cerradas
-  //     const BillsArray = await this.billService.findCurrent();
-  //     const finishedBills = BillsArray.filter(
-  //       (bill) => bill.status === FINISHED_STATUS,
-  //     );
-  //     const totalSellAmount = finishedBills.reduce(
-  //       (acc, bill) => acc + !bill.discount?.discountType ? calculateBillTotal(bill.products) : 0,
-  //       0,
-  //     );
-  //     return {
-  //       finishedBills,
+  async printClosedBillsReport(body: any) {
+    try {
+      // hay que llevar todas las cuentas cerradas
+      const BillsArray = await this.billService.findCurrent();
+      // vamos a separar por cada una de las cuentas
+      // luego ejecutamos el calculo del total por aca tipo
+      // para al final sumarlos todos dado qu ejunto sno se podra por que l afuncion esta preparada solo para restaurante
+      const finishedBills = BillsArray.filter(
+        (bill) => bill.status === FINISHED_STATUS,
+      );
+      console.log('1 ');
 
-  //     };
-  //   } catch (error) {
-  //     throw new NotFoundException(error);
-  //   }
-  // }
+      const finishedBillsRestaurant = finishedBills.filter(
+        (bill) =>
+          bill.sellType === 'ON_SITE_ORDER' ||
+          bill.sellType === 'onSite' ||
+          bill.sellType === 'n/A',
+      );
+
+      const exampleBody = {
+        products: [
+          {
+            quantity: 2,
+            prices: [
+              {
+                name: 'product1',
+                price: 10,
+              },
+            ],
+          },
+        ],
+        discount: {
+          discountMount: '20',
+          setting: 'SET_PERCENT',
+        },
+        functionName: 'calculateProductTotal',
+      };
+      //const exampleBodyJson = JSON.stringify(exampleBody);
+      /*////////////////////////////////////////////////////////////////////////*/
+      // /////////////Aca la logica de calcular con el archivo externo /////////*/
+      // /////////////////////////////////////////////////////////////////////// */
+       // const result = await this.runCalculoExe(exampleBodyJson);
+
+     
+
+      ////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////
+      /////////////////////////////////////////////////////////////////////////////////////
+      // por ejemplo tener un. exe aca que me haga todos los calculos y que siga el servicio despues
+      return finishedBillsRestaurant;
+    } catch (error) {
+      throw new NotFoundException(error);
+    }
+  }
+  private async runCalculoExe(inputJson: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      try {
+        // Parseamos el JSON recibido
+        const parsedBody = JSON.parse(inputJson);
+
+        // Extraemos los parámetros necesarios desde el JSON
+        const products = JSON.stringify(parsedBody.products); // Ejemplo de extraer productos
+        const discount = JSON.stringify(parsedBody.discount); // Ejemplo de extraer descuento
+        const functionName = parsedBody.functionName; // Ejemplo de extraer nombre de función
+
+        // Ahora, pasamos los parámetros como argumentos al ejecutable
+        const exePath = join(__dirname, 'bin', 'calculo.exe');
+        console.log('Ruta al ejecutable:', exePath); // Verifica la ruta generada
+        const process = spawn(exePath, [products, discount, functionName]);
+
+        let output = '';
+        let errorOutput = '';
+
+        // Capturamos la salida estándar del ejecutable
+        process.stdout.on('data', (data) => {
+          output += data.toString(); // Acumulamos la salida
+        });
+
+        // Capturamos los errores del ejecutable
+        process.stderr.on('data', (data) => {
+          errorOutput += data.toString(); // Acumulamos los errores
+        });
+
+        // Capturamos el cierre del proceso
+        process.on('close', (code) => {
+          if (code === 0) {
+            resolve(output); // Si todo va bien, resolvemos con la salida
+          } else {
+            reject(
+              new Error(
+                `El proceso terminó con el código ${code}: ${errorOutput}`,
+              ),
+            ); // Si hay un error, rechazamos
+          }
+        });
+      } catch (error) {
+        reject(new Error('Error al procesar el JSON o ejecutar el calculo'));
+      }
+    });
+  }
 }

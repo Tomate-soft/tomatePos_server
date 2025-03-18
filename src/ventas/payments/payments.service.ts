@@ -201,7 +201,7 @@ export class PaymentsService {
   ) {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
-    console.log("Empezamos");
+    console.log('Empezamos');
     console.log(body);
     try {
       const lastPaymentCode = await this.paymentModel
@@ -240,7 +240,7 @@ export class PaymentsService {
         status: FINISHED_STATUS,
         paymentCode: newPayment._id,
       };
-      console.log("Prymary");
+      console.log('Prymary');
       console.log(dataInjectInNote);
       await this.noteModel.findByIdAndUpdate(id, dataInjectInNote); // cambiamos la nota
       const currentBill = await this.billModel

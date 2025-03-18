@@ -32,17 +32,17 @@ export class ReportsController {
     }
   }
 
-  // @Get('closed-bills-report')
-  // async printClosedBillsReport(@Body() body: any) {
-  //   try {
-  //     console.log('body', body);
-  //     const result = await this.reportsService.printClosedBillsReport(body);
-  //     if (!result) {
-  //       throw new NotFoundException('No se ha podido imprimir el reporte');
-  //     }
-  //     return result;
-  //   } catch (error) {
-  //     throw new NotFoundException('No se ha podido imprimir el reporte');
-  //   }
-  // }
+  @Get('closed-bills-report')
+  async printClosedBillsReport(@Body() body: any) {
+    try {
+      console.log('body', body);
+      const result = await this.reportsService.printClosedBillsReport(body);
+      if (!result) {
+        throw new NotFoundException('No se ha podido imprimir el reporte');
+      }
+      return result;
+    } catch (error) {
+      throw new NotFoundException('No se ha podido imprimir el reporte');
+    }
+  }
 }
