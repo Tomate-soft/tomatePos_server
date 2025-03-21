@@ -91,21 +91,46 @@ export class ProcessService {
   especifTotalPeriodSells = async (id: string, type: string) => {
     const session = await this.operatingModel.startSession();
     session.startTransaction();
+    console.log(type);
     try {
       const resOrders = await this.billsService.findCurrent(id);
       const allOrders = resOrders.filter((order) => order.sellType === type);
-      const filterOrders = resOrders.filter(
+
+      const filterOrders = allOrders.filter(
         (order) => order.status != CANCELLED_STATUS,
       );
-      const sellTotal =
-        filterOrders?.reduce((acc, order) => {
-          return acc + parseFloat(calculateBillTotal(order?.products));
-        }, 0) ?? 0.0;
+
+      // filterOrders.forEach((order) => {
+      //   if (order.sellType === type) {
+      //     console.log(order.sellType);
+      //     console.log(type);
+      //     console.log(order);
+      //   }
+      // });
+      const finishedSells = filterOrders.filter(
+        (order) =>
+          order.status != CANCELLED_STATUS && order.status === FINISHED_STATUS,
+      );
+      const totalPayments = finishedSells
+        .flatMap((order) => order?.payment)
+        .flatMap((payment) => payment.transactions);
+
+      const sellTotal = totalPayments.reduce(
+        (acc, payment) => acc + parseFloat(payment.payQuantity),
+        0,
+      );
       await session.commitTransaction();
       session.endSession();
       const counterSells = allOrders.length ?? 0;
+      console.log({
+        totalSellCount: counterSells,
+        totalSellAmount: isNaN(sellTotal) ? 0 : sellTotal,
+    });
 
-      return { totalSellCount: counterSells, totalSellAmount: sellTotal };
+      return {
+        totalSellCount: counterSells,
+        totalSellAmount: isNaN(sellTotal) ? 0 : sellTotal,
+      };
     } catch (error) {
       await session.abortTransaction();
       session.endSession();

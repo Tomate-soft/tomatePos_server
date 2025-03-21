@@ -17,7 +17,6 @@ export class Bills {
   code: string;
 
   @Prop({
-    required: true,
     trim: true,
     default: 'ON_SITE_ORDER',
   })
