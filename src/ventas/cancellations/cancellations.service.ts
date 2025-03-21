@@ -141,7 +141,7 @@ export class CancellationsService {
         // Mando una nota a cancelar, puede que no haya mas notas habilitadas ni pór págar, y que las demas esten ya canceladas  -----> La mesa deberia estar libre
         // Mando una nota a cancelar, puede que no haya mas notas habilitadas ni pór págar, que haya algunas pagadas y otras canceladas ----> La mesa deberia estar libre
         const newTableStatus =
-          enableNotes?.length > 1 &&
+          enableNotes?.length > 0 &&
           !enableNotes.some((element) => element.status === FOR_PAYMENT_STATUS)
             ? ENABLE_STATUS
             : enableNotes?.length === 1 && onlyForPayment.length > 0

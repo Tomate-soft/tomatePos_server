@@ -201,8 +201,6 @@ export class PaymentsService {
   ) {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
-    console.log('Empezamos');
-    console.log(body);
     try {
       const lastPaymentCode = await this.paymentModel
         .findOne({})
@@ -240,8 +238,6 @@ export class PaymentsService {
         status: FINISHED_STATUS,
         paymentCode: newPayment._id,
       };
-      console.log('Prymary');
-      console.log(dataInjectInNote);
       await this.noteModel.findByIdAndUpdate(id, dataInjectInNote); // cambiamos la nota
       const currentBill = await this.billModel
         .findById(body.accountId)
@@ -259,10 +255,7 @@ export class PaymentsService {
         );
 
         const updatedBillData = {
-          payment:
-            currentBill.payment.length > 0
-              ? [...currentBill.payment, newPayment._id]
-              : [newPayment._id],
+          payment: [...(currentBill.payment ?? []), newPayment._id],
           status: FINISHED_STATUS,
         };
         await this.billModel.findByIdAndUpdate(
@@ -274,10 +267,7 @@ export class PaymentsService {
       }
 
       const updatedBillData = {
-        payment:
-          currentBill.payment.length > 0
-            ? [...currentBill.payment, newPayment._id]
-            : [newPayment._id],
+        payment: [...(currentBill.payment ?? []), newPayment._id],
       };
       await this.billModel.findByIdAndUpdate(currentBill._id, updatedBillData);
       await session.commitTransaction();
@@ -291,8 +281,6 @@ export class PaymentsService {
   }
 
   async paymentToGo(data: { waiterId: string; body: any }) {
-    console.log('vamos hacer un chiringuito por aca');
-    console.log(data);
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {

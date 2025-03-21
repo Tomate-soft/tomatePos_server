@@ -10,6 +10,7 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
+import { formatToCurrency } from 'src/libs/formatToCurrency';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -136,6 +137,7 @@ export class OperatingPeriodService {
           periodId,
           'TOGO_ORDER',
         );
+
       const totalToGoSellsCount = totalToGoSellsCountResponse.totalSellCount;
       // todo: Total de ventas del tipo de venta to Go MONTO EN DINERO
       const totalToGoSellsAmount = totalToGoSellsCountResponse.totalSellAmount;
@@ -237,31 +239,34 @@ export class OperatingPeriodService {
       // total de dinero a depositar
       // total de dinero a retirar
 
+      const resumeData = {
+        state: State.CLOSED,
+        totalSellsAmount: totalSells, // Resumen de ventas
+        totalRestaurantAmount: formatToCurrency(totalRestaurantSellsAmount),// Ventas por tipo de venta RESTAURANTE
+         
+        toGoOrdersAmount: formatToCurrency(totalToGoSellsAmount), // Ventas por tipo de venta PARA LLEVAR
+        phoneOrdersAmount: formatToCurrency(totalPhoneSellsAmount),
+        rappiOrdersAmount: formatToCurrency(totalRappiSellsAmount),
+        totalDeliveryAmount: formatToCurrency(totalRappiSellsAmount),
+       
+        totalCashAmount: totalCashSellsAmount,
+        toGoOrdersTotal: totalToGoSellsCount,
+        phoneOrdersTotal: totalPhoneSellsCount,
+        rappiOrdersTotal: totalRappiSellsCount,
+        totalDebitAmount: totalDebitSellsAmount,
+        totalCreditAmount: totalCreditSellsAmount,
+        totalTransferAmount: totalTransferSellsAmount,
+        restaurantOrdersTotal: totalRestaurantSellsCount,
+        finishedAccounts: accountsBilled.length,
+        totalDiners: totalDiners,
+      };
+
+      console.log(resumeData);
+
       const updatedPeriod = await this.operatingPeriodModel.findByIdAndUpdate(
         periodId,
         {
-          operationalClousure: {
-            ...templateClosing,
-            state: State.CLOSED,
-            totalSellsAmount: totalSells,
-            totalRestaurantAmount: totalRestaurantSellsAmount
-              .toFixed(2)
-              .toString(),
-            toGoOrdersAmount: totalToGoSellsAmount.toFixed(2).toString(),
-            phoneOrdersAmount: totalPhoneSellsAmount.toFixed(2).toString(),
-            rappiOrdersAmount: totalRappiSellsAmount.toFixed(2).toString(),
-            totalDeliveryAmount: totalRappiSellsAmount.toFixed(2).toString(),
-            totalCashAmount: totalCashSellsAmount,
-            toGoOrdersTotal: totalToGoSellsCount,
-            phoneOrdersTotal: totalPhoneSellsCount,
-            rappiOrdersTotal: totalRappiSellsCount,
-            totalDebitAmount: totalDebitSellsAmount,
-            totalCreditAmount: totalCreditSellsAmount,
-            totalTransferAmount: totalTransferSellsAmount,
-            restaurantOrdersTotal: totalRestaurantSellsCount,
-            finishedAccounts: accountsBilled.length,
-            totalDiners: totalDiners,
-          },
+          operationalClousure: resumeData,
         },
         { new: true },
       );
