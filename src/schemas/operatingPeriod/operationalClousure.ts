@@ -12,35 +12,43 @@ export class OperationalClousure {
   @Prop({ type: String, enum: State })
   state: State;
 
-  @Prop({ type: String })
-  totalSellsAmount: string;
+  @Prop({ type: Number })
+  totalSellsAmount: number;
 
-  @Prop({ type: String })
-  totalRestaurantAmount: string;
+  //////////////////////////////////////////
+  //// Ventas por tipo de venta   //////////
+  //////////////////////////////////////////
 
-  @Prop({ type: String })
-  totalToGoAmount: string;
+  @Prop({ type: Number })
+  totalRestaurantAmount: number;
 
-  @Prop({ type: String })
-  totalPhoneAmount: string;
+  @Prop({ type: Number })
+  totalToGoOrdersAmount: number;
 
-  @Prop({ type: String })
-  totalRappiAmount: string;
+  @Prop({ type: Number })
+  totalPhoneAmount: number;
 
-  @Prop({ type: String })
-  totalCashInAmount: string;
+  @Prop({ type: Number })
+  totalRappiAmount: number;
 
-  @Prop({ type: String })
-  totalDebitAmount: string;
+  //////////////////////////////////////////
+  ///// Ventas por tipo de pago ////////////
+  //////////////////////////////////////////
 
-  @Prop({ type: String })
-  totalCreditAmount: string;
+  @Prop({ type: Number })
+  totalCashInAmount: number;
 
-  @Prop({ type: String })
-  totalTransferAmount: string;
+  @Prop({ type: Number })
+  totalDebitAmount: number;
 
-  @Prop({ type: String })
-  totalDeliveryAmount: string;
+  @Prop({ type: Number })
+  totalCreditAmount: number;
+
+  @Prop({ type: Number })
+  totalTransferAmount: number;
+
+  @Prop({ type: Number })
+  totalDeliveryAmount: number;
 
   @Prop({ type: Number })
   totalDiners: number;

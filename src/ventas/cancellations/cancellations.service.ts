@@ -209,14 +209,8 @@ export class CancellationsService {
         session.endSession();
         return newCancelproduct;
       }
-      const checkTotalNewNote = body.aptAccount.products
-        .reduce(
-          (a, b) =>
-            a + parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-          0,
-        )
-        .toFixed(2)
-        .toString();
+      const checkTotalNewNote = calculateBillTotal(body.aptAccount.products);
+
       // aca es el precio de la nota
       const updateNote = await this.notesModel.findByIdAndUpdate(
         body.body.noteId,
