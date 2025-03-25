@@ -162,7 +162,7 @@ export class CancellationsService {
         });
 
         // Cuando vamos a actualizar la mesa?
-        if (enableNotes.length <= 1) {
+        if (enableNotes.length < 1) {
           const updateTabl = await this.tableModel.findByIdAndUpdate(
             currentBill.table,
             { status: newTableStatus, bill: [] },
@@ -191,15 +191,7 @@ export class CancellationsService {
 
       if (newCancelproduct && !body.body.noteId) {
         // aca la cuenta sin notas
-        const checkTotalNew = body.aptAccount.products
-          .reduce(
-            (a, b) =>
-              a +
-              parseFloat(b.quantity > 1 ? b.priceInSiteBill : b.priceInSite),
-            0,
-          )
-          .toFixed(2)
-          .toString();
+        const checkTotalNew = calculateBillTotal(body.aptAccount.products);
         const updateBill = await this.billsModel.findByIdAndUpdate(
           body.body.accountId,
           { products: body.aptAccount.products, checkTotal: checkTotalNew },
