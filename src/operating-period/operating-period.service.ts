@@ -242,14 +242,18 @@ export class OperatingPeriodService {
       const resumeData = {
         state: State.CLOSED,
         totalSellsAmount: totalSells, // Resumen de ventas
-        totalRestaurantAmount: formatToCurrency(totalRestaurantSellsAmount),// Ventas por tipo de venta RESTAURANTE
-         
-        toGoOrdersAmount: formatToCurrency(totalToGoSellsAmount), // Ventas por tipo de venta PARA LLEVAR
-        phoneOrdersAmount: formatToCurrency(totalPhoneSellsAmount),
-        rappiOrdersAmount: formatToCurrency(totalRappiSellsAmount),
+        //////////////////////////////////////////
+        //// Ventas por tipo de venta   //////////
+        //////////////////////////////////////////
+        totalRestaurantAmount: totalRestaurantSellsAmount, // Ventas por tipo de venta RESTAURANTE
+        totalToGoOrdersAmount: totalToGoSellsAmount, // Ventas por tipo de venta PARA LLEVAR
+        totalPhoneAmount: totalPhoneSellsAmount,
+        rappiOrdersAmount: totalRappiSellsAmount,
+        //////////////////////////////////////////
+        ///// Ventas por tipo de pago ////////////
+        //////////////////////////////////////////
+        totalCashInAmount: totalCashSellsAmount,
         totalDeliveryAmount: formatToCurrency(totalRappiSellsAmount),
-       
-        totalCashAmount: totalCashSellsAmount,
         toGoOrdersTotal: totalToGoSellsCount,
         phoneOrdersTotal: totalPhoneSellsCount,
         rappiOrdersTotal: totalRappiSellsCount,
@@ -285,13 +289,15 @@ export class OperatingPeriodService {
     const session = await this.operatingPeriodModel.startSession();
     session.startTransaction();
     try {
-      // TRAEREMOS EL MONTO TOTAL DE VENTAS
+      // Actualizar solo el estado dentro de operationalClousure
       const updatedPeriod = await this.operatingPeriodModel
         .findByIdAndUpdate(
           id,
           {
-            operationalClousure: { state: State.CLOSED },
-            approvedBy: body.userId,
+            $set: {
+              'operationalClousure.state': State.APPROVED,
+              approvedBy: body.userId,
+            },
           },
           { new: true },
         )

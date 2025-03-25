@@ -337,6 +337,7 @@ export class PaymentsService {
 
       return { message: 'Funciona perfecto' };
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       session.endSession();
     }

@@ -96,8 +96,8 @@ export class ProcessService {
       const resOrders = await this.billsService.findCurrent(id);
       const allOrders = resOrders.filter((order) => order.sellType === type);
 
-      const filterOrders = allOrders.filter(
-        (order) => order.status != CANCELLED_STATUS,
+      const filterCancelledOrders = allOrders.filter(
+        (order) => order.status !== CANCELLED_STATUS,
       );
 
       // filterOrders.forEach((order) => {
@@ -107,9 +107,8 @@ export class ProcessService {
       //     console.log(order);
       //   }
       // });
-      const finishedSells = filterOrders.filter(
-        (order) =>
-          order.status != CANCELLED_STATUS && order.status === FINISHED_STATUS,
+      const finishedSells = filterCancelledOrders.filter(
+        (order) => order.status === FINISHED_STATUS,
       );
       const totalPayments = finishedSells
         .flatMap((order) => order?.payment)
@@ -125,7 +124,7 @@ export class ProcessService {
       console.log({
         totalSellCount: counterSells,
         totalSellAmount: isNaN(sellTotal) ? 0 : sellTotal,
-    });
+      });
 
       return {
         totalSellCount: counterSells,
@@ -142,6 +141,11 @@ export class ProcessService {
     const session = await this.operatingModel.startSession();
     session.startTransaction();
     try {
+      /* Vamos a dejar esto asi, pero probablemente se tengan que filtrar 
+          como se hace en el total de ventas y sacar la transacciones de las
+          cuentas filtradas por su tipo de venta y no po si tenga pagos o no. 
+          otra option tambien es ir directamenta a las coleciones de pagos.
+          solo tomarlo en cuenta para futuras refactorizaciones.           */
       const resOrders = await this.billsService.findCurrent(id);
       const allOrders = resOrders.filter((order) => order.payment.length > 0);
       const allTransactions = allOrders.flatMap((order) =>
@@ -154,17 +158,17 @@ export class ProcessService {
               transaction.paymentType,
             ),
       );
-      return {
+
+      const response = {
         numberOfTransactions: filterTransactions.length,
-        totalAmount: filterTransactions
-          .reduce(
-            (acc, transaction) => acc + parseFloat(transaction.payQuantity),
-            0,
-          )
-          .toFixed(2)
-          .toString(),
+        totalAmount: filterTransactions.reduce(
+          (acc, transaction) => acc + parseFloat(transaction.payQuantity),
+          0,
+        ),
         transactionArray: filterTransactions,
       };
+
+      return response;
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
