@@ -2,9 +2,6 @@ import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class createPhoneDto {
   @IsString()
-  code: string;
-
-  @IsString()
   user: string;
 
   @IsString()

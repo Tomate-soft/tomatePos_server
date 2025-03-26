@@ -6,11 +6,18 @@ import {
   RappiOrder,
   RappiOrderSchema,
 } from 'src/schemas/ventas/orders/rappiOrder.schema';
+import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
+import {
+  OperatingPeriod,
+  OperatingPeriodSchema,
+} from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: RappiOrder.name, schema: RappiOrderSchema },
+      { name: Branch.name, schema: BranchSchema },
+      { name: OperatingPeriod.name, schema: OperatingPeriodSchema },
     ]),
   ],
   controllers: [RappiOrderController],

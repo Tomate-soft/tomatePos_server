@@ -37,6 +37,7 @@ export class TogoOrderController {
       const newOrder = await this.togoOrderService.create(body);
       return newOrder;
     } catch (error) {
+      console.log('no se creo');
       if (error.code === 11000) {
         throw new ConflictException(`Ya existe esta orden`);
       }
