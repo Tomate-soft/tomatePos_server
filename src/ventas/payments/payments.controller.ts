@@ -149,6 +149,7 @@ export class PaymentsController {
   ) {
     try {
       const payToGo = await this.paymentService.paymentRappiService(data);
+
       if (!payToGo) {
         throw new NotFoundException('No se completo el pago a domicilio');
       }

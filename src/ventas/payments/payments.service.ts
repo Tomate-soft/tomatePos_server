@@ -238,7 +238,7 @@ export class PaymentsService {
         status: FINISHED_STATUS,
         paymentCode: newPayment._id,
       };
-      await this.noteModel.findByIdAndUpdate(id, dataInjectInNote); // cambiamos la nota
+      await this.noteModel.findByIdAndUpdate(id, dataInjectInNote);
       const currentBill = await this.billModel
         .findById(body.accountId)
         .populate({ path: 'notes' })
@@ -284,16 +284,43 @@ export class PaymentsService {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
-      const newPayment = new this.paymentModel(data.body);
+      const lastPaymentCode = await this.paymentModel
+        .findOne({})
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const nextPaymentCode = lastPaymentCode
+        ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
+        : 1;
+
+      const newCode = nextPaymentCode.toString();
+      const formatCode = this.formatCode(newCode);
+
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      const OperatingPeriod =
+        await this.operatingPeriodModel.findById(periodId);
+
+      // aca debemos pasar el body para crear el pago
+      const newPayment = new this.paymentModel({
+        ...data.body,
+        paymentCode: formatCode,
+        operatingPeriod: OperatingPeriod._id,
+      });
       await newPayment.save();
 
-      // la togo order
+      // la togo order es encontrada aca
       const currentBill = await this.toGoOrderModel.findById(
         data.body.accountId,
       );
-
+      // la data que vamos a cambiar de la orden
       const updatedToGoOrder = {
-        payment: [...currentBill.payment, newPayment._id],
+        payment: [newPayment._id],
         status: FINISHED_STATUS,
       };
 
@@ -301,10 +328,8 @@ export class PaymentsService {
         currentBill._id,
         updatedToGoOrder,
       );
-
       const waiter = await this.userModel.findById(data.waiterId);
       const totalTransactions = newPayment.transactions;
-
       // añadiremos las propinas al mesero
       const totalTips =
         waiter.tips.length > 0
@@ -314,7 +339,6 @@ export class PaymentsService {
         toGoOrder: [...waiter.togoorders, toGoOrderUpdated._id],
         tips: totalTips,
       };
-
       await this.userModel.findByIdAndUpdate(data.waiterId, updatedWaiter);
 
       // falta el cashierSession actualizado
@@ -337,7 +361,6 @@ export class PaymentsService {
 
       return { message: 'Funciona perfecto' };
     } catch (error) {
-      console.log(error);
       await session.abortTransaction();
       session.endSession();
     }
@@ -349,7 +372,34 @@ export class PaymentsService {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
-      const newPayment = new this.paymentModel(data.body);
+      const lastPaymentCode = await this.paymentModel
+        .findOne({})
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const nextPaymentCode = lastPaymentCode
+        ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
+        : 1;
+
+      const newCode = nextPaymentCode.toString();
+      const formatCode = this.formatCode(newCode);
+
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      const OperatingPeriod =
+        await this.operatingPeriodModel.findById(periodId);
+
+      // aca debemos pasar el body para crear el pago
+      const newPayment = new this.paymentModel({
+        ...data.body,
+        paymentCode: formatCode,
+        operatingPeriod: OperatingPeriod._id,
+      });
       await newPayment.save();
 
       // la togo order
@@ -358,7 +408,7 @@ export class PaymentsService {
       );
 
       const updatedPhoneOrder = {
-        payment: [...currentBill.payment, newPayment._id],
+        payment: [newPayment._id],
         status: FINISHED_STATUS,
       };
 
@@ -406,13 +456,38 @@ export class PaymentsService {
     }
   }
   async paymentRappiService(data: { waiterId: string; body: any }) {
-    console.log(data);
-
     const session = await this.paymentModel.startSession();
     session.startTransaction();
     try {
+      const lastPaymentCode = await this.paymentModel
+      .findOne({})
+      .sort({ createdAt: -1 })
+      .exec();
+
+      const nextPaymentCode = lastPaymentCode
+      ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
+      : 1;
+
+      const newCode = nextPaymentCode.toString();
+      const formatCode = this.formatCode(newCode);
+
+      const branch = await this.branchModel.findById(branchId);
+      if (!branch) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new NotFoundException('No se encontro la branch');
+      }
+      const periodId = branch.operatingPeriod;
+      const OperatingPeriod =
+        await this.operatingPeriodModel.findById(periodId);
+
+         // aca debemos pasar el body para crear el pago
+      const newPayment = new this.paymentModel({
+        ...data.body,
+        paymentCode: formatCode,
+        operatingPeriod: OperatingPeriod._id,
+      });
       // se crea el pago
-      const newPayment = new this.paymentModel(data.body);
       await newPayment.save();
 
       // encontramos la orden actual - la que enviamos
@@ -527,6 +602,6 @@ export class PaymentsService {
   }
 
   private formatCode(code: string): string {
-    return code.padStart(4, '0');
+    return code.padStart(6, '0');
   }
 }

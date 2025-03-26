@@ -2,7 +2,6 @@ import { SchemaFactory, Prop, Schema } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Payment } from '../payment.schema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
-import { Discount } from '../discounts.schema';
 
 @Schema({ timestamps: true, versionKey: false })
 export class ToGoOrder {

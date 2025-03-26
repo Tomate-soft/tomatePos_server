@@ -2,9 +2,6 @@ import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class createToGoOrderDto {
   @IsString()
-  code: string;
-
-  @IsString()
   user: string;
 
   @IsString()
