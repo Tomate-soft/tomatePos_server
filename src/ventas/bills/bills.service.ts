@@ -19,7 +19,6 @@ import { ToGoOrder } from 'src/schemas/ventas/orders/toGoOrder.schema';
 import { User } from 'src/schemas/users.schema';
 import { calculateBillTotal } from 'src/utils/business/CalculateTotals';
 import { Table } from 'src/schemas/tables/tableSchema';
-import { path } from 'pdfkit';
 
 @Injectable()
 export class BillsService {
@@ -101,12 +100,13 @@ export class BillsService {
         : 1;
       const formatCode = this.formatCode(nextBillCode.toString());
       const period = await this.operatingPeriodService.getCurrent();
-      const { name, lastName } = await this.userModel.findById(createBill.user);
+      const { name, lastName, employeeNumber } = await this.userModel.findById(createBill.user);
       const { tableNum } = await this.tableModel.findById(createBill.table);
       const billToCreate = new this.billsModel({
         ...createBill,
         code: formatCode,
         user: `${name} ${lastName}`,
+        userCode: employeeNumber.toString(),
         userId: createBill.user,
         checkTotal: calculateBillTotal(createBill.products),
         products: createBill.products,

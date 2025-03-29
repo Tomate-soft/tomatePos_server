@@ -18,6 +18,7 @@ import { format, getISOWeek, startOfWeek } from 'date-fns';
 import { mojeReportTemplate } from './reportsTemplates/mojeReport';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { FINISHED_STATUS } from 'src/libs/status.libs';
+import { response } from 'express';
 //import { ProcessService } from 'src/process/process.service';
 
 @Injectable()
@@ -204,7 +205,6 @@ export class ReportsService {
       const finishedBills = BillsArray.filter(
         (bill) => bill.status === FINISHED_STATUS,
       );
-      console.log('1 ');
 
       const finishedBillsRestaurant = finishedBills.filter(
         (bill) =>
@@ -212,7 +212,37 @@ export class ReportsService {
           bill.sellType === 'onSite' ||
           bill.sellType === 'n/A',
       );
+      const restaurantTotal = this.calculateSellTotalForType(
+        finishedBillsRestaurant,
+      );
 
+      const finishedBillsTogo = finishedBills.filter(
+        (bill) =>
+          bill.sellType === 'TOGO_ORDER' ||
+          bill.sellType === 'togo' ||
+          bill.sellType === 'n/A',
+      );
+
+      const finishedBillsPhone = finishedBills.filter(
+        (bill) =>
+          bill.sellType === 'PHONE_ORDER' ||
+          bill.sellType === 'phone' ||
+          bill.sellType === 'n/A',
+      );
+      const finishedBillsRappi = finishedBills.filter(
+        (bill) =>
+          bill.sellType === 'RAPPI_ORDER' ||
+          bill.sellType === 'rappi' ||
+          bill.sellType === 'n/A',
+      );
+
+      const responseData = {
+        restaurantOrders: finishedBillsRestaurant,
+        restaurantTotal: restaurantTotal,
+        togoOrders: finishedBillsTogo,
+        phoneOrders: finishedBillsPhone,
+        rappiOrders: finishedBillsRappi,
+      };
       const exampleBody = {
         products: [
           {
@@ -242,14 +272,12 @@ export class ReportsService {
       /////////////////////////////////////////////////////////////////////////////////////
       // por ejemplo tener un. exe aca que me haga todos los calculos y que siga el servicio despues
 
-      const response = {
-        onSiteOrders: finishedBillsRestaurant,
-      };
-      return finishedBillsRestaurant;
+      return responseData;
     } catch (error) {
       throw new NotFoundException(error);
     }
   }
+
   private async runCalculoExe(inputJson: string): Promise<string> {
     return new Promise((resolve, reject) => {
       try {
@@ -296,4 +324,24 @@ export class ReportsService {
       }
     });
   }
+
+  
+private calculateSellTotalForType(sellArray) {
+  // Flatten payments from the sell array, filtering out any undefined elements
+  const allPayments = sellArray.flatMap((element) => {
+    return element?.payment || [];
+  });
+  
+  // Flatten transactions from the payments, filtering out any undefined elements
+  const allTransactions = allPayments.flatMap((element) => {
+    return element?.transactions || [];
+  });
+  
+  // Sum the payQuantity of all transactions, converting to a float
+  const responseData = allTransactions.reduce((accumulator, transaction) => {
+    return accumulator + parseFloat(transaction.payQuantity || '0');
+  }, 0);
+
+  return responseData;
+}
 }

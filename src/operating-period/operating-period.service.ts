@@ -138,7 +138,7 @@ export class OperatingPeriodService {
           'TOGO_ORDER',
         );
 
-      const totalToGoSellsCount = totalToGoSellsCountResponse.totalSellCount;
+      const totalToGoSellsCount = totalToGoSellsCountResponse?.totalSellCount;
       // todo: Total de ventas del tipo de venta to Go MONTO EN DINERO
       const totalToGoSellsAmount = totalToGoSellsCountResponse.totalSellAmount;
 
@@ -252,9 +252,9 @@ export class OperatingPeriodService {
         //////////////////////////////////////////
         ///// Ventas por tipo de pago ////////////
         //////////////////////////////////////////
+        togoOrdersTotal: totalToGoSellsCount,
         totalCashInAmount: totalCashSellsAmount,
         totalDeliveryAmount: formatToCurrency(totalRappiSellsAmount),
-        toGoOrdersTotal: totalToGoSellsCount,
         phoneOrdersTotal: totalPhoneSellsCount,
         rappiOrdersTotal: totalRappiSellsCount,
         totalDebitAmount: totalDebitSellsAmount,

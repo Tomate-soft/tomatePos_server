@@ -31,6 +31,12 @@ export class Bills {
   @Prop({
     required: true,
     trim: true,
+  })
+  userCode: string;
+
+  @Prop({
+    required: true,
+    trim: true,
     type: MongooseSchema.Types.ObjectId,
     ref: 'User',
   })

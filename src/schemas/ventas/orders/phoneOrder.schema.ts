@@ -19,6 +19,12 @@ export class PhoneOrder {
     required: true,
     trim: true,
   })
+  userCode: string;
+
+  @Prop({
+    required: true,
+    trim: true,
+  })
   userId: string;
 
   @Prop({

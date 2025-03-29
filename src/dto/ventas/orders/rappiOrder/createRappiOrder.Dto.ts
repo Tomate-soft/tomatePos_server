@@ -8,6 +8,9 @@ export class createRappiOrderDto {
   user: string;
 
   @IsString()
+  userCode: string;
+
+  @IsString()
   userId: string;
 
   @IsString()

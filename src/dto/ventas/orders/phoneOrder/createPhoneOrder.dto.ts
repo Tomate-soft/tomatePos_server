@@ -6,6 +6,9 @@ export class createPhoneDto {
 
   @IsString()
   userId: string;
+  
+  @IsString()
+  userCode: string;
 
   @IsString()
   checkTotal: string;

@@ -460,13 +460,13 @@ export class PaymentsService {
     session.startTransaction();
     try {
       const lastPaymentCode = await this.paymentModel
-      .findOne({})
-      .sort({ createdAt: -1 })
-      .exec();
+        .findOne({})
+        .sort({ createdAt: -1 })
+        .exec();
 
       const nextPaymentCode = lastPaymentCode
-      ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
-      : 1;
+        ? this.getNextPaymentCode(parseFloat(lastPaymentCode.paymentCode))
+        : 1;
 
       const newCode = nextPaymentCode.toString();
       const formatCode = this.formatCode(newCode);
@@ -481,7 +481,7 @@ export class PaymentsService {
       const OperatingPeriod =
         await this.operatingPeriodModel.findById(periodId);
 
-         // aca debemos pasar el body para crear el pago
+      // aca debemos pasar el body para crear el pago
       const newPayment = new this.paymentModel({
         ...data.body,
         paymentCode: formatCode,
