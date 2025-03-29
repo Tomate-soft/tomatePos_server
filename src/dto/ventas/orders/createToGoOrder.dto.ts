@@ -5,6 +5,9 @@ export class createToGoOrderDto {
   user: string;
 
   @IsString()
+  userCode: string;
+
+  @IsString()
   userId: string;
 
   @IsString()
