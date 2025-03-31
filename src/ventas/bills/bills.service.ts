@@ -100,7 +100,9 @@ export class BillsService {
         : 1;
       const formatCode = this.formatCode(nextBillCode.toString());
       const period = await this.operatingPeriodService.getCurrent();
-      const { name, lastName, employeeNumber } = await this.userModel.findById(createBill.user);
+      const { name, lastName, employeeNumber } = await this.userModel.findById(
+        createBill.user,
+      );
       const { tableNum } = await this.tableModel.findById(createBill.table);
       const billToCreate = new this.billsModel({
         ...createBill,

@@ -177,7 +177,7 @@ export class DiscountsService {
 
           const updatedBillDiscount = await this.billsModel.findByIdAndUpdate(
             newDiscountBill.accountId,
-            { discount: newDiscountBill._id, status: FOR_PAYMENT_STATUS },
+            { discount: newDiscountBill._id},
           );
           if (payload.body.discountType === COURTESY_APPLY_BILL) {
             const updateTable = await this.tableModel.findByIdAndUpdate(

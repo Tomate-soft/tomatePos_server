@@ -18,7 +18,8 @@ import { format, getISOWeek, startOfWeek } from 'date-fns';
 import { mojeReportTemplate } from './reportsTemplates/mojeReport';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { FINISHED_STATUS } from 'src/libs/status.libs';
-import { response } from 'express';
+import { User } from 'src/schemas/users.schema';
+import { calculateTempo } from './lib/calculateTimes';
 //import { ProcessService } from 'src/process/process.service';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class ReportsService {
     private cashierSessionModel: Model<CashierSession>,
     private billService: BillsService,
     //private processService: ProcessService,
+    @InjectModel(User.name) private usersModel: Model<User>,
   ) {}
 
   private async ensureReportsFolderExists(folderPath: string) {
@@ -325,23 +327,32 @@ export class ReportsService {
     });
   }
 
-  
-private calculateSellTotalForType(sellArray) {
-  // Flatten payments from the sell array, filtering out any undefined elements
-  const allPayments = sellArray.flatMap((element) => {
-    return element?.payment || [];
-  });
-  
-  // Flatten transactions from the payments, filtering out any undefined elements
-  const allTransactions = allPayments.flatMap((element) => {
-    return element?.transactions || [];
-  });
-  
-  // Sum the payQuantity of all transactions, converting to a float
-  const responseData = allTransactions.reduce((accumulator, transaction) => {
-    return accumulator + parseFloat(transaction.payQuantity || '0');
-  }, 0);
+  async printWorkedTimeReport(body) {
+    const currentUser = await this.usersModel.findById(body.id).populate({
+      path: 'dailyRegister',
+    });
 
-  return responseData;
-}
+    const currentRegister = currentUser.dailyRegister;
+    const res = calculateTempo(currentRegister);
+    return res;
+  }
+
+  private calculateSellTotalForType(sellArray) {
+    // Flatten payments from the sell array, filtering out any undefined elements
+    const allPayments = sellArray.flatMap((element) => {
+      return element?.payment || [];
+    });
+
+    // Flatten transactions from the payments, filtering out any undefined elements
+    const allTransactions = allPayments.flatMap((element) => {
+      return element?.transactions || [];
+    });
+
+    // Sum the payQuantity of all transactions, converting to a float
+    const responseData = allTransactions.reduce((accumulator, transaction) => {
+      return accumulator + parseFloat(transaction.payQuantity || '0');
+    }, 0);
+
+    return responseData;
+  }
 }
