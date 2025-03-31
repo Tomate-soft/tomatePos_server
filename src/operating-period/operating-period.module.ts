@@ -80,12 +80,7 @@ import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
     forwardRef(() => BillsModule),
   ],
   controllers: [OperatingPeriodController],
-  providers: [
-    OperatingPeriodService,
-    ProcessService,
-    BillsService,
-    DiscountsService,
-  ],
+  providers: [OperatingPeriodService, ProcessService, BillsService],
   exports: [OperatingPeriodService],
 })
 export class OperatingPeriodModule {}
