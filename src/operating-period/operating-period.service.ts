@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CANCELLED_STATUS, FINISHED_STATUS } from 'src/libs/status.libs';
 import { Branch } from 'src/schemas/business/branchSchema';
-import { templateClosing } from './templateClosing';
 import {
   OperatingPeriod,
   State,
@@ -12,7 +11,7 @@ import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { formatToCurrency } from 'src/libs/formatToCurrency';
 import { Discount } from 'src/schemas/ventas/discounts.schema';
-import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+// import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -23,9 +22,9 @@ export class OperatingPeriodService {
     @Inject(forwardRef(() => ProcessService))
     @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
-    @InjectModel(Discount.name) private discountModel: Model<Discount>,
     private readonly processService: ProcessService,
-    private readonly discountsService: DiscountsService,
+   // @InjectModel(Discount.name) private discountModel: Model<Discount>,
+    // private readonly discountsService: DiscountsService,
   ) {}
 
   async findAll() {
@@ -205,8 +204,8 @@ export class OperatingPeriodService {
         return a + b.diners;
       }, 0);
 
-      const discountTotal = await this.discountsService.findCurrent();
-      console.log(discountTotal);
+      // const discountTotal = await this.discountsService.findCurrent();
+      // console.log(discountTotal);
 
       // todo: total de ordenes ToGo
       // todo: total de ordenes Phone
@@ -269,7 +268,7 @@ export class OperatingPeriodService {
         restaurantOrdersTotal: totalRestaurantSellsCount,
         finishedAccounts: accountsBilled.length,
         totalDiners: totalDiners,
-        numberOfDiscounts: discountTotal.length,
+        // numberOfDiscounts: discountTotal.length,
       };
 
       console.log(resumeData);

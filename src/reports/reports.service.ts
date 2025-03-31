@@ -224,6 +224,7 @@ export class ReportsService {
           bill.sellType === 'togo' ||
           bill.sellType === 'n/A',
       );
+      const togoTotal = this.calculateSellTotalForType(finishedBillsTogo);
 
       const finishedBillsPhone = finishedBills.filter(
         (bill) =>
@@ -242,6 +243,7 @@ export class ReportsService {
         restaurantOrders: finishedBillsRestaurant,
         restaurantTotal: restaurantTotal,
         togoOrders: finishedBillsTogo,
+        togoTotal: togoTotal,
         phoneOrders: finishedBillsPhone,
         rappiOrders: finishedBillsRappi,
       };
