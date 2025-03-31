@@ -54,7 +54,6 @@ export class DiscountsController {
 
   @Get('current')
   async findAllCurrent() {
-    console.log('asllo');
     try {
       const discountsArray = await this.discountService.findCurrent();
       if (!discountsArray) {

@@ -13,7 +13,7 @@ export class ToGoOrder {
     trim: true,
   })
   user: string;
-  
+
   @Prop({
     required: true,
     trim: true,

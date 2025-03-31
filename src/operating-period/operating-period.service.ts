@@ -11,6 +11,8 @@ import {
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { formatToCurrency } from 'src/libs/formatToCurrency';
+import { Discount } from 'src/schemas/ventas/discounts.schema';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -19,9 +21,11 @@ export class OperatingPeriodService {
     private operatingPeriodModel: Model<OperatingPeriod>,
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
     @Inject(forwardRef(() => ProcessService))
-    private readonly processService: ProcessService,
     @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
+    @InjectModel(Discount.name) private discountModel: Model<Discount>,
+    private readonly processService: ProcessService,
+    private readonly discountsService: DiscountsService,
   ) {}
 
   async findAll() {
@@ -140,7 +144,7 @@ export class OperatingPeriodService {
 
       const totalToGoSellsCount = totalToGoSellsCountResponse?.totalSellCount;
       // todo: Total de ventas del tipo de venta to Go MONTO EN DINERO
-      const totalToGoSellsAmount = totalToGoSellsCountResponse.totalSellAmount;
+      const totalToGoSellsAmount = totalToGoSellsCountResponse?.totalSellAmount;
 
       // todo: Total de ventas del tipo de venta Phone CANTIDAD
 
@@ -201,6 +205,9 @@ export class OperatingPeriodService {
         return a + b.diners;
       }, 0);
 
+      const discountTotal = await this.discountsService.findCurrent();
+      console.log(discountTotal);
+
       // todo: total de ordenes ToGo
       // todo: total de ordenes Phone
       // total de cuentas abiertas en el restaurante
@@ -248,21 +255,21 @@ export class OperatingPeriodService {
         totalRestaurantAmount: totalRestaurantSellsAmount, // Ventas por tipo de venta RESTAURANTE
         totalToGoOrdersAmount: totalToGoSellsAmount, // Ventas por tipo de venta PARA LLEVAR
         totalPhoneAmount: totalPhoneSellsAmount,
-        rappiOrdersAmount: totalRappiSellsAmount,
+        totalRappiAmount: totalRappiSellsAmount,
+        togoOrdersTotal: totalToGoSellsCount,
+        totalCashInAmount: totalCashSellsAmount,
+        phoneOrdersTotal: totalPhoneSellsCount,
+        rappiOrdersTotal: totalRappiSellsCount,
         //////////////////////////////////////////
         ///// Ventas por tipo de pago ////////////
         //////////////////////////////////////////
-        togoOrdersTotal: totalToGoSellsCount,
-        totalCashInAmount: totalCashSellsAmount,
-        totalDeliveryAmount: formatToCurrency(totalRappiSellsAmount),
-        phoneOrdersTotal: totalPhoneSellsCount,
-        rappiOrdersTotal: totalRappiSellsCount,
         totalDebitAmount: totalDebitSellsAmount,
         totalCreditAmount: totalCreditSellsAmount,
         totalTransferAmount: totalTransferSellsAmount,
         restaurantOrdersTotal: totalRestaurantSellsCount,
         finishedAccounts: accountsBilled.length,
         totalDiners: totalDiners,
+        numberOfDiscounts: discountTotal.length,
       };
 
       console.log(resumeData);

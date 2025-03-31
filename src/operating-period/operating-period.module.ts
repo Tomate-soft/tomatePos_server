@@ -28,6 +28,8 @@ import { PaymentsModule } from 'src/ventas/payments/payments.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
 import { User, UserSchema } from 'src/schemas/users.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 
 @Module({
   imports: [
@@ -68,13 +70,22 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
         name: Table.name,
         schema: TableSchema,
       },
+      {
+        name: Discount.name,
+        schema: DiscountSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => PaymentsModule),
     forwardRef(() => BillsModule),
   ],
   controllers: [OperatingPeriodController],
-  providers: [OperatingPeriodService, ProcessService, BillsService],
+  providers: [
+    OperatingPeriodService,
+    ProcessService,
+    BillsService,
+    DiscountsService,
+  ],
   exports: [OperatingPeriodService],
 })
 export class OperatingPeriodModule {}
