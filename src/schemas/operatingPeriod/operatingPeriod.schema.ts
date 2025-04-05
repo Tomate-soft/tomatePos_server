@@ -98,6 +98,9 @@ export class OperatingPeriod {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   approvedBy?: User;
+
+  @Prop()
+  createdAt: Date;
 }
 
 export const OperatingPeriodSchema =

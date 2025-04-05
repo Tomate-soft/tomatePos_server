@@ -30,8 +30,8 @@ export class Payment {
   noteAccountId: Notes;
 
   @Prop({
-    /* unique: true, */
     trim: true,
+    default: 'NP',
   })
   paymentCode: string;
 

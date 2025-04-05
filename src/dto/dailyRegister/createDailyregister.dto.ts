@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDefined, IsNumber, IsString } from 'class-validator';
 
 export class CreateDailyRegisterDto {
   @IsNumber()
@@ -6,6 +6,11 @@ export class CreateDailyRegisterDto {
 
   @IsNumber()
   pinPos: number;
+
+  @IsString()
+  @IsDefined()
+  registerInput: string;
+
   /*
   @IsBoolean()
   active: boolean;

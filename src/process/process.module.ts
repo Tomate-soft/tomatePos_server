@@ -40,7 +40,6 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
         name: Branch.name,
         schema: BranchSchema,
       },
-
       {
         name: ToGoOrder.name,
         schema: ToGoOrderSchema,

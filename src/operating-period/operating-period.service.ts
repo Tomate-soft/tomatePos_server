@@ -9,8 +9,6 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
-import { formatToCurrency } from 'src/libs/formatToCurrency';
-import { Discount } from 'src/schemas/ventas/discounts.schema';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -20,7 +18,7 @@ export class OperatingPeriodService {
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
     @Inject(forwardRef(() => ProcessService))
     private readonly processService: ProcessService,
-    @Inject(forwardRef(() => BillsService)) 
+    @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
   ) {}
 
