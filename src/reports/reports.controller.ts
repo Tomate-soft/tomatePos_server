@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 
 @Controller('reports')
@@ -40,10 +33,9 @@ export class ReportsController {
   }
 
   @Get('closed-bills-report')
-  async printClosedBillsReport(@Body() body: any) {
+  async printClosedBillsReport() {
     try {
-      console.log('body', body);
-      const result = await this.reportsService.printClosedBillsReport(body);
+      const result = await this.reportsService.printClosedBillsReport();
       if (!result) {
         throw new NotFoundException('No se ha podido imprimir el reporte');
       }
@@ -53,10 +45,10 @@ export class ReportsController {
     }
   }
 
-  @Post('worked-time-report')
-  async printWorkedTimeReport(@Body() body: any) {
+  @Get('worked-time-report')
+  async printWorkedTimeReport() {
     try {
-      const result = await this.reportsService.printWorkedTimeReport(body);
+      const result = await this.reportsService.printWorkedTimeReport();
       if (!result) {
         throw new NotFoundException('No se ha podido imprimir el reporte');
       }

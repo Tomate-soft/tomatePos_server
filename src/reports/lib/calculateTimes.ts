@@ -22,9 +22,7 @@ export function calculateTempo(obj: Data) {
 
   // Validar que las horas sean suficientes para calcular
   if (!inicio || !fin) {
-    return {
-      error: 'Faltan registros para calcular el tiempo total trabajado.',
-    };
+    return '--';
   }
 
   let tiempoTotal = fin.getTime() - inicio.getTime();

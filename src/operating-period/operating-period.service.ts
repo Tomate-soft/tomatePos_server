@@ -9,9 +9,6 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
-import { formatToCurrency } from 'src/libs/formatToCurrency';
-import { Discount } from 'src/schemas/ventas/discounts.schema';
-// import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -20,11 +17,9 @@ export class OperatingPeriodService {
     private operatingPeriodModel: Model<OperatingPeriod>,
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
     @Inject(forwardRef(() => ProcessService))
+    private readonly processService: ProcessService,
     @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
-    private readonly processService: ProcessService,
-   // @InjectModel(Discount.name) private discountModel: Model<Discount>,
-    // private readonly discountsService: DiscountsService,
   ) {}
 
   async findAll() {
@@ -288,7 +283,9 @@ export class OperatingPeriodService {
       await session.commitTransaction();
       session.endSession();
       return updatedPeriod;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async approvePeriod(id: string = '', body: any) {

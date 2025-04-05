@@ -229,14 +229,18 @@ export class PaymentsService {
         paymentCode: formatCode,
         operatingPeriod: OperatingPeriod._id,
       });
-      await newPayment.save();
+
       if (!newPayment) {
         throw new NotFoundException(`No se pudo crear el pago`);
+      }
+      if (parseFloat(newPayment.paymentTotal) > 0) {
+        await newPayment.save();
       }
 
       const dataInjectInNote = {
         status: FINISHED_STATUS,
-        paymentCode: newPayment._id,
+        paymentCode:
+          parseFloat(newPayment.paymentTotal) > 0 ? newPayment._id : 'NP',
       };
       await this.noteModel.findByIdAndUpdate(id, dataInjectInNote);
       const currentBill = await this.billModel

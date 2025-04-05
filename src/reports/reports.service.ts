@@ -20,6 +20,7 @@ import { BillsService } from 'src/ventas/bills/bills.service';
 import { FINISHED_STATUS } from 'src/libs/status.libs';
 import { User } from 'src/schemas/users.schema';
 import { calculateTempo } from './lib/calculateTimes';
+import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 //import { ProcessService } from 'src/process/process.service';
 
 @Injectable()
@@ -27,9 +28,9 @@ export class ReportsService {
   constructor(
     @InjectModel(CashierSession.name)
     private cashierSessionModel: Model<CashierSession>,
-    private billService: BillsService,
-    //private processService: ProcessService,
     @InjectModel(User.name) private usersModel: Model<User>,
+    private billService: BillsService,
+    private operatingPeriodService: OperatingPeriodService,
   ) {}
 
   private async ensureReportsFolderExists(folderPath: string) {
@@ -197,13 +198,19 @@ export class ReportsService {
     }
   }
 
-  async printClosedBillsReport(body: any) {
+  async printClosedBillsReport() {
     try {
-      // hay que llevar todas las cuentas cerradas
+      const period = await this.operatingPeriodService.getCurrent();
+      const { createdAt } = period[0];
+      const date = new Date(createdAt)
+        .toLocaleString('es-ES', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
+        .replace(/\/$/, '');
+
       const BillsArray = await this.billService.findCurrent();
-      // vamos a separar por cada una de las cuentas
-      // luego ejecutamos el calculo del total por aca tipo
-      // para al final sumarlos todos dado qu ejunto sno se podra por que l afuncion esta preparada solo para restaurante
       const finishedBills = BillsArray.filter(
         (bill) => bill.status === FINISHED_STATUS,
       );
@@ -232,12 +239,15 @@ export class ReportsService {
           bill.sellType === 'phone' ||
           bill.sellType === 'n/A',
       );
+      const phoneTotal = this.calculateSellTotalForType(finishedBillsPhone);
+
       const finishedBillsRappi = finishedBills.filter(
         (bill) =>
           bill.sellType === 'RAPPI_ORDER' ||
           bill.sellType === 'rappi' ||
           bill.sellType === 'n/A',
       );
+      const rappiTotal = this.calculateSellTotalForType(finishedBillsRappi);
 
       const responseData = {
         restaurantOrders: finishedBillsRestaurant,
@@ -245,7 +255,10 @@ export class ReportsService {
         togoOrders: finishedBillsTogo,
         togoTotal: togoTotal,
         phoneOrders: finishedBillsPhone,
+        phoneTotal: phoneTotal,
         rappiOrders: finishedBillsRappi,
+        rappiTotal: rappiTotal,
+        period: date,
       };
       const exampleBody = {
         products: [
@@ -329,14 +342,46 @@ export class ReportsService {
     });
   }
 
-  async printWorkedTimeReport(body) {
-    const currentUser = await this.usersModel.findById(body.id).populate({
+  async printWorkedTimeReport() {
+    const currentUser = await this.usersModel.find().populate({
       path: 'dailyRegister',
     });
 
-    const currentRegister = currentUser.dailyRegister;
-    const res = calculateTempo(currentRegister);
-    return res;
+    let workUsers: any[] = [];
+    const period = await this.getShortPeriodDate();
+
+    currentUser.forEach((user) => {
+      if (user?.dailyRegister?.firstTime) {
+        const { firstTime, secondTime, thirdTime, fourthTime } =
+          user?.dailyRegister;
+        workUsers.push({
+          user: `${user?.employeeNumber} ${user.name} ${user.lastName}`,
+          firstTime: firstTime?.slice(0, 5) || '--',
+          secondTime: secondTime?.slice(0, 5) || '--',
+          thirdTime: thirdTime?.slice(0, 5) || '--',
+          fourthTime: fourthTime?.slice(0, 5) || '--',
+          workedTime: calculateTempo(user?.dailyRegister),
+        });
+      }
+    });
+
+    return {
+      workData: workUsers,
+      period,
+    };
+  }
+
+  private async getShortPeriodDate() {
+    const period = await this.operatingPeriodService.getCurrent();
+    const { createdAt } = period[0];
+    const date = new Date(createdAt)
+      .toLocaleString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+      .replace(/\/$/, '');
+    return date;
   }
 
   private calculateSellTotalForType(sellArray) {
@@ -354,7 +399,6 @@ export class ReportsService {
     const responseData = allTransactions.reduce((accumulator, transaction) => {
       return accumulator + parseFloat(transaction.payQuantity || '0');
     }, 0);
-
     return responseData;
   }
 }
