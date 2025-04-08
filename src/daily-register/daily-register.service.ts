@@ -120,7 +120,10 @@ export class DailyRegisterService {
           if (!updatedRegister) {
             throw new NotFoundException('No se pudo actualizar el registro');
           }
-          return { username: `${actuallyUser.name} ${actuallyUser.lastName}`, registerData: updatedRegister };
+          return {
+            username: `${actuallyUser.name} ${actuallyUser.lastName}`,
+            registerData: updatedRegister,
+          };
         }
         if (actuallyUser.dailyRegister.fourthTime) {
           const res = {
