@@ -27,6 +27,10 @@ import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
 import { CronController } from './cron.controller';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -66,6 +70,10 @@ import { CronController } from './cron.controller';
       {
         name: PhoneOrder.name,
         schema: PhoneOrderSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
     forwardRef(() => ProcessModule),

@@ -6,6 +6,7 @@ import { FREE_STATUS } from 'src/libs/status.libs';
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Branch } from 'src/schemas/business/branchSchema';
 import { OperatingPeriod } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
+import { SourcePeriod } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 import { Table } from 'src/schemas/tables/tableSchema';
 import { User } from 'src/schemas/users.schema';
 import { Bills } from 'src/schemas/ventas/bills.schema';
@@ -22,6 +23,8 @@ export class CronService {
     @InjectModel(User.name)
     private userModel: Model<User>,
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
+    @InjectModel(SourcePeriod.name)
+    private sourcePeriodModel: Model<SourcePeriod>,
     @InjectModel(Notes.name) private notesModel: Model<Notes>,
     @InjectModel(Table.name) private tableModel: Model<Table>,
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
@@ -210,6 +213,35 @@ export class CronService {
       await session.commitTransaction();
       session.endSession();
       return updatedPeriod;
+    } catch (error) {
+      console.log(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
+
+  async createSourcePeriod() {
+    const session = await this.sourcePeriodModel.startSession();
+    session.startTransaction();
+
+    const objetoDeloquesea = {
+      key: 'Simonj si jala',
+    };
+
+    const newSourceData = {
+      periodDate: new Date().toISOString(),
+      accounts: [objetoDeloquesea],
+    };
+    try {
+      const newSourcePeriod = new this.sourcePeriodModel(newSourceData);
+      await newSourcePeriod.save();
+      if (!newSourcePeriod) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error('No se pudo crear el periodo de fuente');
+      }
+      return newSourcePeriod;
     } catch (error) {
       console.log(error);
       await session.abortTransaction();

@@ -31,6 +31,10 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
 import { BillsModule } from 'src/ventas/bills/bills.module';
 import { UsersService } from 'src/users/users.service';
 import { User, UserSchema } from 'src/schemas/users.schema';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 /**
  * Module for handling closures of operations.
@@ -49,6 +53,7 @@ import { User, UserSchema } from 'src/schemas/users.schema';
       { name: RappiOrder.name, schema: RappiOrderSchema },
       { name: PhoneOrder.name, schema: PhoneOrderSchema },
       { name: User.name, schema: UserSchema },
+      { name: SourcePeriod.name, schema: SourcePeriodSchema },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),

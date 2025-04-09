@@ -19,6 +19,10 @@ import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { BillsModule } from 'src/ventas/bills/bills.module';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -42,6 +46,10 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
       {
         name: Branch.name,
         schema: BranchSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
     forwardRef(() => ProcessModule),

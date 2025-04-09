@@ -30,6 +30,10 @@ import {
 } from 'src/schemas/ventas/orders/phoneOrder.schema';
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -73,6 +77,10 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
       {
         name: OperatingPeriod.name,
         schema: OperatingPeriodSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
   ],
