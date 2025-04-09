@@ -46,29 +46,21 @@ export class CronService {
       throw new Error('No se encontro la branch');
     }
 
-    const { initOperatingPeriod, closeOperatingPeriod } = branch;
+    const { initOperatingPeriod } = branch;
 
     const [openingHour, openingMinute] = initOperatingPeriod
       .split(':')
       .map((num) => parseInt(num, 10));
-    const [closingHour, closingMinute] = closeOperatingPeriod
-      .split(':')
-      .map((num) => parseInt(num, 10));
+   
 
     // Validación de horas y minutos
     if (
       isNaN(openingHour) ||
       isNaN(openingMinute) ||
-      isNaN(closingHour) ||
-      isNaN(closingMinute) ||
       openingHour < 0 ||
       openingHour > 23 ||
       openingMinute < 0 ||
-      openingMinute > 59 ||
-      closingHour < 0 ||
-      closingHour > 23 ||
-      closingMinute < 0 ||
-      closingMinute > 59
+      openingMinute > 59 
     ) {
       console.log('Formato de hora/minuto inválido en la sucursal');
       return;
