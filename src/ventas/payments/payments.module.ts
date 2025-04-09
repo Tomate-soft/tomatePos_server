@@ -33,6 +33,10 @@ import {
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { ProcessModule } from 'src/process/process.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -80,6 +84,10 @@ import { OperatingPeriodModule } from 'src/operating-period/operating-period.mod
       {
         name: OperatingPeriod.name,
         schema: OperatingPeriodSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
     forwardRef(() => ProcessModule), // Importa ProcessModule con forwardRef si es necesario

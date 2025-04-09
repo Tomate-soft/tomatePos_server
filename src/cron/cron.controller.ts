@@ -28,4 +28,16 @@ export class CronController {
       );
     }
   }
+
+  @Post('create-source-period')
+  async createSourcePeriod() {
+    try {
+      const res = await this.readonlycronService.createSourcePeriod();
+      return res;
+    } catch (error) {
+      throw new NotFoundException(
+        `Ha ocurrido algo inesperado. Mas informacion: ${error}`,
+      );
+    }
+  }
 }

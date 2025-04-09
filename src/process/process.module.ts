@@ -27,6 +27,10 @@ import { BillsModule } from 'src/ventas/bills/bills.module';
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { User, UserSchema } from 'src/schemas/users.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -63,6 +67,10 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
       {
         name: Table.name,
         schema: TableSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
     forwardRef(() => BillsModule),

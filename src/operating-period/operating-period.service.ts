@@ -9,10 +9,13 @@ import {
 } from 'src/schemas/operatingPeriod/operatingPeriod.schema';
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
+import { SourcePeriod } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Injectable()
 export class OperatingPeriodService {
   constructor(
+    @InjectModel(SourcePeriod.name)
+    private sourcePeriodModel: Model<SourcePeriod>,
     @InjectModel(OperatingPeriod.name)
     private operatingPeriodModel: Model<OperatingPeriod>,
     @InjectModel(Branch.name) private branchModel: Model<Branch>,
@@ -240,6 +243,11 @@ export class OperatingPeriodService {
       // total de dinero a depositar
       // total de dinero a retirar
 
+      const bills = await this.billsService.findCurrent();
+      console.log(bills);
+
+      await this.createSourcePeriod(bills);
+
       const resumeData = {
         state: State.CLOSED,
         totalSellsAmount: totalSells, // Resumen de ventas
@@ -265,8 +273,6 @@ export class OperatingPeriodService {
         totalDiners: totalDiners,
         // numberOfDiscounts: discountTotal.length,
       };
-
-      console.log(resumeData);
 
       const updatedPeriod = await this.operatingPeriodModel.findByIdAndUpdate(
         periodId,
@@ -352,6 +358,33 @@ export class OperatingPeriodService {
       session.endSession();
       return updatedPeriod;
     } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
+
+  async createSourcePeriod(data: any) {
+    const session = await this.sourcePeriodModel.startSession();
+    session.startTransaction();
+
+    const newSourceData = {
+      periodDate: new Date().toISOString(),
+      accounts: data,
+    };
+    try {
+      const newSourcePeriod = new this.sourcePeriodModel(newSourceData);
+      await newSourcePeriod.save();
+      console.log('Se creo esta mierda!!!!!!!!!!!!!');
+      console.log(newSourcePeriod);
+      if (!newSourcePeriod) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error('No se pudo crear el periodo de fuente');
+      }
+      return newSourcePeriod;
+    } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       session.endSession();
       throw error;

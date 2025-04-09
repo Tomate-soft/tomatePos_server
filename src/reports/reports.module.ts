@@ -30,6 +30,10 @@ import {
 import { OperatingPeriodService } from 'src/operating-period/operating-period.service';
 import { Branch, BranchSchema } from 'src/schemas/business/branchSchema';
 import { ProcessService } from 'src/process/process.service';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -44,6 +48,7 @@ import { ProcessService } from 'src/process/process.service';
       { name: Table.name, schema: TableSchema },
       { name: OperatingPeriod.name, schema: OperatingPeriodSchema },
       { name: Branch.name, schema: BranchSchema },
+      { name: SourcePeriod.name, schema: SourcePeriodSchema },
     ]),
   ],
   controllers: [ReportsController],

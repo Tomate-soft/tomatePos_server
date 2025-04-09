@@ -32,6 +32,10 @@ import {
 import { OperatingPeriodModule } from 'src/operating-period/operating-period.module';
 import { ProcessModule } from 'src/process/process.module';
 import { User, UserSchema } from 'src/schemas/users.schema';
+import {
+  SourcePeriod,
+  SourcePeriodSchema,
+} from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 
 @Module({
   imports: [
@@ -75,6 +79,10 @@ import { User, UserSchema } from 'src/schemas/users.schema';
       {
         name: User.name,
         schema: UserSchema,
+      },
+      {
+        name: SourcePeriod.name,
+        schema: SourcePeriodSchema,
       },
     ]),
     forwardRef(() => ProcessModule),
