@@ -390,4 +390,17 @@ export class OperatingPeriodService {
       throw error;
     }
   }
+
+  async getSourcePeriodBranch(branchId: string){
+    // const session = await this.sourcePeriodModel.startSession();
+    try {
+      const currentSourcePeriod = await this.sourcePeriodModel.findById(branchId);
+      if(!currentSourcePeriod){
+        throw new Error("Periodo no encontrado")
+      }
+      return currentSourcePeriod;
+    } catch (error) {
+      throw new Error("Periodo no encontrado")      
+    }
+  }
 }
