@@ -7,6 +7,9 @@ export class SourcePeriod extends Document {
   periodDate: string;
 
   @Prop()
+  branchId: string;
+
+  @Prop()
   accounts: Mixed[];
 }
 
