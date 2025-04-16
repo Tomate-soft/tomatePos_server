@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   Put,
 } from '@nestjs/common';
 import { OperatingPeriodService } from './operating-period.service';
@@ -127,20 +128,35 @@ export class OperatingPeriodController {
     }
   }
 
-  @Get("source/:id")
-  async getSourcePeriod(@Param("id") id: string){
+  @Post('search-source-period')
+  async searchSourcePeriod(@Body() body: any) {
     try {
-      const response = await this.operatingPeriodService.getSourcePeriodBranch(id);
-      if(!response){
-        throw new Error("ha ocurrido un error inesperado")
+      const res =
+        await this.operatingPeriodService.SearchSourcePeriodByBranchIdAndDate(
+          body,
+        );
+      if (!res) {
+        throw new NotFoundException('No se ha podido buscar el periodo');
       }
-      return response;
-
-
+      return res;
     } catch (error) {
-      throw new Error("ha ocurrido un error inesperado")
-      
+      throw new NotFoundException(
+        `Ha ocurrido algo inesperado. Mas informacion: ${error}`,
+      );
     }
   }
 
+  @Get('source/:id')
+  async getSourcePeriod(@Param('id') id: string) {
+    try {
+      const response =
+        await this.operatingPeriodService.getSourcePeriodBranch(id);
+      if (!response) {
+        throw new Error('ha ocurrido un error inesperado');
+      }
+      return response;
+    } catch (error) {
+      throw new Error('ha ocurrido un error inesperado');
+    }
+  }
 }

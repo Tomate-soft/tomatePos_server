@@ -51,7 +51,6 @@ export class CronService {
     const [openingHour, openingMinute] = initOperatingPeriod
       .split(':')
       .map((num) => parseInt(num, 10));
-   
 
     // Validación de horas y minutos
     if (
@@ -60,7 +59,7 @@ export class CronService {
       openingHour < 0 ||
       openingHour > 23 ||
       openingMinute < 0 ||
-      openingMinute > 59 
+      openingMinute > 59
     ) {
       console.log('Formato de hora/minuto inválido en la sucursal');
       return;

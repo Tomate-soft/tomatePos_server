@@ -10,6 +10,7 @@ import {
 import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { SourcePeriod } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { branchId } from 'src/variablesProvisionales';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -246,7 +247,7 @@ export class OperatingPeriodService {
       const bills = await this.billsService.findCurrent();
       console.log(bills);
 
-      await this.createSourcePeriod(bills);
+      await this.createSourcePeriod(bills, branchId);
 
       const resumeData = {
         state: State.CLOSED,
@@ -363,12 +364,14 @@ export class OperatingPeriodService {
       throw error;
     }
   }
+  // new pull request
 
-  async createSourcePeriod(data: any) {
+  async createSourcePeriod(data: any, branchId: string) {
     const session = await this.sourcePeriodModel.startSession();
     session.startTransaction();
 
     const newSourceData = {
+      branchId,
       periodDate: new Date().toISOString(),
       accounts: data,
     };
@@ -391,16 +394,31 @@ export class OperatingPeriodService {
     }
   }
 
-  async getSourcePeriodBranch(branchId: string){
-    // const session = await this.sourcePeriodModel.startSession();
+  async SearchSourcePeriodByBranchIdAndDate(body: any) {
+    const session = await this.sourcePeriodModel.startSession();
+    session.startTransaction();
+
     try {
-      const currentSourcePeriod = await this.sourcePeriodModel.findById(branchId);
-      if(!currentSourcePeriod){
-        throw new Error("Periodo no encontrado")
+      const sourcePeriod = await this.sourcePeriodModel.findOne({
+        branchId: body.branchId,
+        // createdAt: body.periodDate,
+      });
+      console.log(sourcePeriod);
+      console.log(sourcePeriod.branchId);
+      console.log(body.branchId);
+      console.log(body.branchId === sourcePeriod.branchId);
+
+      if (!sourcePeriod) {
+        await session.abortTransaction();
+        session.endSession();
+        throw new Error('No se pudo buscar el periodo de fuente');
       }
-      return currentSourcePeriod;
+      return sourcePeriod;
     } catch (error) {
-      throw new Error("Periodo no encontrado")      
+      console.log(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
     }
   }
 }
