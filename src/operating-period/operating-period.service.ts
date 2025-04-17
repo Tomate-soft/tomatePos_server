@@ -110,9 +110,11 @@ export class OperatingPeriodService {
     session.startTransaction();
     try {
       let periodId = id;
+      let currentDate = new Date();
       if (!id) {
         const currentPeriod = await this.getCurrent();
         periodId = currentPeriod[0]._id.toString();
+        currentDate = new Date(currentPeriod[0].createdAt);
       }
       // aca traemos el total de ventas
       const totalSellsResponse =
@@ -245,9 +247,8 @@ export class OperatingPeriodService {
       // total de dinero a retirar
 
       const bills = await this.billsService.findCurrent();
-      console.log(bills);
-
-      await this.createSourcePeriod(bills, branchId);
+      const periodDate = currentDate.toISOString();
+      await this.createSourcePeriod(bills, branchId, periodDate);
 
       const resumeData = {
         state: State.CLOSED,
@@ -364,22 +365,22 @@ export class OperatingPeriodService {
       throw error;
     }
   }
+
   // new pull request
 
-  async createSourcePeriod(data: any, branchId: string) {
+  async createSourcePeriod(data: any, branchId: string, date: string) {
     const session = await this.sourcePeriodModel.startSession();
     session.startTransaction();
 
     const newSourceData = {
       branchId,
-      periodDate: new Date().toISOString(),
+      periodDate: date,
       accounts: data,
     };
+
     try {
       const newSourcePeriod = new this.sourcePeriodModel(newSourceData);
       await newSourcePeriod.save();
-      console.log('Se creo esta mierda!!!!!!!!!!!!!');
-      console.log(newSourcePeriod);
       if (!newSourcePeriod) {
         await session.abortTransaction();
         session.endSession();
@@ -397,18 +398,45 @@ export class OperatingPeriodService {
   async SearchSourcePeriodByBranchIdAndDate(body: any) {
     const session = await this.sourcePeriodModel.startSession();
     session.startTransaction();
+    console.log(body);
 
     try {
-      const sourcePeriod = await this.sourcePeriodModel.findOne({
+      //  asi seria con una fecha en especifico
+      // const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+      // const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+
+      // aca por tiempo un minuto antes y 24 horas despues de crearse
+      // const date = new Date(body.periodDate);
+      // const startDate = new Date(date.getTime() - 60000); // 1 minuto antes
+      // const endDate = new Date(date.getTime() + 86400000); // 24 horas después
+
+      const date = new Date(body.periodDate);
+      const startDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        0,
+        0,
+        0,
+        0,
+      ).toISOString();
+      const endDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        23,
+        59,
+        59,
+        999,
+      ).toISOString();
+
+      const sourcePeriod = await this.sourcePeriodModel.find({
         branchId: body.branchId,
-        // createdAt: body.periodDate,
+        periodDate: { $gte: startDate, $lte: endDate },
       });
       console.log(sourcePeriod);
-      console.log(sourcePeriod.branchId);
-      console.log(body.branchId);
-      console.log(body.branchId === sourcePeriod.branchId);
 
-      if (!sourcePeriod) {
+      if (!sourcePeriod || sourcePeriod.length === 0) {
         await session.abortTransaction();
         session.endSession();
         throw new Error('No se pudo buscar el periodo de fuente');
