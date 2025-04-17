@@ -212,17 +212,14 @@ export class CronService {
     }
   }
 
-  async createSourcePeriod() {
+  async createSourcePeriod(data: any, branchId: string, date: string) {
     const session = await this.sourcePeriodModel.startSession();
     session.startTransaction();
 
-    const objetoDeloquesea = {
-      key: 'Simonj si jala',
-    };
-
     const newSourceData = {
-      periodDate: new Date().toISOString(),
-      accounts: [objetoDeloquesea],
+      branchId,
+      periodDate: date,
+      accounts: data,
     };
     try {
       const newSourcePeriod = new this.sourcePeriodModel(newSourceData);

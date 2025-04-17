@@ -432,9 +432,6 @@ export class BillsService {
           })
           .populate({
             path: 'payment',
-            populate: {
-              path: 'transactions',
-            },
           })
           .populate({
             path: 'notes',
@@ -454,9 +451,6 @@ export class BillsService {
           })
           .populate({
             path: 'payment',
-            populate: {
-              path: 'transactions',
-            },
           });
         return toGoOrders;
       }
@@ -467,9 +461,6 @@ export class BillsService {
           })
           .populate({
             path: 'payment',
-            populate: {
-              path: 'transactions',
-            },
           });
         return phoneOrders;
       }
@@ -480,9 +471,6 @@ export class BillsService {
           })
           .populate({
             path: 'payment',
-            populate: {
-              path: 'transactions',
-            },
           });
         return rappiOrders;
       }
