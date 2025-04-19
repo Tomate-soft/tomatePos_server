@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Products } from '../../schemas/catalogo/products.schema';
 import { Model } from 'mongoose';
@@ -46,10 +50,19 @@ export class ProductsService {
     return await this.productsModel.findByIdAndDelete(id);
   }
   async update(id: string, updatedProduct: UpdateProductDto) {
-    console.log(updatedProduct);
-    return await this.productsModel.findByIdAndUpdate(id, updatedProduct, {
-      new: true,
-    });
+    try {
+      const currentProduct = await this.productsModel.findByIdAndUpdate(
+        id,
+        updatedProduct,
+        {
+          new: true,
+        },
+      );
+      return currentProduct;
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException('No se encontro el producto');
+    }
   }
   async replace(): Promise<DeleteResult> {
     return await this.productsModel.deleteMany({}).exec();
@@ -78,7 +91,5 @@ export class ProductsService {
       console.log('2');
       return `${subcategory.code}0001`; // Si no hay productos, comienza con 0001
     }
-
-    throw new NotAcceptableException('No se encontró el subcategory');
   }
 }

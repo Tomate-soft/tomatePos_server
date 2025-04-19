@@ -64,6 +64,7 @@ export class CashierSessionService {
         { new: true }, // Devuelve el documento actualizado
       );
     }
+    let cashierName = '';
 
     if (newSession._id) {
       try {
@@ -72,14 +73,21 @@ export class CashierSessionService {
           { cashierSession: newSession._id },
           { new: true },
         );
+        cashierName = ` ${updatedUser.employeeNumber} ${updatedUser.name} ${updatedUser.lastName}`;
       } catch (error) {
         throw new NotFoundException(
           'No se completo la actualizacion de usuario',
         );
       }
-    }
+    } //
+    const periodDate = new Date(updatedOperatingPeriod.createdAt).toISOString();
+
     // Se retorna la nueva sesión creada
-    return newSession;
+    return {
+      ...newSession.toObject(),
+      periodDate,
+      cashierName,
+    };
   }
 
   async update(id: string, body: updateCashierSessionDto) {

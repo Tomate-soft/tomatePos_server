@@ -80,8 +80,12 @@ export class CashierSessionController {
 
   @Post()
   async create(@Body() body: createCashierSessionDto) {
+    console.log('entra a crear la session');
+    console.log(body);
     try {
       const newSession = await this.cashierSessionService.create(body);
+      console.log('depoues de crear la session');
+      console.log(newSession);
       return newSession;
     } catch (error) {
       if (error.code === 11000) {
