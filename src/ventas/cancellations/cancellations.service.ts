@@ -89,11 +89,11 @@ export class CancellationsService {
           createdCancellation.noteId,
           { status: CANCELLED_STATUS },
         );
-        const updateTable = await this.tableModel.findByIdAndUpdate(
-          currentBill.table,
-          { status: FREE_STATUS, bill: [] },
-          { new: true },
-        );
+        // const updateTable = await this.tableModel.findByIdAndUpdate(
+        //   currentBill.table,
+        //   { status: FREE_STATUS, bill: [] },
+        //   { new: true },
+        // );
 
         const currentBill = await this.billsModel
           .findById(createdCancellation.accountId)
