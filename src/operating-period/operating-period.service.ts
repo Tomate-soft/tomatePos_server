@@ -275,6 +275,7 @@ export class OperatingPeriodService {
         totalDiners: totalDiners,
         // numberOfDiscounts: discountTotal.length,
       };
+      console.log(resumeData);
 
       const updatedPeriod = await this.operatingPeriodModel.findByIdAndUpdate(
         periodId,
@@ -301,14 +302,14 @@ export class OperatingPeriodService {
     session.startTransaction();
     try {
       // Actualizar solo el estado dentro de operationalClousure
+      const period = await this.operatingPeriodModel.findById(id);
       const updatedPeriod = await this.operatingPeriodModel
         .findByIdAndUpdate(
           id,
           {
-            $set: {
-              'operationalClousure.state': State.APPROVED,
-              approvedBy: body.userId,
-            },
+            ...period.toObject(),
+            status: State.APPROVED,
+            approvedBy: body.userId,
           },
           { new: true },
         )
