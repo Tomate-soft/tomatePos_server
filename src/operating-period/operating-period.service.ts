@@ -246,7 +246,7 @@ export class OperatingPeriodService {
       // total de dinero a depositar
       // total de dinero a retirar
 
-      const bills = await this.billsService.findCurrent();
+      const bills = await this.billsService.findCurrent(periodId);
       const periodDate = currentDate.toISOString();
       await this.createSourcePeriod(bills, branchId, periodDate);
 
@@ -376,7 +376,7 @@ export class OperatingPeriodService {
     const newSourceData = {
       branchId,
       periodDate: date,
-      accounts: data,
+      accounts: data.map((bill) => bill?.toObject()),
     };
 
     try {
