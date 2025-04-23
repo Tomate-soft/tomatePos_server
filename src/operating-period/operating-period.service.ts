@@ -246,10 +246,6 @@ export class OperatingPeriodService {
       // total de dinero a depositar
       // total de dinero a retirar
 
-      const bills = await this.billsService.findCurrent(periodId);
-      const periodDate = currentDate.toISOString();
-      await this.createSourcePeriod(bills, branchId, periodDate);
-
       const resumeData = {
         state: State.CLOSED,
         totalSellsAmount: totalSells, // Resumen de ventas
@@ -276,6 +272,10 @@ export class OperatingPeriodService {
         // numberOfDiscounts: discountTotal.length,
       };
       console.log(resumeData);
+
+      const bills = await this.billsService.findCurrent(periodId);
+      const periodDate = currentDate.toISOString();
+      await this.createSourcePeriod(bills, branchId, periodDate, resumeData);
 
       const updatedPeriod = await this.operatingPeriodModel.findByIdAndUpdate(
         periodId,
@@ -369,7 +369,12 @@ export class OperatingPeriodService {
 
   // new pull request
 
-  async createSourcePeriod(data: any, branchId: string, date: string) {
+  async createSourcePeriod(
+    data: any,
+    branchId: string,
+    date: string,
+    clousureData: any,
+  ) {
     const session = await this.sourcePeriodModel.startSession();
     session.startTransaction();
 
@@ -377,6 +382,7 @@ export class OperatingPeriodService {
       branchId,
       periodDate: date,
       accounts: data.map((bill) => bill?.toObject()),
+      operationalClousure: clousureData,
     };
 
     try {
