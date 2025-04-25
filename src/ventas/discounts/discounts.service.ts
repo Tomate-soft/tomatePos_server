@@ -62,6 +62,33 @@ export class DiscountsService {
       });
   }
 
+  // async findAllCurrent(id?: string) {
+  //   const session = await this.operatingPeriod.startSession();
+  //   session.startTransaction();
+
+  //   try {
+  //     const currentPeriod = id
+  //       ? await this.operatingPeriodService.getCurrent(id)
+  //       : await this.operatingPeriodService.getCurrent();
+
+  //     return await this.discountModel
+  //       .find({ _id: currentPeriod[0]._id })
+  //       .populate({
+  //         path: 'accountId',
+  //       })
+  //       .populate({
+  //         path: 'discountByUser',
+  //       })
+  //       .populate({
+  //         path: 'noteAccountId',
+  //       });
+  //   } catch (error) {
+  //     await session.abortTransaction();
+  //     await session.endSession();
+  //     throw new NotFoundException('No se encontraron descuentos');
+  //   }
+  // }
+
   async findOne(id: string) {
     return await this.discountModel
       .findById(id)
@@ -422,11 +449,12 @@ export class DiscountsService {
   }
 
   async findCurrent() {
+    console.log('Aqui si llegue');
     const session = await this.discountModel.startSession();
     session.startTransaction();
     try {
       const currentPeriod = await this.operatingPeriodService.getCurrent();
-      const currentPeriodId = currentPeriod[0]._id.toString();
+      const currentPeriodId = currentPeriod[0]._id;
 
       const currentDiscounts = await this.discountModel.find({
         operatingPeriod: currentPeriodId,
@@ -439,6 +467,7 @@ export class DiscountsService {
       session.endSession();
       return currentDiscounts;
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       session.endSession();
       throw error;

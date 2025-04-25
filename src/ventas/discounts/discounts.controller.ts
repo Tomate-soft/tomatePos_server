@@ -30,6 +30,20 @@ export class DiscountsController {
       new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+  @Get('current')
+  async findAllCurrent() {
+    console.log('controller !!!');
+    try {
+      const discountsArray = await this.discountService.findCurrent();
+      if (!discountsArray) {
+        throw new NotFoundException('No se encontro ningun decsuento');
+      }
+      return discountsArray;
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 
   @Get(':id')
   /**
@@ -47,19 +61,6 @@ export class DiscountsController {
         throw new NotFoundException('No se encontro el descuento');
       }
       return selectedDiscount;
-    } catch (error) {
-      throw new NotFoundException('Ha ocurrido algo inesperado');
-    }
-  }
-
-  @Get('current')
-  async findAllCurrent() {
-    try {
-      const discountsArray = await this.discountService.findCurrent();
-      if (!discountsArray) {
-        throw new NotFoundException('No se encontro ningun decsuento');
-      }
-      return discountsArray;
     } catch (error) {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }

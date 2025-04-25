@@ -36,6 +36,8 @@ import {
   SourcePeriod,
   SourcePeriodSchema,
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
+import { DiscountsService } from '../discounts/discounts.service';
 
 @Module({
   imports: [
@@ -84,6 +86,10 @@ import {
         name: SourcePeriod.name,
         schema: SourcePeriodSchema,
       },
+      {
+        name: Discount.name,
+        schema: DiscountSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
@@ -94,6 +100,7 @@ import {
     BillsService,
     OperatingPeriodService,
     TogoOrderService,
+    DiscountsService,
   ],
 })
 export class NotesModule {}

@@ -11,6 +11,7 @@ import { ProcessService } from 'src/process/process.service';
 import { BillsService } from 'src/ventas/bills/bills.service';
 import { SourcePeriod } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 import { branchId } from 'src/variablesProvisionales';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -24,6 +25,8 @@ export class OperatingPeriodService {
     private readonly processService: ProcessService,
     @Inject(forwardRef(() => BillsService))
     private readonly billsService: BillsService,
+    @Inject(forwardRef(() => DiscountsService))
+    private readonly discountsService: DiscountsService,
   ) {}
 
   async findAll() {
@@ -205,7 +208,7 @@ export class OperatingPeriodService {
         return a + b.diners;
       }, 0);
 
-      // const discountTotal = await this.discountsService.findCurrent();
+      const discountTotal = await this.discountsService.findCurrent();
       // console.log(discountTotal);
 
       // todo: total de ordenes ToGo
@@ -269,7 +272,8 @@ export class OperatingPeriodService {
         restaurantOrdersTotal: totalRestaurantSellsCount,
         finishedAccounts: accountsBilled.length,
         totalDiners: totalDiners,
-        // numberOfDiscounts: discountTotal.length,
+        numberOfDiscounts: discountTotal.length,
+        discountsData: discountTotal.map((item) => item.toObject()),
       };
       console.log(resumeData);
 
