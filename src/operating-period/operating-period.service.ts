@@ -208,7 +208,14 @@ export class OperatingPeriodService {
         return a + b.diners;
       }, 0);
 
-      const discountTotal = await this.discountsService.findCurrent();
+      const discountArray =  await this.discountsService.findCurrent();
+      // const cancellationsArray = await this.cancellationsService.findCurrent(); //  Aca hay que armar todo para traer tambien las cancellaciones. el find current
+      //                                                                           // ya esta implementado y funciona bien.
+
+      const discountTotal = discountArray.filter((discount) => !discount.discountType.startsWith("COURTESY"));
+      const courtesyTotal = discountArray.filter((discount) => discount.discountType.startsWith("COURTESY"));
+      
+
       // console.log(discountTotal);
 
       // todo: total de ordenes ToGo
@@ -274,6 +281,8 @@ export class OperatingPeriodService {
         totalDiners: totalDiners,
         numberOfDiscounts: discountTotal.length,
         discountsData: discountTotal.map((item) => item.toObject()),
+        numberOfCourtesy: courtesyTotal.length,
+        courtesyData: courtesyTotal.map((item) => item.toObject()),
       };
       console.log(resumeData);
 

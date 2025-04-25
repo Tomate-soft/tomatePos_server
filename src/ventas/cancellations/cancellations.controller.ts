@@ -30,6 +30,20 @@ export class CancellationsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+  @Get('current')
+  async findAllCurrent() {
+    console.log('controller !!!');
+    try {
+      const cancellationArray = await this.cancellationService.findCurrent();
+      if (!cancellationArray) {
+        throw new NotFoundException('No se encontro ningun decsuento');
+      }
+      return cancellationArray;
+    } catch (error) {
+      console.log(error);
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -71,6 +85,7 @@ export class CancellationsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
+ 
 
   @Delete(':id')
   @HttpCode(204)
