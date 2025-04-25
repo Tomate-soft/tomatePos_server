@@ -23,6 +23,11 @@ import {
   SourcePeriod,
   SourcePeriodSchema,
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
+import { Bills, BillSchema } from 'src/schemas/ventas/bills.schema';
+import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 @Module({
   imports: [
@@ -51,12 +56,28 @@ import {
         name: SourcePeriod.name,
         schema: SourcePeriodSchema,
       },
+      {
+        name: Discount.name,
+        schema: DiscountSchema,
+      },
+      {
+        name: Bills.name,
+        schema: BillSchema,
+      },
+      {
+        name: Notes.name,
+        schema: NoteSchema,
+      },
+      {
+        name: Table.name,
+        schema: TableSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
     forwardRef(() => BillsModule),
   ],
   controllers: [CashierSessionController],
-  providers: [CashierSessionService, OperatingPeriodService],
+  providers: [CashierSessionService, OperatingPeriodService, DiscountsService],
 })
 export class CashierSessionModule {}

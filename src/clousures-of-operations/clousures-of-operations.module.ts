@@ -35,6 +35,10 @@ import {
   SourcePeriod,
   SourcePeriodSchema,
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
+import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
+import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
 
 /**
  * Module for handling closures of operations.
@@ -54,6 +58,9 @@ import {
       { name: PhoneOrder.name, schema: PhoneOrderSchema },
       { name: User.name, schema: UserSchema },
       { name: SourcePeriod.name, schema: SourcePeriodSchema },
+      { name: Discount.name, schema: DiscountSchema },
+      { name: Notes.name, schema: NoteSchema },
+      { name: Table.name, schema: TableSchema },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
@@ -65,6 +72,7 @@ import {
     ReportsService,
     OperatingPeriodService,
     UsersService,
+    DiscountsService,
   ],
 })
 export class ClousuresOfOperationsModule {}

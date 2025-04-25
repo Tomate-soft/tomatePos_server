@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
@@ -244,5 +244,30 @@ export class CancellationsService {
       updatedCancellation,
       { new: true },
     );
+  }
+
+  async findCurrent() {
+    const session = await this.cancellationModel.startSession();
+    session.startTransaction();
+    try {
+      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriodId = currentPeriod[0]._id;
+
+      const currentCancellations = await this.cancellationModel.find({
+        operatingPeriod: currentPeriodId,
+      });
+
+      if (!currentCancellations) {
+        throw new NotFoundException('No se encontraron cancelaciones');
+      }
+      await session.commitTransaction();
+      session.endSession();
+      return currentCancellations;
+    } catch (error) {
+      console.log(error);
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }

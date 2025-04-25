@@ -34,6 +34,8 @@ import {
   SourcePeriod,
   SourcePeriodSchema,
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
+import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import {
       { name: OperatingPeriod.name, schema: OperatingPeriodSchema },
       { name: Branch.name, schema: BranchSchema },
       { name: SourcePeriod.name, schema: SourcePeriodSchema },
+      { name: Discount.name, schema: DiscountSchema },
     ]),
   ],
   controllers: [ReportsController],
@@ -57,6 +60,7 @@ import {
     BillsService,
     OperatingPeriodService,
     ProcessService,
+    DiscountsService,
   ],
 })
 export class ReportsModule {}
