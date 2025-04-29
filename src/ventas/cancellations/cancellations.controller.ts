@@ -85,7 +85,6 @@ export class CancellationsController {
       throw new NotFoundException('Ha ocurrido algo inesperado');
     }
   }
- 
 
   @Delete(':id')
   @HttpCode(204)

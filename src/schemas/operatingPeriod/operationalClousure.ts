@@ -15,10 +15,6 @@ export class OperationalClousure {
   @Prop({ type: Number })
   totalSellsAmount: number;
 
-  //////////////////////////////////////////
-  //// Ventas por tipo de venta   //////////
-  //////////////////////////////////////////
-
   @Prop({ type: Number })
   totalRestaurantAmount: number;
 
@@ -31,12 +27,17 @@ export class OperationalClousure {
   @Prop({ type: Number })
   totalRappiAmount: number;
 
-  //////////////////////////////////////////
-  ///// Ventas por tipo de pago ////////////
-  //////////////////////////////////////////
+  @Prop({ type: Number })
+  togoOrdersTotal: number;
 
   @Prop({ type: Number })
   totalCashInAmount: number;
+
+  @Prop({ type: Number })
+  phoneOrdersTotal: number;
+
+  @Prop({ type: Number })
+  rappiOrdersTotal: number;
 
   @Prop({ type: Number })
   totalDebitAmount: number;
@@ -48,77 +49,38 @@ export class OperationalClousure {
   totalTransferAmount: number;
 
   @Prop({ type: Number })
-  totalDeliveryAmount: number;
-
-  @Prop({ type: Number })
-  totalDiners: number;
+  restaurantOrdersTotal: number;
 
   @Prop({ type: Number })
   finishedAccounts: number;
 
   @Prop({ type: Number })
-  togoOrdersTotal: number;
-
-  @Prop({ type: Number })
-  phoneOrdersTotal: number;
-
-  @Prop({ type: Number })
-  restaurantOrdersTotal: number;
-
-  @Prop({ type: Number })
-  rappiOrdersTotal: number;
+  totalDiners: number;
 
   @Prop({ type: Number })
   numberOfDiscounts: number;
 
-  @Prop({ type: String })
-  discountTotalAmount: string;
+  @Prop({ type: Array })
+  discountsData: any[];
 
   @Prop({ type: Number })
-  numberOfNotesWithDiscount: number;
-
-  @Prop({ type: String })
-  notesWithDiscountTotalAmount: string;
+  discountTotalAmount: number;
 
   @Prop({ type: Number })
-  numberOfproductsWithDiscount: number;
+  numberOfCourtesy: number;
 
-  @Prop({ type: String })
-  productsWithDiscountTotalAmount: string;
-
-  @Prop({ type: Number })
-  numberOfCourtesies: number;
-
-  @Prop({ type: String })
-  courtesiesTotalAmount: string;
+  @Prop({ type: Array })
+  courtesyData: any[];
+  /* Hasta aqui vamos solo nos falta agregar las cancelaciones 
+     y agregar la data por categorias agrupadas, esto no es prioridad
+     sin embargo se tendra que lanzar antes de llegar a produccion */
 
   @Prop({ type: Number })
-  numberOfNotesWithCourtesy: number;
-
-  @Prop({ type: String })
-  notesWithCourtesyTotalAmount: string;
-
-  @Prop({ type: Number })
-  numberOfproductsWithCourtesy: number;
-
-  @Prop({ type: String })
-  productsWithCourtesyTotalAmount: string;
+  courtesyTotalAmount: number;
 
   @Prop({ type: Number })
   numberOfCancellations: number;
 
-  @Prop({ type: String })
-  cancellationsTotalAmount: string;
-
   @Prop({ type: Number })
-  numberOfNotesWithCancellation: number;
-
-  @Prop({ type: String })
-  notesWithCancellationTotalAmount: string;
-
-  @Prop({ type: Number })
-  numberOfproductsWithCancellation: number;
-
-  @Prop({ type: String })
-  productsWithCancellationTotalAmount: string;
+  cancellationsTotalAmount: number;
 }

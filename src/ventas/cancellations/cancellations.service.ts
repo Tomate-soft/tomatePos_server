@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCancellationDto } from 'src/dto/ventas/cancellations/createCancellationDto';
@@ -27,7 +32,8 @@ export class CancellationsService {
     @InjectModel(Bills.name) private billsModel: Model<Bills>,
     @InjectModel(Notes.name) private notesModel: Model<Notes>,
     @InjectModel(Product.name) private productsModel: Model<Product>,
-    private operatingPeriodService: OperatingPeriodService,
+    @Inject(forwardRef(() => OperatingPeriodService))
+    private readonly operatingPeriodService: OperatingPeriodService,
   ) {}
 
   async findAll() {
@@ -246,11 +252,14 @@ export class CancellationsService {
     );
   }
 
-  async findCurrent() {
+  async findCurrent(id?: string) {
     const session = await this.cancellationModel.startSession();
     session.startTransaction();
     try {
-      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriod = id
+        ? await this.operatingPeriodService.getCurrent(id)
+        : await this.operatingPeriodService.getCurrent();
+
       const currentPeriodId = currentPeriod[0]._id;
 
       const currentCancellations = await this.cancellationModel.find({

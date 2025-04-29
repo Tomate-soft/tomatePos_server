@@ -37,6 +37,13 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
 
 @Module({
   imports: [
@@ -89,12 +96,25 @@ import {
         name: CashierSession.name,
         schema: CashierSessionSchema,
       },
+      {
+        name: Cancellations.name,
+        schema: CancellationSchema,
+      },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
     forwardRef(() => BillsModule),
   ],
-  providers: [CronService, OperatingPeriodService, DiscountsService],
+  providers: [
+    CronService,
+    OperatingPeriodService,
+    DiscountsService,
+    CancellationsService,
+  ],
   controllers: [CronController],
 })
 export class CronModule {}

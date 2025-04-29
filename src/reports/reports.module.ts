@@ -36,6 +36,11 @@ import {
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
+import { Cancellations } from 'src/schemas/ventas/cancellations.schema';
+import { CancellationReasonSchema } from 'src/schemas/ventas/cancellationReason.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
 
 @Module({
   imports: [
@@ -52,6 +57,11 @@ import { DiscountsService } from 'src/ventas/discounts/discounts.service';
       { name: Branch.name, schema: BranchSchema },
       { name: SourcePeriod.name, schema: SourcePeriodSchema },
       { name: Discount.name, schema: DiscountSchema },
+      { name: Cancellations.name, schema: CancellationReasonSchema },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
   ],
   controllers: [ReportsController],
@@ -61,6 +71,7 @@ import { DiscountsService } from 'src/ventas/discounts/discounts.service';
     OperatingPeriodService,
     ProcessService,
     DiscountsService,
+    CancellationsService,
   ],
 })
 export class ReportsModule {}
