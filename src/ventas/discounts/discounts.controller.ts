@@ -45,6 +45,20 @@ export class DiscountsController {
     }
   }
 
+  @Get('close/:id')
+  async closeId(@Param('id') id: string) {
+    try {
+      const discountsArray = await this.discountService.findCurrent(id);
+
+      if (!discountsArray) {
+        throw new NotFoundException('No se encontro el descuento');
+      }
+      return discountsArray;
+    } catch (error) {
+      throw new NotFoundException('Ha ocurrido algo inesperado');
+    }
+  }
+
   @Get(':id')
   /**
    * Retrieves a discount by its ID.

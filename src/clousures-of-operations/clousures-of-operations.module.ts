@@ -39,6 +39,13 @@ import { DiscountsService } from 'src/ventas/discounts/discounts.service';
 import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
 
 /**
  * Module for handling closures of operations.
@@ -61,6 +68,8 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
       { name: Discount.name, schema: DiscountSchema },
       { name: Notes.name, schema: NoteSchema },
       { name: Table.name, schema: TableSchema },
+      { name: Cancellations.name, schema: CancellationSchema },
+      { name: Product.name, schema: ProductSchema },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
@@ -73,6 +82,7 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
     OperatingPeriodService,
     UsersService,
     DiscountsService,
+    CancellationsService,
   ],
 })
 export class ClousuresOfOperationsModule {}

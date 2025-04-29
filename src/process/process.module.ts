@@ -37,6 +37,13 @@ import {
   CashierSession,
   CashierSessionSchema,
 } from 'src/schemas/cashierSession/cashierSession';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
 
 @Module({
   imports: [
@@ -86,6 +93,14 @@ import {
         name: CashierSession.name,
         schema: CashierSessionSchema,
       },
+      {
+        name: Cancellations.name,
+        schema: CancellationSchema,
+      },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
     forwardRef(() => BillsModule),
     forwardRef(() => OperatingPeriodModule),
@@ -96,6 +111,7 @@ import {
     OperatingPeriodService,
     BillsService,
     DiscountsService,
+    CancellationsService,
   ],
   exports: [ProcessService],
 })

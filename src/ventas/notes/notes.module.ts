@@ -38,6 +38,13 @@ import {
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { DiscountsService } from '../discounts/discounts.service';
+import { CancellationsService } from '../cancellations/cancellations.service';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
 
 @Module({
   imports: [
@@ -90,6 +97,14 @@ import { DiscountsService } from '../discounts/discounts.service';
         name: Discount.name,
         schema: DiscountSchema,
       },
+      {
+        name: Cancellations.name,
+        schema: CancellationSchema,
+      },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
@@ -101,6 +116,7 @@ import { DiscountsService } from '../discounts/discounts.service';
     OperatingPeriodService,
     TogoOrderService,
     DiscountsService,
+    CancellationsService,
   ],
 })
 export class NotesModule {}

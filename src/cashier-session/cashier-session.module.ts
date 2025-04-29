@@ -28,6 +28,13 @@ import { Discount, DiscountSchema } from 'src/schemas/ventas/discounts.schema';
 import { Bills, BillSchema } from 'src/schemas/ventas/bills.schema';
 import { Notes, NoteSchema } from 'src/schemas/ventas/notes.schema';
 import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
 
 @Module({
   imports: [
@@ -72,12 +79,25 @@ import { Table, TableSchema } from 'src/schemas/tables/tableSchema';
         name: Table.name,
         schema: TableSchema,
       },
+      {
+        name: Cancellations.name,
+        schema: CancellationSchema,
+      },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
     forwardRef(() => BillsModule),
   ],
   controllers: [CashierSessionController],
-  providers: [CashierSessionService, OperatingPeriodService, DiscountsService],
+  providers: [
+    CashierSessionService,
+    OperatingPeriodService,
+    DiscountsService,
+    CancellationsService,
+  ],
 })
 export class CashierSessionModule {}

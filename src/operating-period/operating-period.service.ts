@@ -12,6 +12,7 @@ import { BillsService } from 'src/ventas/bills/bills.service';
 import { SourcePeriod } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
 import { branchId } from 'src/variablesProvisionales';
 import { DiscountsService } from 'src/ventas/discounts/discounts.service';
+import { CancellationsService } from 'src/ventas/cancellations/cancellations.service';
 
 @Injectable()
 export class OperatingPeriodService {
@@ -27,6 +28,8 @@ export class OperatingPeriodService {
     private readonly billsService: BillsService,
     @Inject(forwardRef(() => DiscountsService))
     private readonly discountsService: DiscountsService,
+    @Inject(forwardRef(() => CancellationsService))
+    private readonly cancellationService: CancellationsService,
   ) {}
 
   async findAll() {
@@ -208,13 +211,28 @@ export class OperatingPeriodService {
         return a + b.diners;
       }, 0);
 
-      const discountArray =  await this.discountsService.findCurrent();
-      // const cancellationsArray = await this.cancellationsService.findCurrent(); //  Aca hay que armar todo para traer tambien las cancellaciones. el find current
-      //                                                                           // ya esta implementado y funciona bien.
+      const discountArray = await this.discountsService.findCurrent(id);
 
-      const discountTotal = discountArray.filter((discount) => !discount.discountType.startsWith("COURTESY"));
-      const courtesyTotal = discountArray.filter((discount) => discount.discountType.startsWith("COURTESY"));
-      
+      const cancellationsArray = await this.cancellationService.findCurrent();
+
+      const cancellationsTotalAmount = cancellationsArray
+        .reduce((a, b) => a + parseFloat(b.cancelledAmount), 0)
+        .toFixed(2);
+
+      const discountTotal = discountArray.filter(
+        (discount) => !discount.discountType.startsWith('COURTESY'),
+      );
+
+      const discountTotalAmount = discountTotal
+        .reduce((a, b) => a + parseFloat(b.totalDiscountQuantity), 0)
+        .toFixed(2);
+      const courtesyTotal = discountArray.filter((discount) =>
+        discount.discountType.startsWith('COURTESY'),
+      );
+
+      const courtesyTotalAmount = courtesyTotal
+        .reduce((a, b) => a + parseFloat(b.totalDiscountQuantity), 0)
+        .toFixed(2);
 
       // console.log(discountTotal);
 
@@ -259,9 +277,6 @@ export class OperatingPeriodService {
       const resumeData = {
         state: State.CLOSED,
         totalSellsAmount: totalSells, // Resumen de ventas
-        //////////////////////////////////////////
-        //// Ventas por tipo de venta   //////////
-        //////////////////////////////////////////
         totalRestaurantAmount: totalRestaurantSellsAmount, // Ventas por tipo de venta RESTAURANTE
         totalToGoOrdersAmount: totalToGoSellsAmount, // Ventas por tipo de venta PARA LLEVAR
         totalPhoneAmount: totalPhoneSellsAmount,
@@ -270,9 +285,6 @@ export class OperatingPeriodService {
         totalCashInAmount: totalCashSellsAmount,
         phoneOrdersTotal: totalPhoneSellsCount,
         rappiOrdersTotal: totalRappiSellsCount,
-        //////////////////////////////////////////
-        ///// Ventas por tipo de pago ////////////
-        //////////////////////////////////////////
         totalDebitAmount: totalDebitSellsAmount,
         totalCreditAmount: totalCreditSellsAmount,
         totalTransferAmount: totalTransferSellsAmount,
@@ -280,11 +292,15 @@ export class OperatingPeriodService {
         finishedAccounts: accountsBilled.length,
         totalDiners: totalDiners,
         numberOfDiscounts: discountTotal.length,
+        discountTotalAmount: discountTotalAmount,
         discountsData: discountTotal.map((item) => item.toObject()),
         numberOfCourtesy: courtesyTotal.length,
+        courtesyTotalAmount: courtesyTotalAmount,
         courtesyData: courtesyTotal.map((item) => item.toObject()),
+        numberOfCancellations: cancellationsArray.length,
+        cancellationsTotalAmount: cancellationsTotalAmount,
+        // cancellationsData: cancellationTotal.map((item) => item.toObject()),
       };
-      console.log(resumeData);
 
       const bills = await this.billsService.findCurrent(periodId);
       const periodDate = currentDate.toISOString();

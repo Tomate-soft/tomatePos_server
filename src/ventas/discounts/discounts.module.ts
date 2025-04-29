@@ -23,6 +23,13 @@ import {
   SourcePeriod,
   SourcePeriodSchema,
 } from 'src/schemas/SourcePeriod/sourcePeriod.schema';
+import { CancellationsService } from '../cancellations/cancellations.service';
+import {
+  Cancellations,
+  CancellationSchema,
+} from 'src/schemas/ventas/cancellations.schema';
+import { Product } from 'src/schemas/ventas/product.schema';
+import { ProductSchema } from 'src/schemas/catalogo/products.schema';
 
 @Module({
   imports: [
@@ -59,12 +66,20 @@ import {
         name: SourcePeriod.name,
         schema: SourcePeriodSchema,
       },
+      {
+        name: Cancellations.name,
+        schema: CancellationSchema,
+      },
+      {
+        name: Product.name,
+        schema: ProductSchema,
+      },
     ]),
     forwardRef(() => ProcessModule),
     forwardRef(() => OperatingPeriodModule),
     forwardRef(() => BillsModule),
   ],
   controllers: [DiscountsController],
-  providers: [DiscountsService, OperatingPeriodService],
+  providers: [DiscountsService, OperatingPeriodService, CancellationsService],
 })
 export class DiscountsModule {}

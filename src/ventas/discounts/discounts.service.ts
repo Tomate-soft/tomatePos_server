@@ -448,12 +448,16 @@ export class DiscountsService {
     }
   }
 
-  async findCurrent() {
+  async findCurrent(id?: string) {
     console.log('Aqui si llegue');
     const session = await this.discountModel.startSession();
     session.startTransaction();
+
     try {
-      const currentPeriod = await this.operatingPeriodService.getCurrent();
+      const currentPeriod = id
+        ? await this.operatingPeriodService.getCurrent(id)
+        : await this.operatingPeriodService.getCurrent();
+
       const currentPeriodId = currentPeriod[0]._id;
 
       const currentDiscounts = await this.discountModel.find({
