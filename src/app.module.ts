@@ -43,6 +43,7 @@ import { ProcessModule } from './process/process.module';
 import { BusinessModule } from './business/business.module';
 import { ReopenModule } from './reopen/reopen.module';
 import { AdditionsGroupModule } from './additions-group/additions-group.module';
+import { RewritePeriodModule } from './rewrite-period/rewrite-period.module';
 
 const uri =
   'mongodb+srv://tomatesoftadmin:Masqueunataqueria.2025@tomatesoft.mongocluster.cosmos.azure.com/dbtomatesoft?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000';
@@ -92,6 +93,7 @@ const uri =
     BusinessModule,
     ReopenModule,
     AdditionsGroupModule,
+    RewritePeriodModule,
   ],
   controllers: [],
   providers: [
