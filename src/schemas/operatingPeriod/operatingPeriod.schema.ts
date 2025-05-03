@@ -90,7 +90,7 @@ export class OperatingPeriod {
     },
     default: { init: false, amount: '$0.00' },
   })
-  cashIn?: CashIn;
+  cashIn: CashIn;
 
   // Aquí solo referenciamos la clase
   @Prop({ type: OperationalClousure })

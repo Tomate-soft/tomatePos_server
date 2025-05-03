@@ -64,6 +64,8 @@ export class OperatingPeriodService {
             { path: 'bills', populate: { path: 'discount' } },
           ],
         });
+
+      console.log(operatingPeriod);
       await session.commitTransaction();
       session.endSession();
       return [operatingPeriod];
