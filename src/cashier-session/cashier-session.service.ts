@@ -165,6 +165,7 @@ export class CashierSessionService {
       session.endSession();
       return newWithdraw;
     });
+    console.log(newWithdraw);
     return newWithdraw;
   }
 

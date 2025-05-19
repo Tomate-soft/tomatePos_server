@@ -57,6 +57,7 @@ export class SubcategoryOneService {
       session.endSession();
       return newCategory;
     } catch (error) {
+      console.log(error);
       await session.abortTransaction();
       session.endSession();
       console.error(error);
