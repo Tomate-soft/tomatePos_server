@@ -98,6 +98,7 @@ export class DiscountsService {
       .lean();
   }
   async create(payload: { accountApt: any; body: CreateDiscountDto }) {
+    console.log('payload', payload);
     const session = await this.discountModel.startSession();
     session.startTransaction();
     const operatingPeriod = await this.operatingPeriodService.getCurrent();
@@ -206,6 +207,7 @@ export class DiscountsService {
             newDiscountBill.accountId,
             { discount: newDiscountBill._id },
           );
+          console.log('pase por aqui');
           if (payload.body.discountType === COURTESY_APPLY_BILL) {
             const updateTable = await this.tableModel.findByIdAndUpdate(
               updatedBillDiscount.table,
@@ -214,9 +216,12 @@ export class DiscountsService {
 
             const currentPeriod: any =
               await this.operatingPeriodService.getCurrent();
-            const randomIndex = Math.floor(
-              Math.random() * currentPeriod[0].sellProcess.length,
-            );
+            const randomIndex =
+              currentPeriod[0].sellProcess.length === 1
+                ? 1
+                : Math.floor(
+                    Math.random() * currentPeriod[0].sellProcess.length,
+                  );
             const cashierSessionId =
               currentPeriod[0].sellProcess[randomIndex]._id;
             const selectSession =
