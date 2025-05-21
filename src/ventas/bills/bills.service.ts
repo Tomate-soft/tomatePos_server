@@ -92,11 +92,11 @@ export class BillsService {
     try {
       const lastBill = await this.billsModel
         .findOne({})
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1 })}
         .exec();
 
       const nextBillCode = lastBill
-        ? this.getNextBillCode(parseFloat(lastBill.code))
+        ? this.getNextBillCode(parseFloat(lastBill.code.slice(3)))
         : 1;
       const period = await this.operatingPeriodService.getCurrent();
       const { name, lastName, employeeNumber } = await this.userModel.findById(
