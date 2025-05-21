@@ -62,33 +62,6 @@ export class DiscountsService {
       });
   }
 
-  // async findAllCurrent(id?: string) {
-  //   const session = await this.operatingPeriod.startSession();
-  //   session.startTransaction();
-
-  //   try {
-  //     const currentPeriod = id
-  //       ? await this.operatingPeriodService.getCurrent(id)
-  //       : await this.operatingPeriodService.getCurrent();
-
-  //     return await this.discountModel
-  //       .find({ _id: currentPeriod[0]._id })
-  //       .populate({
-  //         path: 'accountId',
-  //       })
-  //       .populate({
-  //         path: 'discountByUser',
-  //       })
-  //       .populate({
-  //         path: 'noteAccountId',
-  //       });
-  //   } catch (error) {
-  //     await session.abortTransaction();
-  //     await session.endSession();
-  //     throw new NotFoundException('No se encontraron descuentos');
-  //   }
-  // }
-
   async findOne(id: string) {
     return await this.discountModel
       .findById(id)
@@ -194,36 +167,42 @@ export class DiscountsService {
           return newDiscountNote;
         case COURTESY_APPLY_BILL:
         case BILL_DISCOUNTS:
+          console.log('paso uno');
           const newDiscountBill =
             await this.discountModel.create(createDiscountData);
 
+          console.log('paso dos');
           if (!newDiscountBill) {
             await session.abortTransaction();
             session.endSession();
             throw new Error('No se pudo completar');
           }
 
+          console.log('paso tres');
           const updatedBillDiscount = await this.billsModel.findByIdAndUpdate(
             newDiscountBill.accountId,
             { discount: newDiscountBill._id },
           );
-          console.log('pase por aqui');
+          console.log('paso cuatro');
           if (payload.body.discountType === COURTESY_APPLY_BILL) {
+            console.log('paso cinco');
             const updateTable = await this.tableModel.findByIdAndUpdate(
               updatedBillDiscount.table,
               { status: FOR_PAYMENT_STATUS },
             );
-
+            console.log('paso seis');
             const currentPeriod: any =
               await this.operatingPeriodService.getCurrent();
             const randomIndex =
-              currentPeriod[0].sellProcess.length === 1
-                ? 1
+              currentPeriod[0].sellProcess.length <= 1
+                ? 0
                 : Math.floor(
                     Math.random() * currentPeriod[0].sellProcess.length,
                   );
+            console.log(`randomIndex: ${randomIndex}`);
             const cashierSessionId =
-              currentPeriod[0].sellProcess[randomIndex]._id;
+              currentPeriod[0].sellProcess[randomIndex]._id; // chequemos cada parte de esto
+            console.log(`cashierSessionId: ${cashierSessionId}`); 
             const selectSession =
               await this.cashierSessionModel.findById(cashierSessionId);
             const updatedSession =
@@ -233,12 +212,16 @@ export class DiscountsService {
                   bills: [...selectSession.bills, updatedBillDiscount._id],
                 },
               );
+              console.log('paso siete');
+              console.log(updatedSession);
+              console.log('paso ocho');
 
             const updateBill = await this.billsModel.findByIdAndUpdate(
               updatedBillDiscount._id,
-              { cashierSession: cashierSessionId },
+              { cashierSession: cashierSessionId, status: FOR_PAYMENT_STATUS },
               { new: true },
             );
+            console.log('paso final');
           }
           await session.commitTransaction();
           session.endSession();
