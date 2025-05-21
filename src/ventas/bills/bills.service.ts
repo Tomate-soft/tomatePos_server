@@ -92,7 +92,7 @@ export class BillsService {
     try {
       const lastBill = await this.billsModel
         .findOne({})
-        .sort({ createdAt: -1 })}
+        .sort({ createdAt: -1 })
         .exec();
 
       const nextBillCode = lastBill
