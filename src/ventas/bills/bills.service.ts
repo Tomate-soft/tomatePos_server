@@ -96,7 +96,7 @@ export class BillsService {
         .exec();
 
       const nextBillCode = lastBill
-        ? this.getNextBillCode(parseFloat(lastBill.code))
+        ? this.getNextBillCode(parseFloat(lastBill.code.slice(3)))
         : 1;
       const period = await this.operatingPeriodService.getCurrent();
       const { name, lastName, employeeNumber } = await this.userModel.findById(
