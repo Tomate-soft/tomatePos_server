@@ -14,7 +14,7 @@ export class DishesService {
 
   private generateNextCode(): string {
     const prefix = this.currentCode[0];
-    const numericPart = parseInt(this.currentCode.slice(1));
+    const numericPart = parseInt(this.currentCode.slice(3));
 
     if (numericPart < 99) {
       this.currentCode = `${prefix}${String(numericPart + 1).padStart(2, '0')}`;
@@ -41,6 +41,7 @@ export class DishesService {
       ...createDishes,
       code: this.generateNextCode(), // Automatically assign the code
     });
+    console.log(newDish);
     return await newDish.save();
   }
 
