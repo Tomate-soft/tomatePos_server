@@ -1,10 +1,4 @@
-import {
-  IsDefined,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsDefined, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class createProfileDto {
   @IsString()
@@ -15,6 +9,6 @@ export class createProfileDto {
   @IsString()
   @IsDefined()
   @IsNotEmpty()
-  @Length(1, 25)
+  @Length(1, 32)
   profileName: string;
 }

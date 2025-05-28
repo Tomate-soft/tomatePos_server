@@ -9,7 +9,7 @@ export class updateProfileDto {
 
   @IsString()
   @IsOptional()
-  @Length(1, 45)
+  @Length(1, 32)
   profileName?: string;
 
   @IsOptional()

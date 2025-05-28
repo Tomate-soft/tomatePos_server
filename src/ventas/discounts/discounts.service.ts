@@ -202,7 +202,7 @@ export class DiscountsService {
             console.log(`randomIndex: ${randomIndex}`);
             const cashierSessionId =
               currentPeriod[0].sellProcess[randomIndex]._id; // chequemos cada parte de esto
-            console.log(`cashierSessionId: ${cashierSessionId}`); 
+            console.log(`cashierSessionId: ${cashierSessionId}`);
             const selectSession =
               await this.cashierSessionModel.findById(cashierSessionId);
             const updatedSession =
@@ -212,9 +212,9 @@ export class DiscountsService {
                   bills: [...selectSession.bills, updatedBillDiscount._id],
                 },
               );
-              console.log('paso siete');
-              console.log(updatedSession);
-              console.log('paso ocho');
+            console.log('paso siete');
+            console.log(updatedSession);
+            console.log('paso ocho');
 
             const updateBill = await this.billsModel.findByIdAndUpdate(
               updatedBillDiscount._id,
