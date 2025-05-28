@@ -113,7 +113,7 @@ export class BillsService {
         user: `${name} ${lastName}`,
         userCode: employeeNumber.toString(),
         userId: createBill.user,
-        checkTotal: calculateBillTotal(createBill.products),
+        // checkTotal: calculateBillTotal(createBill.products),
         products: createBill.products,
         tableNum: tableNum,
         table: createBill.table,
