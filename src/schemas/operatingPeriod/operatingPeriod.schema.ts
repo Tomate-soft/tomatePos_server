@@ -4,6 +4,7 @@ import { Schema as MongooseSchema } from 'mongoose';
 import { CashierSession } from '../cashierSession/cashierSession';
 import { OperationalClousure } from './operationalClousure';
 import { User } from '../users.schema';
+import { CashWithdraw } from '../cashierSession/cashWithdraw';
 
 interface CashIn {
   init: boolean;
@@ -91,6 +92,14 @@ export class OperatingPeriod {
     default: { init: false, amount: '$0.00' },
   })
   cashIn: CashIn;
+
+  @Prop({
+    trim: true,
+    type: [{ type: MongooseSchema.Types.ObjectId, ref: 'CashWithdraw' }],
+    ref: 'CashWithdraw',
+    default: [],
+  })
+  moneyMovements: CashWithdraw[];
 
   // Aquí solo referenciamos la clase
   @Prop({ type: OperationalClousure })

@@ -144,9 +144,8 @@ export class CashierSessionService {
   // ver si hay dinero para realizar el retiro
   // ya que creamos el retiro lo metemos a la session del cajero
   async cashWithdrawal(body: createCashWithdrawDto) {
-    console.log(body);
-    // vamos a mover le mopdelo t los DTO
     const session = await this.cashierSessionModel.startSession();
+    const currentPeriod = await this.operatingPeriodService.getCurrent();
     const newWithdraw = await session.withTransaction(async () => {
       const currentSession = await this.cashierSessionModel.findById(
         body.sessionId,
@@ -161,11 +160,23 @@ export class CashierSessionService {
           new: true,
         },
       );
+
+      const periodUpdated = await this.operatingPeriodModel.findByIdAndUpdate(
+        currentPeriod[0]?._id,
+        {
+          moneyMovements: [...currentPeriod[0]?.moneyMovements, newWithdraw],
+        },
+      );
+
+      if (!periodUpdated) {
+        throw new NotFoundException(
+          'No se completo la actualizacion de usuario',
+        );
+      }
       await session.commitTransaction();
       session.endSession();
       return newWithdraw;
     });
-    console.log(newWithdraw);
     return newWithdraw;
   }
 
