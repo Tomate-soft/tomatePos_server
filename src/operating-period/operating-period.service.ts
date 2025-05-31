@@ -63,6 +63,9 @@ export class OperatingPeriodService {
             { path: 'bills', populate: { path: 'payment' } },
             { path: 'bills', populate: { path: 'discount' } },
           ],
+        })
+        .populate({
+          path: 'moneyMovements',
         });
 
       console.log(operatingPeriod);

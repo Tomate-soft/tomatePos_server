@@ -114,6 +114,8 @@ export class PaymentsService {
   async create(createdPayment: CreatePaymentDto) {
     const session = await this.paymentModel.startSession();
     session.startTransaction();
+    console.log('esto es lo que nos estan enviando');
+    console.log(createdPayment);
     try {
       const lastPaymentCode = await this.paymentModel
         .findOne({})
@@ -153,6 +155,20 @@ export class PaymentsService {
       const billCurrent = await this.billModel
         .findById(createdPayment.accountId)
         .populate({ path: 'payment' });
+      console.log(
+        'esta es la cuenta y con esta infoirmaciopn vamos a seguir con l afuncionalidad',
+      );
+      console.log(billCurrent);
+      const updatedUser = await this.userModel.findOneAndUpdate(
+        { employeeNumber: parseInt(billCurrent.userCode, 10) },
+        {
+          $push: {
+            tips: { $each: createdPayment.transactions || [] },
+          },
+        },
+        { new: true },
+      );
+
       const updatedBillData = {
         payment: [...billCurrent.payment, newPaymentCode._id],
         status: FINISHED_STATUS,

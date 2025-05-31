@@ -126,6 +126,7 @@ export class BillsService {
       await billToCreate.save();
       return billToCreate;
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
@@ -182,7 +183,7 @@ export class BillsService {
     session.startTransaction();
 
     // receiving data
-    const receivingProducts = body.receivingBill.products; // ✅
+    const receivingProducts = body.receivingBill.products;
 
     const receivingUpdate = {
       products: receivingProducts,
@@ -321,7 +322,7 @@ export class BillsService {
           return updateReceivingBillToNoteCase;
 
         case NOTE_TO_BILL:
-          console.log('Ultimo metodo funciona'); ////////////////
+          console.log('Ultimo metodo funciona');
           const currentReceivingNoteToBill =
             await this.billsModel.findByIdAndUpdate(
               body.receivingBill._id,
