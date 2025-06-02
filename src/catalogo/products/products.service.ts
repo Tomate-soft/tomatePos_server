@@ -21,10 +21,13 @@ export class ProductsService {
   ) {}
 
   async findAll() {
-    return this.productsModel.find().populate({
-      path: 'group',
-      populate: [{ path: 'modifiers' }, { path: 'dishes' }],
-    });
+    return this.productsModel
+      .find()
+      .populate({
+        path: 'group',
+        populate: [{ path: 'modifiers' }, { path: 'dishes' }],
+      })
+      .lean();
   }
 
   async create(createdProduct: CreateProductDto) {

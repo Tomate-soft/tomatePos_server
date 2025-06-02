@@ -149,14 +149,6 @@ export class ClousuresOfOperationsService {
       ...phonePayments,
     ];
 
-    // VAMOS A REVISAR LAS TRANSACTIONS  EN EL FRONTEND PARA VER COMO FUNCIONA
-    // vamos a apliocar filter a concentratedPayments para que solo nos devuelva los valores que sean de tipo efectivo
-    // necesitamos las transaciones concentrarlas en un solo array para filtr carlas, elas transacciones dentro de los paymenmts, estan diferenciadas por el tipo de pago
-    // luego sumaremos cada una para lograr las cantidad a pedir
-    // ya teniando el array vamos a filtrar cada uno por "cash", "debit", "credit", "transfer"
-    // y sumaremos cada uno de los valores para obtener el total de cada uno y lo guardaremos en una variable para luego pasarlo al reporte
-    // por ejemplo si tenemos un array de pagos de la siguiente manera
-
     const totalWithdraws = currentSession.cashWithdraw.reduce(
       (acc, current) => parseFloat(current.quantity) + acc,
       0,
@@ -170,7 +162,8 @@ export class ClousuresOfOperationsService {
     const totalDebit = calculateTotalByType(requestCash, 'debit');
     const totalCredit = calculateTotalByType(requestCash, 'credit');
     const totalTransfer = calculateTotalByType(requestCash, 'transfer');
-    const total = totalCash + totalDebit + totalCredit + totalTransfer;
+    const totalQr = calculateTotalByType(requestCash, 'qr');
+    const total = totalCash + totalDebit + totalCredit + totalTransfer + totalQr;
 
     // Summary totals
     // Summary cash    total de las ventas del efetivo -
