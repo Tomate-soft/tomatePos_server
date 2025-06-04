@@ -1,0 +1,27 @@
+# Control de versiones
+.git
+.gitignore
+.github
+
+
+# Carpetas que no van en producción
+node_modules
+src
+uploads
+
+# Archivos de configuración y desarrollo
+.eslintrc.js
+.prettierrc
+.nvmrc
+nest-cli.json
+
+# Archivos de logs y temporales
+*.log
+*.tsbuildinfo
+
+# Archivos de configuración del proyecto (solo para desarrollo)
+dockerfile
+render.yml
+
+# Archivos de lock que no necesitas si instalas deps en contenedor
+package-lock.json
