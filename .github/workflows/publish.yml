@@ -1,5 +1,4 @@
 name: publish
-
 on:
   push:
     branches: ["hostinguer"]
@@ -11,24 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Login to GitHub Container Registry
+      - name: Login to Github Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN_CD }}
-
       - name: Build and push Docker image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/tomatepos
-          VERSION=${{ github.sha }}
+          docker build . --tag ghcr.io/${{ github.actor }}/tomatepos:${{ github.sha }}
+          docker push ghcr.io/${{ github.actor }}/tomatepos:${{ github.sha }}
+      
 
-          docker build -t $IMAGE_ID:$VERSION .
-          docker tag $IMAGE_ID:$VERSION $IMAGE_ID:latest
-
-          docker push $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:latest
-
+  
+        
+      
       
        
