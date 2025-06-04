@@ -1,9 +1,9 @@
 name: publish
 on:
   push:
-    branches: ["hostinguer"]
+    branches: ["hostinger"]
   pull_request:
-    branches: ["hostinguer"]
+    branches: ["hostinger"]
 
 jobs:
   create-docker-image:
