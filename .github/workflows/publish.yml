@@ -14,7 +14,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: Tomate-soft
+          username: ${{ github.actor }}
           password: ${{ secrets.TOKEN_CD }}
       - name: Build and push Docker image
         run: |
