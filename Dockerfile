@@ -14,7 +14,6 @@ EXPOSE 3000
 
 CMD ["npm", "run", "start:prod"]
 
-## update worwflow redeploy???
   
 #Flujo multistage para usar imagenes distroless
 # FROM node:24-slim AS builder

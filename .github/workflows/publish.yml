@@ -10,20 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Login to Github Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN_CD }}
+
       - name: Build and push Docker image
         run: |
           docker build . --tag ghcr.io/tomate-soft/tomatesoft_server:latest
           docker push ghcr.io/tomate-soft/tomatesoft_server:latest
-      
 
-  
-        
-      
-      
-       
+      - name: Trigger deploy in Dockploy
+        run: |
+          curl -X POST ${{ secrets.DOCKPLOY_WEBHOOK_URL }}
