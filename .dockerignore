@@ -6,7 +6,6 @@
 
 # Carpetas que no van en producción
 node_modules
-src
 uploads
 
 # Archivos de configuración y desarrollo
